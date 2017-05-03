@@ -324,7 +324,7 @@ as uint16 values (thus a value of type Color occupies 2 bytes in the byte stream
 
 ~~~
 enum : uint16 {
-        Red(1234),
+        Red(0x1234),
         Green(9),
         Blue(60000)
 } Color;
@@ -376,5 +376,70 @@ struct {
 
 This section describes protocol types and constants.
 
-(TODO)
+## Common Message Header
+
+~~~
+enum : uint8 {
+        client_init(0x01),
+        server_init_and_attest(0x02),
+        client_id_client_attest_no_response_payload(0x11),
+        client_id_client_attest_response_no_payload(0x12),
+        client_id_client_attest_response_payload(0x13),
+        client_id_server_finished(0x14),
+        session_client_attest_no_response_payload(0x21),
+        session_client_attest_response_no_payload(0x22),
+        session_client_attest_response_payload(0x23),
+        session_server_finished(0x24),
+        record_regular(0x31),
+        alert(0x41)
+} MsgType;
+~~~
+
+~~~
+enum : uint8 {
+        one(1)
+} Version;
+~~~
+
+## Handshakes
+
+~~~
+enum : uint16 {
+        x25519_epid2_chacha20poly1305_sha512(1),
+        x25519_epid2_chacha20poly1305_blake2b(2),
+        x25519_epid2_aes256gcm_sha512(3),
+        x25519_epid2_aes256gcm_blake2b(4),
+        x25519_epid2_null_sha512(5),
+        x25519_epid2_null_blake2b(6)
+} SuiteSpec;
+~~~
+
+~~~
+byte SessionIDSeed[8];
+~~~
+
+~~
+byte SigningNonce[32];
+~~~
+
+## Record Layer
+
+~~~
+byte SessionID[16];
+~~~
+
+~~~
+uint32 SequenceNumber;
+~~~
+
+~~~
+uint16 MsgLength;
+~~~
+
+~~~
+enum : uint8 {
+        queue_protocol(1),
+        ipv6(2)
+} EncapsulatedPayloadType;
+~~~
 
