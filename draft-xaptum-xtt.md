@@ -243,6 +243,135 @@ comprehension. Messages which are sent only sometimes are indicated in
 
 (TODO)
 
+# Presentation Language
+
+## Miscellaneous
+Comments begin with "/\*" and end with "\*/".
+
+To indicate the number of bytes taken up in the byte stream
+by a type or value, the expression `sizeof(value-or-type)` is used.
+
+Optional components are denoted by enclosing them in "[[ ]]" double
+brackets.
+
+## Definition of Byte
+One byte is defined to be 8 bits.
+Multiple-byte data items are concatenations of bytes, from left to right, from top to
+bottom.
+
+## Byte Arrays
+A byte-array is a single-dimensional array of bytes of given fixed length.
+The syntax for specifying a new type, `T’`, that is a
+byte-array of length `n` is
+
+~~~
+byte T’[n];
+~~~
+
+Here, `T’` occupies `n` bytes in the data stream.
+The length of the vector is not included in the
+encoded stream.
+
+Unless defined as a numeric data type, the bytes comprising
+a byte-array are not to be interpreted by the protocol in any way.
+
+## Numeric Data
+A type defined as an n-byte numeric value
+indicates that the byte stream
+is interpreted (using C notation) as:
+
+~~~
+numeric_value = (byte[0] << 8*(n-1)) | (byte[1] << 8*(n-2)) |
+        ... | byte[n-1];
+~~~
+
+This byte ordering for multi-byte values is the commonplace network
+byte order or big-endian format.
+The pre-defined numeric types uint8, uint16, uint32, and uint64 are defined as
+
+~~~
+byte uint8[1];
+byte uint16[2];
+byte uint32[4];
+byte uint64[8];
+~~~
+
+For example, the uint32 value given by the bytestream
+`01 02 03 04` is interpreted as the decimal value 16909060.
+
+## Enumerateds
+To indicate a type that may take values only from
+a fixed set of possible values, a new type may be defined
+as of type `enum`.
+Each definition of an enumerated type is a different type.
+Only enumerateds of the same type may be assigned or compared.
+Every element of an enumerated must be assigned a value.
+
+The possible values of an enumerated type are specified in this
+document using numeric values.
+To indicate how to interpret a value of an enumerated type,
+and to indicate how much space in the byte stream is occupied
+by an enumerated type, the definition of the enumerated type includes
+the underlying numeric type used to define its values.
+
+Implementations that receive a value of an enumerated type that is not
+in the set of possible values for that type MUST reject the containing
+message and handle the error as specified for that message type.
+
+The following example defines an enumerated type called Color
+that has three possible values, which are represented in the byte stream
+as uint16 values (thus a value of type Color occupies 2 bytes in the byte stream)
+
+~~~
+enum : uint16 {
+        Red(1234),
+        Green(9),
+        Blue(60000)
+} Color;
+~~~
+
+The names of the elements of an enumerated type are scoped within
+the defined type, and a reference in this document
+to the value of a name is always
+given by the fully-qualified form `Type.Name`.
+Thus a reference to the `Color` value `Blue` from above is given by `Color.Blue`.
+
+## Constructed Types
+Complex types may be constructed from primitive types, using
+the `struct` construction.
+Each constructed type defines a new type.
+
+The following example defines a constructed type called `T`, which comprises
+two subfields `f1` and `f2`
+
+~~~
+struct {
+        T1 f1;
+        T2 f2;
+} T;
+~~~
+
+A value of type `T` would occupy a total of `sizeof(T1) + sizeof(T2)` bytes in the byte stream.
+
+Subfields of a constructed type are referenced in this document by
+`Type.subfield` when referring to the field in the general type `Type`,
+and by `name.subfield` when referring to the field in a specific value named `name`.
+Thus, the value of the subfield `f2`
+in a value called `foo` of type `T`, from the example above, would be
+referenced as `foo.f1`.
+
+## Constants
+Fields and variables may be assigned a fixed value using `=`.
+In the following example, all values of type `T` would always have
+`T.c` equal to `Color.Blue`
+
+~~~
+struct {
+        Color c = Color.Blue;
+        T2 f2;
+} T;
+~~~
+
 # Protocol Data Structures and Constant Values
 
 This section describes protocol types and constants.
