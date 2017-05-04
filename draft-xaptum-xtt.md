@@ -537,6 +537,32 @@ select(server_signature_algorithm) {
 } ServerSignature;
 ~~~
 
+### DAA Types
+
+~~~
+select(dh_algorithm) {
+        case x25519_epid2_chacha20poly1305_sha512:
+        case x25519_epid2_chacha20poly1305_blake2b:
+        case x25519_epid2_aes256gcm_sha512:
+        case x25519_epid2_aes256gcm_blake2b:
+        case x25519_epid2_null_sha512:
+        case x25519_epid2_null_blake2b:
+                byte[320];
+} DAAGroupKey;
+~~~
+
+~~~
+select(dh_algorithm) {
+        case x25519_epid2_chacha20poly1305_sha512:
+        case x25519_epid2_chacha20poly1305_blake2b:
+        case x25519_epid2_aes256gcm_sha512:
+        case x25519_epid2_aes256gcm_blake2b:
+        case x25519_epid2_null_sha512:
+        case x25519_epid2_null_blake2b:
+                byte[128];
+} DAASignature;
+~~~
+
 ### Server Certificates
 
 ~~~
