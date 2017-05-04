@@ -526,7 +526,7 @@ Comments begin with "/\*" and end with "\*/".
 To indicate the number of bytes taken up in the byte stream
 by a type or value, the expression `sizeof(value-or-type)` is used.
 
-Optional components are denoted by enclosing them in "[[ ]]" double
+Optional components are denoted by enclosing them in `[[ ]]` double
 brackets.
 
 ## Definition of Byte
