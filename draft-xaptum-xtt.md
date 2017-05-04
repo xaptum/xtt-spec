@@ -272,6 +272,10 @@ Here, `Tp` occupies `n` bytes in the data stream.
 The length of the vector is not included in the
 encoded stream.
 
+An anonymous byte array is specified by not including a new
+type name: `byte[n]` indicates space of n bytes in the byte stream.
+This is useful for constructed and variant types.
+
 Unless defined as a numeric data type, the bytes comprising
 a byte-array are not to be interpreted by the protocol in any way.
 
