@@ -463,8 +463,99 @@ enum : uint16 {
 byte SessionIDSeed[8];
 ~~~
 
-~~
+~~~
 byte SigningNonce[32];
+~~~
+
+~~~
+byte ServerCookie[130];
+~~~
+
+~~~
+byte ClientID[16];
+~~~
+
+~~~
+byte LongtermSecret[64];
+~~~
+
+~~~
+select(dh_algorithm) {
+        case x25519_epid2_chacha20poly1305_sha512:
+        case x25519_epid2_chacha20poly1305_blake2b:
+        case x25519_epid2_aes256gcm_sha512:
+        case x25519_epid2_aes256gcm_blake2b:
+        case x25519_epid2_null_sha512:
+        case x25519_epid2_null_blake2b:
+                byte[32];
+} DHKeyShare;
+~~~
+
+~~~
+enum : uint8 {
+        Ed25519(1)
+} ServerSignatureType;
+~~~
+
+~~~
+select(server_signature_algorithm) {
+        case Ed25519:
+                byte[32];
+} ServerSignature;
+~~~
+
+### Server Certificates
+
+~~~
+enum : uint8 {
+        one(1)
+} ServerCertificateVersion;
+~~~
+
+~~~
+byte Date[8];   /* YYYYMMDD according to UTC */
+~~~
+
+~~~
+struct {
+        ServerCertificateVersion version;
+        ServerSignatureType algorithm;
+        Date expiry;
+        ClientID id;
+        ServerSignature signature;
+        ServerIntermediateCertificate signers_certificate;
+        ServerSignature signers_signature;
+} ServerCertificate;
+~~~
+
+~~~
+struct {
+        ServerSignatureVersion version;
+        ServerSignatureType algorithm;
+        Date expiry;
+        select(algorithm) {
+                case ServerSignatureType.Ed25519:
+                        byte[32];
+        } public_key;
+        byte root_id[32];       /* ServerRootCertificate to use */
+        select(root_certificate.algorithm) {
+                case ServerSignatureType.Ed25519:
+                        byte[64];
+        } root_signature;
+} ServerIntermediateCertificate;
+~~~
+
+~~~
+struct {
+        ServerSignatureVersion version;
+        ServerSignatureType algorithm;
+        Date expiry;
+        select(algorithm) {
+                case ServerSignatureType.Ed25519:
+                        byte[32];
+        } public_key;
+        byte id[32];
+} ServerRootCertificate;
 ~~~
 
 ## Record Layer
