@@ -217,12 +217,12 @@ Structure of this message:
 
 ~~~
 struct {
-        MsgType type = client_init;
-        Version version;
-        SuiteSpec spec;
-        SessionIDSeed client_id_seed;
-        SigningNonce client_nonce;
-        DHKeyShare client_dh_keyshare;
+    MsgType type = client_init;
+    Version version;
+    SuiteSpec spec;
+    SessionIDSeed client_id_seed;
+    SigningNonce client_nonce;
+    DHKeyShare client_dh_keyshare;
 } ClientInit;
 ~~~
 
@@ -234,16 +234,16 @@ Structure of this message:
 
 ~~~
 aead_struct<handshake_keys>(
-        MsgType type = server_init_and_attest;
-        Version version;
-        SuiteSpec spec;
-        SessionIDSeed client_id_seed;   /* echo from client */
-        DHKeyShare server_dh_keyshare;
+    MsgType type = server_init_and_attest;
+    Version version;
+    SuiteSpec spec;
+    SessionIDSeed client_id_seed;   /* echo from client */
+    DHKeyShare server_dh_keyshare;
 )[
-        ServerCertificate certificate;
-        SessionIDSeed server_id_seed;
-        ServerSignature server_signature;
-        ServerCookie server_cookie;
+    ServerCertificate certificate;
+    SessionIDSeed server_id_seed;
+    ServerSignature server_signature;
+    ServerCookie server_cookie;
 ] ServerInitAndAttest;
 ~~~
 
@@ -253,109 +253,109 @@ aead_struct<handshake_keys>(
 
 ~~~
 struct {
-        aead_struct<handshake_keys>(
-                MsgType type =
-                        MsgType.id_clientattest_noresponse_payload_ip;
-                Version version;
-                SuiteSpec spec;
-                DHKeyShare server_dh_keyshare;  /* echo from server */
-                ServerCookie server_cookie;     /* echo from server */
-        }[
-                DAAGroupKey daa_gpk;
-                ClientID id;
-                DAASignature signature;
-        ];
-        aead_struct<session_keys>(
-                MsgLength length;               /* total length */
-        )[
-                EncapsulatedPayloadType payload_type;
-                byte payload[length - sizeof(rest_of_message)];
-        ];
+    aead_struct<handshake_keys>(
+        MsgType type =
+                MsgType.id_clientattest_noresponse_payload_ip;
+        Version version;
+        SuiteSpec spec;
+        DHKeyShare server_dh_keyshare;  /* echo from server */
+        ServerCookie server_cookie;     /* echo from server */
+    }[
+        DAAGroupKey daa_gpk;
+        ClientID id;
+        DAASignature signature;
+    ];
+    aead_struct<session_keys>(
+        MsgLength length;               /* total length */
+    )[
+        EncapsulatedPayloadType payload_type;
+        byte payload[length - sizeof(rest_of_message)];
+    ];
 } ClientIdentity_ClientAttest_NoResponsePayloadIP;
 ~~~
 
 ~~~
 aead_struct<handshake_keys>(
-        MsgType type = 
-                MsgType.id_clientattest_response_nopayload_ip;
-        Version version;
-        SuiteSpec spec;
-        DHKeyShare server_dh_keyshare;  /* echo from server */
-        ServerCookie server_cookie;     /* echo from server */
+    MsgType type = 
+        MsgType.id_clientattest_response_nopayload_ip;
+    Version version;
+    SuiteSpec spec;
+    DHKeyShare server_dh_keyshare;  /* echo from server */
+    ServerCookie server_cookie;     /* echo from server */
 }[
-        DAAGroupKey daa_gpk;
-        ClientID id;
-        DAASignature signature;
+    DAAGroupKey daa_gpk;
+    ClientID id;
+    DAASignature signature;
 ] ClientIdentity_ClientAttest_ResponseNoPayloadIP;
 ~~~
 
 ~~~
 struct {
-        aead_struct<handshake_keys>(
-                MsgType type =
-                        MsgType.id_clientattest_response_payload_ip;
-                Version version;
-                SuiteSpec spec;
-                DHKeyShare server_dh_keyshare;  /* echo from server */
-                ServerCookie server_cookie;     /* echo from server */
-        }[
-                DAAGroupKey daa_gpk;
-                ClientID id;
-                DAASignature signature;
-        ];
-        aead_struct<session_keys>(
-                MsgLength length;               /* total length */
-        )[
-                EncapsulatedPayloadType payload_type;
-                byte payload[length - sizeof(rest_of_message)];
-        ];
+    aead_struct<handshake_keys>(
+        MsgType type =
+            MsgType.id_clientattest_response_payload_ip;
+        Version version;
+        SuiteSpec spec;
+        DHKeyShare server_dh_keyshare;  /* echo from server */
+        ServerCookie server_cookie;     /* echo from server */
+    }[
+        DAAGroupKey daa_gpk;
+        ClientID id;
+        DAASignature signature;
+    ];
+    aead_struct<session_keys>(
+        MsgLength length;               /* total length */
+    )[
+        EncapsulatedPayloadType payload_type;
+        byte payload[length - sizeof(rest_of_message)];
+    ];
 } ClientIdentity_ClientAttest_ResponsePayloadIP;
 ~~~
 
 ~~~
 aead_struct<handshake_keys>(
-        MsgType type =
-                MsgType.id_clientattest_response_nopayload_noip;
-        Version version;
-        SuiteSpec spec;
-        DHKeyShare server_dh_keyshare;  /* echo from server */
-        ServerCookie server_cookie;     /* echo from server */
+    MsgType type =
+        MsgType.id_clientattest_response_nopayload_noip;
+    Version version;
+    SuiteSpec spec;
+    DHKeyShare server_dh_keyshare;  /* echo from server */
+    ServerCookie server_cookie;     /* echo from server */
 }[
-        DAAGroupKey daa_gpk;
-        DAASignature signature;
+    DAAGroupKey daa_gpk;
+    DAASignature signature;
 ] ClientIdentity_ClientAttest_ResponseNoPayloadNoIP;
 ~~~
 
 ~~~
 struct {
-        aead_struct<handshake_keys>(
-                MsgType type = 
-                        MsgType.id_clientattest_response_payload_noip;
-                Version version;
-                SuiteSpec spec;
-                DHKeyShare server_dh_keyshare;  /* echo from server */
-                ServerCookie server_cookie;     /* echo from server */
-        }[
-                DAAGroupKey daa_gpk;
-                DAASignature signature;
-        ];
-        aead_struct<session_keys>(
-                MsgLength length;               /* total length */
-        )[
-                EncapsulatedPayloadType payload_type;
-                byte payload[length - sizeof(rest_of_message)];
-        ];
+    aead_struct<handshake_keys>(
+        MsgType type = 
+                MsgType.id_clientattest_response_payload_noip;
+        Version version;
+        SuiteSpec spec;
+        DHKeyShare server_dh_keyshare;  /* echo from server */
+        ServerCookie server_cookie;     /* echo from server */
+    }[
+        DAAGroupKey daa_gpk;
+        DAASignature signature;
+    ];
+    aead_struct<session_keys>(
+        MsgLength length;               /* total length */
+    )[
+        EncapsulatedPayloadType payload_type;
+        byte payload[length - sizeof(rest_of_message)];
+    ];
 } ClientIdentity_ClientAttest_ResponsePayloadNoIP;
 ~~~
 
 ~~~
 aead_struct<session_keys>(
-        MsgType type = MsgType.id_serverfinished;
-        Version version;
-        SuiteSpec spec;
+    MsgType type = MsgType.id_serverfinished;
+    Version version;
+    SuiteSpec spec;
 )[
-        ClientID client_id;     /* confirm id of client */
-        FinishedContext ctx;
+    ClientID client_id;     /* confirm id of client */
+    FinishedContext ctx;
 ];
 ~~~
 
@@ -365,108 +365,108 @@ aead_struct<session_keys>(
 
 ~~~
 struct {
-        aead_struct<handshake_keys>(
-                MsgType type =
-                        MsgType.session_clientattest_noresponse_payload_ip;
-                Version version;
-                SuiteSpec spec;
-                DHKeyShare server_dh_keyshare;  /* echo from server */
-                ServerCookie server_cookie;     /* echo from server */
-        }[
-                DAAGroupKey daa_gpk;
-                ClientID id;
-                DAASignature signature;
-        ];
-        aead_struct<MsgType.session_keys>(
-                MsgLength length;               /* total length */
-        )[
-                EncapsulatedPayloadType payload_type;
-                byte payload[length - sizeof(rest_of_message)];
-        ];
+    aead_struct<handshake_keys>(
+        MsgType type =
+            MsgType.session_clientattest_noresponse_payload_ip;
+        Version version;
+        SuiteSpec spec;
+        DHKeyShare server_dh_keyshare;  /* echo from server */
+        ServerCookie server_cookie;     /* echo from server */
+    }[
+        DAAGroupKey daa_gpk;
+        ClientID id;
+        DAASignature signature;
+    ];
+    aead_struct<MsgType.session_keys>(
+        MsgLength length;               /* total length */
+    )[
+        EncapsulatedPayloadType payload_type;
+        byte payload[length - sizeof(rest_of_message)];
+    ];
 } MsgType.session_ClientAttest_NoResponsePayloadIP;
 ~~~
 
 ~~~
 aead_struct<handshake_keys>(
-        MsgType type = 
-                MsgType.session_clientattest_response_nopayload_ip;
-        Version version;
-        SuiteSpec spec;
-        DHKeyShare server_dh_keyshare;  /* echo from server */
-        ServerCookie server_cookie;     /* echo from server */
+    MsgType type = 
+        MsgType.session_clientattest_response_nopayload_ip;
+    Version version;
+    SuiteSpec spec;
+    DHKeyShare server_dh_keyshare;  /* echo from server */
+    ServerCookie server_cookie;     /* echo from server */
 }[
-        DAAGroupKey daa_gpk;
-        ClientID id;
-        DAASignature signature;
+    DAAGroupKey daa_gpk;
+    ClientID id;
+    DAASignature signature;
 ] MsgType.session_ClientAttest_ResponseNoPayloadIP;
 ~~~
 
 ~~~
 struct {
-        aead_struct<handshake_keys>(
-                MsgType type =
-                        MsgType.session_clientattest_response_payload_ip;
-                Version version;
-                SuiteSpec spec;
-                DHKeyShare server_dh_keyshare;  /* echo from server */
-                ServerCookie server_cookie;     /* echo from server */
-        }[
-                DAAGroupKey daa_gpk;
-                ClientID id;
-                DAASignature signature;
-        ];
-        aead_struct<MsgType.session_keys>(
-                MsgLength length;               /* total length */
-        )[
-                EncapsulatedPayloadType payload_type;
-                byte payload[length - sizeof(rest_of_message)];
-        ];
+    aead_struct<handshake_keys>(
+        MsgType type =
+            MsgType.session_clientattest_response_payload_ip;
+        Version version;
+        SuiteSpec spec;
+        DHKeyShare server_dh_keyshare;  /* echo from server */
+        ServerCookie server_cookie;     /* echo from server */
+    }[
+        DAAGroupKey daa_gpk;
+        ClientID id;
+        DAASignature signature;
+    ];
+    aead_struct<MsgType.session_keys>(
+        MsgLength length;               /* total length */
+    )[
+        EncapsulatedPayloadType payload_type;
+        byte payload[length - sizeof(rest_of_message)];
+    ];
 } MsgType.session_ClientAttest_ResponsePayloadIP;
 ~~~
 
 ~~~
 aead_struct<handshake_keys>(
-        MsgType type =
-                MsgType.session_clientattest_response_nopayload_noip;
-        Version version;
-        SuiteSpec spec;
-        DHKeyShare server_dh_keyshare;  /* echo from server */
-        ServerCookie server_cookie;     /* echo from server */
+    MsgType type =
+        MsgType.session_clientattest_response_nopayload_noip;
+    Version version;
+    SuiteSpec spec;
+    DHKeyShare server_dh_keyshare;  /* echo from server */
+    ServerCookie server_cookie;     /* echo from server */
 }[
-        DAAGroupKey daa_gpk;
-        DAASignature signature;
+    DAAGroupKey daa_gpk;
+    DAASignature signature;
 ] MsgType.session_ClientAttest_ResponseNoPayloadNoIP;
 ~~~
 
 ~~~
 struct {
-        aead_struct<handshake_keys>(
-                MsgType type = 
-                        MsgType.session_clientattest_response_payload_noip;
-                Version version;
-                SuiteSpec spec;
-                DHKeyShare server_dh_keyshare;  /* echo from server */
-                ServerCookie server_cookie;     /* echo from server */
-        }[
-                DAAGroupKey daa_gpk;
-                DAASignature signature;
-        ];
-        aead_struct<MsgType.session_keys>(
-                MsgLength length;               /* total length */
-        )[
-                EncapsulatedPayloadType payload_type;
-                byte payload[length - sizeof(rest_of_message)];
-        ];
+    aead_struct<handshake_keys>(
+        MsgType type = 
+            MsgType.session_clientattest_response_payload_noip;
+        Version version;
+        SuiteSpec spec;
+        DHKeyShare server_dh_keyshare;  /* echo from server */
+        ServerCookie server_cookie;     /* echo from server */
+    }[
+        DAAGroupKey daa_gpk;
+        DAASignature signature;
+    ];
+    aead_struct<MsgType.session_keys>(
+        MsgLength length;               /* total length */
+    )[
+        EncapsulatedPayloadType payload_type;
+        byte payload[length - sizeof(rest_of_message)];
+    ];
 } MsgType.session_ClientAttest_ResponsePayloadNoIP;
 ~~~
 
 ~~~
 aead_struct<MsgType.session_keys>(
-        MsgType type = MsgType.session_serverfinished;
-        Version version;
-        SuiteSpec spec;
+    MsgType type = MsgType.session_serverfinished;
+    Version version;
+    SuiteSpec spec;
 )[
-        FinishedContext ctx;
+    FinishedContext ctx;
 ];
 ~~~
 
@@ -603,9 +603,9 @@ as uint16 values (thus a value of type Color occupies 2 bytes in the byte stream
 
 ~~~
 enum : uint16 {
-        Red(0x1234),
-        Green(9),
-        Blue(60000)
+    Red(0x1234),
+    Green(9),
+    Blue(60000)
 } Color;
 ~~~
 
@@ -625,8 +625,8 @@ two subfields `f1` and `f2`
 
 ~~~
 struct {
-        T1 f1;
-        T2 f2;
+    T1 f1;
+    T2 f2;
 } T;
 ~~~
 
@@ -647,15 +647,15 @@ the following notation is used:
 
 ~~~
 aead_struct<key_set>(
-        addl1;
-        addl2;
-        ...
-        addlN;
+    addl1;
+    addl2;
+    ...
+    addlN;
 )[
-        enc1;
-        enc2;
-        ...
-        encN;
+    enc1;
+    enc2;
+    ...
+    encN;
 ] T;
 ~~~
 
@@ -674,8 +674,8 @@ In the following example, all values of type `T` would always have
 
 ~~~
 struct {
-        Color c = Color.Blue;
-        T2 f2;
+    Color c = Color.Blue;
+    T2 f2;
 } T;
 ~~~
 
@@ -699,13 +699,13 @@ For example:
 uint8 SubT1;
 uint16 SubT2;
 struct {
-        select (color_in) {
-                case Color.Red:
-                        SubT1;
-                case Color.Green:
-                case Color.Blue:
-                        SubT2;
-        } variant_field;
+    select (color_in) {
+        case Color.Red:
+            SubT1;
+        case Color.Green:
+        case Color.Blue:
+            SubT2;
+    } variant_field;
 } VariantStruct;
 ~~~
 
@@ -728,28 +728,28 @@ This section describes protocol types and constants.
 
 ~~~
 enum : uint8 {
-        client_init(0x01),
-        server_init_and_attest(0x02),
-        id_clientattest_noresponse_payload_ip(0x11),
-        id_clientattest_response_nopayload_ip(0x12),
-        id_clientattest_response_payload_ip(0x13),
-        id_clientattest_response_nopayload_noip(0x14),
-        id_clientattest_response_payload_noip(0x15),
-        id_serverfinished(0x16),
-        session_clientattest_noresponse_payload_ip(0x21),
-        session_clientattest_response_nopayload_ip(0x22),
-        session_clientattest_response_payload_ip(0x23),
-        session_clientattest_response_nopayload_noip(0x24),
-        session_clientattest_response_payload_noip(0x25),
-        session_serverfinished(0x26),
-        record_regular(0x31),
-        alert(0x41)
+    client_init(0x01),
+    server_init_and_attest(0x02),
+    id_clientattest_noresponse_payload_ip(0x11),
+    id_clientattest_response_nopayload_ip(0x12),
+    id_clientattest_response_payload_ip(0x13),
+    id_clientattest_response_nopayload_noip(0x14),
+    id_clientattest_response_payload_noip(0x15),
+    id_serverfinished(0x16),
+    session_clientattest_noresponse_payload_ip(0x21),
+    session_clientattest_response_nopayload_ip(0x22),
+    session_clientattest_response_payload_ip(0x23),
+    session_clientattest_response_nopayload_noip(0x24),
+    session_clientattest_response_payload_noip(0x25),
+    session_serverfinished(0x26),
+    record_regular(0x31),
+    alert(0x41)
 } MsgType;
 ~~~
 
 ~~~
 enum : uint8 {
-        one(1)
+    one(1)
 } Version;
 ~~~
 
@@ -757,12 +757,12 @@ enum : uint8 {
 
 ~~~
 enum : uint16 {
-        x25519_epid2_chacha20poly1305_sha512(1),
-        x25519_epid2_chacha20poly1305_blake2b(2),
-        x25519_epid2_aes256gcm_sha512(3),
-        x25519_epid2_aes256gcm_blake2b(4),
-        x25519_epid2_null_sha512(5),
-        x25519_epid2_null_blake2b(6)
+    x25519_epid2_chacha20poly1305_sha512(1),
+    x25519_epid2_chacha20poly1305_blake2b(2),
+    x25519_epid2_aes256gcm_sha512(3),
+    x25519_epid2_aes256gcm_blake2b(4),
+    x25519_epid2_null_sha512(5),
+    x25519_epid2_null_blake2b(6)
 } SuiteSpec;
 ~~~
 
@@ -788,26 +788,26 @@ byte LongtermSecret[64];
 
 ~~~
 select(dh_algorithm) {
-        case x25519_epid2_chacha20poly1305_sha512:
-        case x25519_epid2_chacha20poly1305_blake2b:
-        case x25519_epid2_aes256gcm_sha512:
-        case x25519_epid2_aes256gcm_blake2b:
-        case x25519_epid2_null_sha512:
-        case x25519_epid2_null_blake2b:
-                byte[32];
+    case x25519_epid2_chacha20poly1305_sha512:
+    case x25519_epid2_chacha20poly1305_blake2b:
+    case x25519_epid2_aes256gcm_sha512:
+    case x25519_epid2_aes256gcm_blake2b:
+    case x25519_epid2_null_sha512:
+    case x25519_epid2_null_blake2b:
+        byte[32];
 } DHKeyShare;
 ~~~
 
 ~~~
 enum : uint8 {
-        Ed25519(1)
+    Ed25519(1)
 } ServerSignatureType;
 ~~~
 
 ~~~
 select(server_signature_algorithm) {
-        case Ed25519:
-                byte[32];
+    case Ed25519:
+        byte[32];
 } ServerSignature;
 ~~~
 
@@ -815,25 +815,25 @@ select(server_signature_algorithm) {
 
 ~~~
 select(dh_algorithm) {
-        case x25519_epid2_chacha20poly1305_sha512:
-        case x25519_epid2_chacha20poly1305_blake2b:
-        case x25519_epid2_aes256gcm_sha512:
-        case x25519_epid2_aes256gcm_blake2b:
-        case x25519_epid2_null_sha512:
-        case x25519_epid2_null_blake2b:
-                byte[320];
+    case x25519_epid2_chacha20poly1305_sha512:
+    case x25519_epid2_chacha20poly1305_blake2b:
+    case x25519_epid2_aes256gcm_sha512:
+    case x25519_epid2_aes256gcm_blake2b:
+    case x25519_epid2_null_sha512:
+    case x25519_epid2_null_blake2b:
+        byte[320];
 } DAAGroupKey;
 ~~~
 
 ~~~
 select(dh_algorithm) {
-        case x25519_epid2_chacha20poly1305_sha512:
-        case x25519_epid2_chacha20poly1305_blake2b:
-        case x25519_epid2_aes256gcm_sha512:
-        case x25519_epid2_aes256gcm_blake2b:
-        case x25519_epid2_null_sha512:
-        case x25519_epid2_null_blake2b:
-                byte[128];
+    case x25519_epid2_chacha20poly1305_sha512:
+    case x25519_epid2_chacha20poly1305_blake2b:
+    case x25519_epid2_aes256gcm_sha512:
+    case x25519_epid2_aes256gcm_blake2b:
+    case x25519_epid2_null_sha512:
+    case x25519_epid2_null_blake2b:
+        byte[128];
 } DAASignature;
 ~~~
 
@@ -841,7 +841,7 @@ select(dh_algorithm) {
 
 ~~~
 enum : uint8 {
-        one(1)
+    one(1)
 } ServerCertificateVersion;
 ~~~
 
@@ -851,43 +851,43 @@ byte Date[8];   /* YYYYMMDD according to UTC */
 
 ~~~
 struct {
-        ServerCertificateVersion version;
-        ServerSignatureType algorithm;
-        Date expiry;
-        ClientID id;
-        ServerSignature signature;
-        ServerIntermediateCertificate signers_certificate;
-        ServerSignature signers_signature;
+    ServerCertificateVersion version;
+    ServerSignatureType algorithm;
+    Date expiry;
+    ClientID id;
+    ServerSignature signature;
+    ServerIntermediateCertificate signers_certificate;
+    ServerSignature signers_signature;
 } ServerCertificate;
 ~~~
 
 ~~~
 struct {
-        ServerSignatureVersion version;
-        ServerSignatureType algorithm;
-        Date expiry;
-        select(algorithm) {
-                case ServerSignatureType.Ed25519:
-                        byte[32];
-        } public_key;
-        byte root_id[32];       /* ServerRootCertificate to use */
-        select(root_certificate.algorithm) {
-                case ServerSignatureType.Ed25519:
-                        byte[64];
-        } root_signature;
+    ServerSignatureVersion version;
+    ServerSignatureType algorithm;
+    Date expiry;
+    select(algorithm) {
+        case ServerSignatureType.Ed25519:
+            byte[32];
+    } public_key;
+    byte root_id[32];       /* ServerRootCertificate to use */
+    select(root_certificate.algorithm) {
+        case ServerSignatureType.Ed25519:
+            byte[64];
+    } root_signature;
 } ServerIntermediateCertificate;
 ~~~
 
 ~~~
 struct {
-        ServerSignatureVersion version;
-        ServerSignatureType algorithm;
-        Date expiry;
-        select(algorithm) {
-                case ServerSignatureType.Ed25519:
-                        byte[32];
-        } public_key;
-        byte id[32];
+    ServerSignatureVersion version;
+    ServerSignatureType algorithm;
+    Date expiry;
+    select(algorithm) {
+        case ServerSignatureType.Ed25519:
+            byte[32];
+    } public_key;
+    byte id[32];
 } ServerRootCertificate;
 ~~~
 
@@ -907,8 +907,8 @@ uint16 MsgLength;
 
 ~~~
 enum : uint8 {
-        queue_protocol(1),
-        ipv6(2)
+    queue_protocol(1),
+    ipv6(2)
 } EncapsulatedPayloadType;
 ~~~
 
