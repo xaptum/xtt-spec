@@ -372,6 +372,47 @@ struct {
 } T;
 ~~~
 
+## Variants
+Defined structures may have variants based on some knowledge that is
+available within the environment.
+The selector must be an enumerated
+type that defines the possible variants the structure defines.
+There must be a case arm for every element of the enumeration declared in
+the select.
+Case arms have limited fall-through: if two case arms
+follow in immediate succession with no fields in between, then they
+both contain the same fields.
+
+The mechanism by which the variant is selected at runtime is not
+prescribed by the presentation language.
+
+For example:
+
+~~~
+uint8 SubT1;
+uint16 SubT2;
+struct {
+        select (color_in) {
+                case Color.Red:
+                        SubT1;
+                case Color.Green:
+                case Color.Blue:
+                        SubT2;
+        } variant_field;
+} VariantStruct;
+~~~
+
+In this example, it is assumed the creation of a value
+of type `VariantStruct` requires the input of a parameter
+called `color_in` of type `Color`.
+When creating a value of type VariantStruct with name S,
+if `color_in` is `Red` then the subfield `S.variant_field`
+is of type `SubT1`.
+Alternatively, if `color_in` is either `Green` or `Blue`,
+`S.variant_field` is of type `SubT2`.
+Note that the size of the type `VariantStruct` depends on the value
+of `color_in` at the time of construction.
+
 # Protocol Data Structures and Constant Values
 
 This section describes protocol types and constants.
