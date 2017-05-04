@@ -261,14 +261,14 @@ bottom.
 
 ## Byte Arrays
 A byte-array is a single-dimensional array of bytes of given fixed length.
-The syntax for specifying a new type, `T’`, that is a
+The syntax for specifying a new type, `Tp`, that is a
 byte-array of length `n` is
 
 ~~~
-byte T’[n];
+byte Tp[n];
 ~~~
 
-Here, `T’` occupies `n` bytes in the data stream.
+Here, `Tp` occupies `n` bytes in the data stream.
 The length of the vector is not included in the
 encoded stream.
 
