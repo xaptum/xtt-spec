@@ -474,8 +474,6 @@ aead_struct<MsgType.session_keys>(
 
 ## Message Header Structure
 
-## Per-message Nonce Calculation
-
 # Cryptographic Computations
 
 ## Notation
@@ -485,6 +483,20 @@ aead_struct<MsgType.session_keys>(
 ## Key Calculation and Schedule
 
 ## SessionID Generation
+
+## ECDHE Parameters
+The size and interpretation of a value of type DHKeyShare
+depends on the Diffie-Hellman algorithm specified in the handshake messages.
+
+Currently, only x25519 is supported by the protocol.
+
+For x25519, the contents are the byte string inputs and
+outputs of the corresponding functions defined in {{RFC7748}}.
+The size of the DHKeyShare in this case is 32 bytes.
+
+## Signature Algorithms
+
+## Per-message Nonce Calculation
 
 (TODO)
 
@@ -788,13 +800,7 @@ byte LongtermSecret[64];
 
 ~~~
 select(dh_algorithm) {
-    case x25519_epid2_chacha20poly1305_sha512:
-    case x25519_epid2_chacha20poly1305_blake2b:
-    case x25519_epid2_aes256gcm_sha512:
-    case x25519_epid2_aes256gcm_blake2b:
-    case x25519_epid2_null_sha512:
-    case x25519_epid2_null_blake2b:
-        byte[32];
+    byte[<size of public key for this algorithm>];
 } DHKeyShare;
 ~~~
 
@@ -806,34 +812,27 @@ enum : uint8 {
 
 ~~~
 select(server_signature_algorithm) {
-    case Ed25519:
-        byte[32];
+    byte[<size of signature for this algorithm>];
 } ServerSignature;
+~~~
+
+~~~
+select(server_signature_algorithm) {
+    byte[<size of public key for this algorithm>];
+} ServerSignaturePublicKey;
 ~~~
 
 ### DAA Types
 
 ~~~
 select(dh_algorithm) {
-    case x25519_epid2_chacha20poly1305_sha512:
-    case x25519_epid2_chacha20poly1305_blake2b:
-    case x25519_epid2_aes256gcm_sha512:
-    case x25519_epid2_aes256gcm_blake2b:
-    case x25519_epid2_null_sha512:
-    case x25519_epid2_null_blake2b:
-        byte[320];
+    byte[<size of group public key for this algorithm>];
 } DAAGroupKey;
 ~~~
 
 ~~~
 select(dh_algorithm) {
-    case x25519_epid2_chacha20poly1305_sha512:
-    case x25519_epid2_chacha20poly1305_blake2b:
-    case x25519_epid2_aes256gcm_sha512:
-    case x25519_epid2_aes256gcm_blake2b:
-    case x25519_epid2_null_sha512:
-    case x25519_epid2_null_blake2b:
-        byte[128];
+    byte[<size of signature for this algorithm>];
 } DAASignature;
 ~~~
 
@@ -866,15 +865,9 @@ struct {
     ServerSignatureVersion version;
     ServerSignatureType algorithm;
     Date expiry;
-    select(algorithm) {
-        case ServerSignatureType.Ed25519:
-            byte[32];
-    } public_key;
+    ServerSignaturePublicKey public_key;
     byte root_id[32];       /* ServerRootCertificate to use */
-    select(root_certificate.algorithm) {
-        case ServerSignatureType.Ed25519:
-            byte[64];
-    } root_signature;
+    ServerSignature root_signature;
 } ServerIntermediateCertificate;
 ~~~
 
@@ -883,10 +876,7 @@ struct {
     ServerSignatureVersion version;
     ServerSignatureType algorithm;
     Date expiry;
-    select(algorithm) {
-        case ServerSignatureType.Ed25519:
-            byte[32];
-    } public_key;
+    ServerSignaturePublicKey public_key;
     byte id[32];
 } ServerRootCertificate;
 ~~~
