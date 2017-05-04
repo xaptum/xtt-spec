@@ -36,6 +36,7 @@ author:
         email: david.bild@xaptum.com
 
 normative:
+  RFC5116:
   RFC5869:
   RFC7539:
   RFC7693:
@@ -363,6 +364,34 @@ and by `name.subfield` when referring to the field in a specific value named `na
 Thus, the value of the subfield `f2`
 in a value called `foo` of type `T`, from the example above, would be
 referenced as `foo.f1`.
+
+## AEAD-Encrypted Constructed Types
+Encryption and authentication of all messages in this protocol
+are done using Authenticated Encryption with Additional Data (AEAD) {{RFC5116}}.
+To indicate that a constructed type is processed using an AEAD algorithm,
+the following notation is used:
+
+~~~
+aead_struct<key_set>(
+        addl1;
+        addl2;
+        ...
+        addlN;
+)[
+        enc1;
+        enc2;
+        ...
+        encN;
+] T;
+~~~
+
+In this example, the type `T` consists of the unencrypted subfields `addl1`
+through `addlN`, and the encrypted subfields `enc1` through `encN`.
+The keys (encryption key, authentication key, and nonce) used is given by `key_set`.
+The entire struct is authenticated.
+Note that the total length in the byte stream of a value of type `T` is
+the size of an authentication tag (determined by the chosen AEAD algorithm)
+in addition to the sum of the sizes of its subfields.
 
 ## Constants
 Fields and variables may be assigned a fixed value using `=`.
