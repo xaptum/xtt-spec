@@ -200,17 +200,291 @@ Auth | {CertificateVerify*}
 
 (TODO) (1 diagram). Basic flow.
 
-# Identity Provisioning Protocol
+# Handshake Protocols
 
-(TODO)
+## Features Common to All Handshakes
 
+### ClientInit Message
+All handshakes begin with the client sending a ClientInit message to the server.
+A client may resend a ClientInit if it has not received a ServerInitAndAttest
+in response within a timeout period.
+There is no requirement that ClientInit retries be identical, as long
+as a client only responds to one ServerInitAndAttest response.
 
-# Session Establishment Protocol
+TODO: Explain purpose of this message?
 
-(TODO)
+Structure of this message:
 
+~~~
+struct {
+        MsgType type = client_init;
+        Version version;
+        SuiteSpec spec;
+        SessionIDSeed client_id_seed;
+        SigningNonce client_nonce;
+        DHKeyShare client_dh_keyshare;
+} ClientInit;
+~~~
+
+### ServerInitAndAttest
+
+TODO: Explain purpose of this message?
+
+Structure of this message:
+
+~~~
+aead_struct<handshake_keys>(
+        MsgType type = server_init_and_attest;
+        Version version;
+        SuiteSpec spec;
+        SessionIDSeed client_id_seed;   /* echo from client */
+        DHKeyShare server_dh_keyshare;
+)[
+        ServerCertificate certificate;
+        SessionIDSeed server_id_seed;
+        ServerSignature server_signature;
+        ServerCookie server_cookie;
+] ServerInitAndAttest;
+~~~
+
+## Identity Provisioning Protocol
+
+### ClientIdentity_ClientAttest
+
+~~~
+struct {
+        aead_struct<handshake_keys>(
+                MsgType type =
+                        MsgType.id_clientattest_noresponse_payload_ip;
+                Version version;
+                SuiteSpec spec;
+                DHKeyShare server_dh_keyshare;  /* echo from server */
+                ServerCookie server_cookie;     /* echo from server */
+        }[
+                DAAGroupKey daa_gpk;
+                ClientID id;
+                DAASignature signature;
+        ];
+        aead_struct<session_keys>(
+                MsgLength length;               /* total length */
+        )[
+                EncapsulatedPayloadType payload_type;
+                byte payload[length - sizeof(rest_of_message)];
+        ];
+} ClientIdentity_ClientAttest_NoResponsePayloadIP;
+~~~
+
+~~~
+aead_struct<handshake_keys>(
+        MsgType type = 
+                MsgType.id_clientattest_response_nopayload_ip;
+        Version version;
+        SuiteSpec spec;
+        DHKeyShare server_dh_keyshare;  /* echo from server */
+        ServerCookie server_cookie;     /* echo from server */
+}[
+        DAAGroupKey daa_gpk;
+        ClientID id;
+        DAASignature signature;
+] ClientIdentity_ClientAttest_ResponseNoPayloadIP;
+~~~
+
+~~~
+struct {
+        aead_struct<handshake_keys>(
+                MsgType type =
+                        MsgType.id_clientattest_response_payload_ip;
+                Version version;
+                SuiteSpec spec;
+                DHKeyShare server_dh_keyshare;  /* echo from server */
+                ServerCookie server_cookie;     /* echo from server */
+        }[
+                DAAGroupKey daa_gpk;
+                ClientID id;
+                DAASignature signature;
+        ];
+        aead_struct<session_keys>(
+                MsgLength length;               /* total length */
+        )[
+                EncapsulatedPayloadType payload_type;
+                byte payload[length - sizeof(rest_of_message)];
+        ];
+} ClientIdentity_ClientAttest_ResponsePayloadIP;
+~~~
+
+~~~
+aead_struct<handshake_keys>(
+        MsgType type =
+                MsgType.id_clientattest_response_nopayload_noip;
+        Version version;
+        SuiteSpec spec;
+        DHKeyShare server_dh_keyshare;  /* echo from server */
+        ServerCookie server_cookie;     /* echo from server */
+}[
+        DAAGroupKey daa_gpk;
+        DAASignature signature;
+] ClientIdentity_ClientAttest_ResponseNoPayloadNoIP;
+~~~
+
+~~~
+struct {
+        aead_struct<handshake_keys>(
+                MsgType type = 
+                        MsgType.id_clientattest_response_payload_noip;
+                Version version;
+                SuiteSpec spec;
+                DHKeyShare server_dh_keyshare;  /* echo from server */
+                ServerCookie server_cookie;     /* echo from server */
+        }[
+                DAAGroupKey daa_gpk;
+                DAASignature signature;
+        ];
+        aead_struct<session_keys>(
+                MsgLength length;               /* total length */
+        )[
+                EncapsulatedPayloadType payload_type;
+                byte payload[length - sizeof(rest_of_message)];
+        ];
+} ClientIdentity_ClientAttest_ResponsePayloadNoIP;
+~~~
+
+~~~
+aead_struct<session_keys>(
+        MsgType type = MsgType.id_serverfinished;
+        Version version;
+        SuiteSpec spec;
+)[
+        ClientID client_id;     /* confirm id of client */
+        FinishedContext ctx;
+];
+~~~
+
+## Session Establishment Protocol
+
+### Session_ClientAttest
+
+~~~
+struct {
+        aead_struct<handshake_keys>(
+                MsgType type =
+                        MsgType.session_clientattest_noresponse_payload_ip;
+                Version version;
+                SuiteSpec spec;
+                DHKeyShare server_dh_keyshare;  /* echo from server */
+                ServerCookie server_cookie;     /* echo from server */
+        }[
+                DAAGroupKey daa_gpk;
+                ClientID id;
+                DAASignature signature;
+        ];
+        aead_struct<MsgType.session_keys>(
+                MsgLength length;               /* total length */
+        )[
+                EncapsulatedPayloadType payload_type;
+                byte payload[length - sizeof(rest_of_message)];
+        ];
+} MsgType.session_ClientAttest_NoResponsePayloadIP;
+~~~
+
+~~~
+aead_struct<handshake_keys>(
+        MsgType type = 
+                MsgType.session_clientattest_response_nopayload_ip;
+        Version version;
+        SuiteSpec spec;
+        DHKeyShare server_dh_keyshare;  /* echo from server */
+        ServerCookie server_cookie;     /* echo from server */
+}[
+        DAAGroupKey daa_gpk;
+        ClientID id;
+        DAASignature signature;
+] MsgType.session_ClientAttest_ResponseNoPayloadIP;
+~~~
+
+~~~
+struct {
+        aead_struct<handshake_keys>(
+                MsgType type =
+                        MsgType.session_clientattest_response_payload_ip;
+                Version version;
+                SuiteSpec spec;
+                DHKeyShare server_dh_keyshare;  /* echo from server */
+                ServerCookie server_cookie;     /* echo from server */
+        }[
+                DAAGroupKey daa_gpk;
+                ClientID id;
+                DAASignature signature;
+        ];
+        aead_struct<MsgType.session_keys>(
+                MsgLength length;               /* total length */
+        )[
+                EncapsulatedPayloadType payload_type;
+                byte payload[length - sizeof(rest_of_message)];
+        ];
+} MsgType.session_ClientAttest_ResponsePayloadIP;
+~~~
+
+~~~
+aead_struct<handshake_keys>(
+        MsgType type =
+                MsgType.session_clientattest_response_nopayload_noip;
+        Version version;
+        SuiteSpec spec;
+        DHKeyShare server_dh_keyshare;  /* echo from server */
+        ServerCookie server_cookie;     /* echo from server */
+}[
+        DAAGroupKey daa_gpk;
+        DAASignature signature;
+] MsgType.session_ClientAttest_ResponseNoPayloadNoIP;
+~~~
+
+~~~
+struct {
+        aead_struct<handshake_keys>(
+                MsgType type = 
+                        MsgType.session_clientattest_response_payload_noip;
+                Version version;
+                SuiteSpec spec;
+                DHKeyShare server_dh_keyshare;  /* echo from server */
+                ServerCookie server_cookie;     /* echo from server */
+        }[
+                DAAGroupKey daa_gpk;
+                DAASignature signature;
+        ];
+        aead_struct<MsgType.session_keys>(
+                MsgLength length;               /* total length */
+        )[
+                EncapsulatedPayloadType payload_type;
+                byte payload[length - sizeof(rest_of_message)];
+        ];
+} MsgType.session_ClientAttest_ResponsePayloadNoIP;
+~~~
+
+~~~
+aead_struct<MsgType.session_keys>(
+        MsgType type = MsgType.session_serverfinished;
+        Version version;
+        SuiteSpec spec;
+)[
+        FinishedContext ctx;
+];
+~~~
 
 # Record Protocol
+
+## Message Header Structure
+
+## Per-message Nonce Calculation
+
+# Cryptographic Computations
+
+## Notation
+
+## Handshake Contexts
+
+## Key Calculation and Schedule
+
+## SessionID Generation
 
 (TODO)
 
