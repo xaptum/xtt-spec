@@ -347,7 +347,7 @@ struct {
     MsgType type = client_init;
     Version version;
     SuiteSpec spec;
-    SessionIDSeed client_id_seed;
+    SessionIDSeed session_id_seed;
     SigningNonce client_nonce;
     DHKeyShare client_dh_keyshare;
 } ClientInit;
@@ -362,11 +362,11 @@ aead_struct<handshake_keys>(
     MsgType type = server_init_and_attest;
     Version version;
     SuiteSpec spec;
-    SessionIDSeed client_id_seed;   /* echo from client */
+    SessionIDSeed session_id_seed;   /* echo from client */
     DHKeyShare server_dh_keyshare;
 )[
     ServerCertificate certificate;
-    SessionIDSeed server_id_seed;
+    SessionIDSeed session_id_seed;
     ServerSignature server_signature;
     ServerCookie server_cookie;
 ] ServerInitAndAttest;
