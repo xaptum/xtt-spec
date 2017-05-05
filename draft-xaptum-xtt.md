@@ -431,7 +431,6 @@ aead_struct<handshake_keys>(
         MsgType.id_clientattest_response_nopayload_ip;
     Version version;
     SuiteSpec spec;
-    DHKeyShare server_dh_keyshare;  /* echo from server */
     ServerCookie server_cookie;     /* echo from server */
 }[
     DAAGroupKey daa_gpk;
@@ -447,7 +446,6 @@ struct {
             MsgType.id_clientattest_response_payload_ip;
         Version version;
         SuiteSpec spec;
-        DHKeyShare server_dh_keyshare;  /* echo from server */
         ServerCookie server_cookie;     /* echo from server */
     }[
         DAAGroupKey daa_gpk;
@@ -469,7 +467,6 @@ aead_struct<handshake_keys>(
         MsgType.id_clientattest_response_nopayload_noip;
     Version version;
     SuiteSpec spec;
-    DHKeyShare server_dh_keyshare;  /* echo from server */
     ServerCookie server_cookie;     /* echo from server */
 }[
     DAAGroupKey daa_gpk;
@@ -484,7 +481,6 @@ struct {
                 MsgType.id_clientattest_response_payload_noip;
         Version version;
         SuiteSpec spec;
-        DHKeyShare server_dh_keyshare;  /* echo from server */
         ServerCookie server_cookie;     /* echo from server */
     }[
         DAAGroupKey daa_gpk;
@@ -517,7 +513,6 @@ struct {
                 MsgType.id_clientattest_noresponse_payload_ip;
         Version version;
         SuiteSpec spec;
-        DHKeyShare server_dh_keyshare;  /* echo from server */
         ServerCookie server_cookie;     /* echo from server */
     }[
         DAAGroupKey daa_gpk;
@@ -540,7 +535,6 @@ struct {
                 MsgType.id_clientattest_noresponse_payload_noip;
         Version version;
         SuiteSpec spec;
-        DHKeyShare server_dh_keyshare;  /* echo from server */
         ServerCookie server_cookie;     /* echo from server */
     }[
         DAAGroupKey daa_gpk;
@@ -565,7 +559,6 @@ aead_struct<handshake_keys>(
         MsgType.session_clientattest_response_nopayload_ip;
     Version version;
     SuiteSpec spec;
-    DHKeyShare server_dh_keyshare;  /* echo from server */
     ServerCookie server_cookie;     /* echo from server */
 }[
     DAAGroupKey daa_gpk;
@@ -581,7 +574,6 @@ struct {
             MsgType.session_clientattest_response_payload_ip;
         Version version;
         SuiteSpec spec;
-        DHKeyShare server_dh_keyshare;  /* echo from server */
         ServerCookie server_cookie;     /* echo from server */
     }[
         DAAGroupKey daa_gpk;
@@ -603,7 +595,6 @@ aead_struct<handshake_keys>(
         MsgType.session_clientattest_response_nopayload_noip;
     Version version;
     SuiteSpec spec;
-    DHKeyShare server_dh_keyshare;  /* echo from server */
     ServerCookie server_cookie;     /* echo from server */
 }[
     DAAGroupKey daa_gpk;
@@ -618,7 +609,6 @@ struct {
             MsgType.session_clientattest_response_payload_noip;
         Version version;
         SuiteSpec spec;
-        DHKeyShare server_dh_keyshare;  /* echo from server */
         ServerCookie server_cookie;     /* echo from server */
     }[
         DAAGroupKey daa_gpk;
@@ -640,7 +630,6 @@ struct {
             MsgType.session_clientattest_noresponse_payload_ip;
         Version version;
         SuiteSpec spec;
-        DHKeyShare server_dh_keyshare;  /* echo from server */
         ServerCookie server_cookie;     /* echo from server */
     }[
         DAAGroupKey daa_gpk;
