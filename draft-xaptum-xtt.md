@@ -275,33 +275,73 @@ while protecting the server's identity from passive attackers
 
 ~~~
       Client                                                Server
-Key  ^ ClientInit
-Exch | + key_share*
-     | + signature_algorithms*
-     | + psk_key_exchange_modes*
-     v + pre_shared_key*          -------> 
-                                                      ServerHello ^ Key
-                                                     + key_share* | Exch
-                                                + pre_shared_key* v
+     ^ ClientInit
+     | + version and crypto-spec
+     | + ECDHE public key
+     v + session id seed          -------> 
+                                            
+                                              ServerInitAndAttest ^    
+                                        version and crypto-spec + |
+                                               ECDHE public key + |     
+                                                  {certificate} + |     
+                                              {session id seed} + |     
+                                                    {signature} + v
                                   <-------
-     ^ {Certificate*}
-Auth | {CertificateVerify*}
-     V {Finished}                 ------->
+     ^  ClientAttest 
+     | + {DAA group public key}
+     | + {DAA signature}
+     | * {identity request}
+     v * [Application Data]       ------->
+                                                 ServerFinished * ^    
+                                  <------    [identity confirm] * v
+
        [Application Data]         <------>     [Application Data]
 
-            +  Indicates noteworty
-               something
+            +  Indicates message subfields
               
-            *  Indicates optional
-               something
+            *  Indicates optional subfields/messages
               
             {} Indicates messages protected using
-               something
+               handshake keys
                
             [] Indicates messages protected using
-               something
+               session keys
 ~~~
 {: #xtt-provisioning title="Message flow for XTT Identity Provisioning Handshake"}
+
+~~~
+      Client                                                Server
+     ^ ClientInit
+     | + version and crypto-spec
+     | + ECDHE public key
+     v + session id seed          -------> 
+                                            
+                                              ServerInitAndAttest ^    
+                                        version and crypto-spec + |
+                                               ECDHE public key + |     
+                                                  {certificate} + |     
+                                              {session id seed} + |     
+                                                    {signature} + v
+                                  <-------
+     ^  ClientAttest 
+     | + {identity}
+     | + {psk signature}
+     v * [Application Data]       ------->
+                                  <------        ServerFinished *
+
+       [Application Data]         <------>     [Application Data]
+
+            +  Indicates message subfields
+              
+            *  Indicates optional subfields/messages
+              
+            {} Indicates messages protected using
+               handshake keys
+               
+            [] Indicates messages protected using
+               session keys
+~~~
+{: #xtt-session title="Message flow for XTT Session Creation Handshake"}
 
 (TODO) record layer
 
