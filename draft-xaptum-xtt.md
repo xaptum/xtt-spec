@@ -281,38 +281,59 @@ while protecting the server's identity from passive attackers
     * No arbitrary-length certificate chains
 
 ~~~
-      Client                                                Server
-     ^ ClientInit
-     | + version and crypto-spec
-     | + ECDHE public key
-     v + session id seed          -------> 
-                                            
-                                              ServerInitAndAttest ^    
-                                        version and crypto-spec + |
-                                               ECDHE public key + |     
-                                                  {certificate} + |     
-                                              {session id seed} + |     
-                                                    {signature} + v
-                                  <-------
-     ^  ClientAttest 
-     | + {DAA group public key}
-     | + {DAA signature}
-     | * {identity request}
-     v * [Application Data]       ------->
-                                                 ServerFinished * ^    
-                                  <------    [identity confirm] * v
+        Client                                             Server
+        -----------------------             -----------------------
+  
+         CLIENTINIT
+         + version
+         + crypto-spec
+         + session_id_seed_c
+         + signing nonce
+         + ECDHE public key      ------->
+                                           
+                                             SERVERINITANDATTEST ^ < Hk
+                                                       version + | 
+                                                   crypto-spec + | 
+                                             session_id_seed_c + |
+                                              ECDHE public key + | 
+                                                 {certificate} + | 
+                                           {session_id_seed_s} + | 
+                                                   {signature} + |
+                                 <-------      {server cookie} + v 
 
-       [Application Data]         <------>     [Application Data]
+  Hk > ^ CLIENTATTEST 
+       | + {DAA group key}
+       | + ({identity request})
+       v + {DAA signature}
+  Sk > ^
+       | + ([Application Data])  ------->
+       v
 
-            +  Indicates message subfields
-              
-            *  Indicates optional subfields/messages
-              
-            {} Indicates messages protected using
-               handshake keys
-               
-            [] Indicates messages protected using
-               session keys
+                                                                 ^ < Sk
+                                                (SERVERFINISHED) |
+                                 <------- ([identity confirm]) + |
+                                                                 v
+  
+  Sk > ^                                                         ^ < Sk
+       |  RECORDREGULAR                            RECORDREGULAR |
+       |  + [Application Data]   <------>   [Application Data] + |
+       v                                                         v
+  
+              +  Indicates message subfields
+
+              () Indicates optional messages/subfields
+
+              {} Indicates data encrypted using handshake keys
+  
+              [] Indicates data encrypted using session keys
+  
+         Hk > ^ 
+              | Indicates data MAC'd using handshake keys
+              v  
+  
+         Sk > ^ 
+              | Indicates data MAC'd using session keys
+              v  
 ~~~
 {: #xtt-provisioning title="Message flow for XTT Identity Provisioning Handshake"}
 
