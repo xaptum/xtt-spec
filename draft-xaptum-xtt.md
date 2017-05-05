@@ -54,6 +54,7 @@ informative:
   RFC2119:
   RFC5246:
   RFC6347:
+  RFC7296:
 
   MINIMALT:
        title: "MinimalLT: Minimal-latency Networking Through Better Security"
@@ -69,6 +70,26 @@ informative:
          ins: D. Bernstein
        -
          ins: T. Lange
+
+  SIGMA:
+       title: "SIGMA: the 'SIGn-and-MAc' approach to authenticated Diffie-Hellman and its use in the IKE protocols"
+       date:  2003-06
+       author: 
+       -
+         ins: H. Krawczyk
+         name: Hugo Krawczyk
+       seriesinfo: Proceedings of CRYPTO 2003
+
+  SIGMASEC:
+       title: "Security Analysis of IKE's Signature-Based Key-Exchange Protocol"
+       date: 2002-10
+       author:
+       -
+         ins: R. Canetti
+         name: Ran Canetti
+       -
+         ins: H. Krawczyk
+         name: Hugo Krawczyk
 
 --- abstract
 
@@ -161,11 +182,71 @@ requirements.
 
 # Protocol Overview
 
-(TODO) (1-2 para.) Outline the flow from provisioning, to
-establishment, to communication.
+An XTT session is started using one of two related but distinct
+handshake protocols: one to create an Authenticated Session,
+and another to both create an Authenticated Session
+and provision a ClientID to the client.
+Running an Authenticated Session handshake requires
+that a ClientID handshake has successfully been
+performed at least once previously.
 
-(TODO) (1 para.) Discuss protocol error handling
+The ClientID handshake is used to authenticate both parties
+as being members of recognized and permissioned groups.
+The typical case is of a client proving membership in a group
+permissioned to access a private network, and a server
+proving membership in the group of access points for that network.
+Upon successful completion of a ClientID handshake,
+the server provisions to the client a ClientID, a unique
+identifier within the client's group.
+In addition, the client and server have now negotiated
+shared secret material that can be used for future authentication,
+without requiring the public-cryptography-based authentication
+of the ClientID handshake.
 
+Note that the lifetime of a given ClientID, i.e. the time between
+successive ClientID handshakes, is up to the discretion of the client.
+It is possible for a given physical endpoint to perform a ClientID handshake
+only once (due to, for example, hardware constraints the preclude the required signatures)
+and retain the same ClientID for its entire lifetime.
+Conversely, a client that does not wish its messages to be linkable
+by passive attackers
+may perform a ClientID handshake as often as every message;
+in fact, by using anonymized signature algorithms (e.g. Direct Anonymous Attestation),
+a client may keep active attackers and even the server from being
+able to link its messages to one another.
+
+The XTT AuthenticatedSession handshake can be performed after
+(or at the same time as) a successful ClientID handshake.
+The AuthenticatedSession handshake leverages existing
+secret material shared between the client and server
+to generate shared secret cryptographic keys,
+to be used for encrypting and authenticating subsequent messages.
+
+Both XTT handshake protocols are based on the
+SigMA family of authenticated key exchange protocols,
+which is also the basis for signature-based authentication
+in the Internet Key Exchange version 2 (IKEv2) protocol {{RFC7296}}
+used in the IPSec protocol suite.
+Specifically, the XTT protocol uses
+the SigMA-I variant described in {{SIGMA}}.
+In particular, note that the present protocol does not place
+the MAC under the signature, as is done in IKEv2
+(this is referred to as variant (ii) in {{SIGMA}}).
+A formal security analysis of the SigMA protocols can be found in {{SIGMASEC}}.
+
+The handshake protocols are authenticated Diffie-Hellman key exchanges.
+Both protocols require three messages,
+and only one full round-trip (1 RTT) before a client can begin pushing traffic.
+The client, who is always the initiator of a handshake,
+may choose to begin pushing traffic with the third message,
+before receiving the final response from the server.
+The reason for requiring 1 RTT
+(in distinction to the 0-RTT option proposed for the upcoming TLSv1.3 standard)
+is to protect against replay attacks.
+The handshake protocol protects the confidentiality of the
+client's identity from both passive and active attackers,
+while protecting the server's identity from passive attackers
+(this isn't an issue in IoT, as the server's identity is usually known).
 
 ~~~
       Client                                                Server
@@ -197,12 +278,35 @@ Auth | {CertificateVerify*}
 ~~~
 {: #xtt-provisioning title="Message flow for XTT Identity Provisioning Handshake"}
 
-
-(TODO) (1 diagram). Basic flow.
+(TODO) record layer
 
 # Handshake Protocols
 
 ## Features Common to All Handshakes
+The first two messages of a handshake (ClientInit and ServerInitAndAttest)
+are the same for both handshake types (ClientID and AuthenticatedSession).
+When responding to a ClientInit with a ServerInitAndAttest,
+an implementation MAY store all necessary state in the ServerCookie
+embedded in the ServerInitAndAttest and save no state locally.
+
+After receiving a ServerInitAndAttest,
+a client responds with one of twelve variants of a ClientAttest message,
+where six of the variants are for a ClientID handshake and six
+are for an AuthenticatedSession handshake.
+The variant chosen depends on three decision parameters:
+whether a ServerFinished response is requested,
+whether the client is requesting a specific ClientID (specified in its message)
+rather than allowing the server to assign it,
+and whether the message also contains a payload.
+
+|ClientAttest*  MsgType| Response Requested?   | ClientID Specified?   | Payload Included? |
+|--------------------- |:---------------------:| ---------------------:|:-----------------:|
+|ResponseNoPayloadIP   | Yes                   | Yes                   | No                |
+|ResponsePayloadIP     | Yes                   | Yes                   | Yes               |
+|ResponseNoPayloadNoIP | Yes                   | No                    | No                |
+|ResponsePayloadNoIP   | Yes                   | No                    | Yes               |
+|NoResponsePayloadIP   | No                    | Yes                   | Yes               |
+|NoResponsePayloadNoIP | No                    | No                    | Yes               |
 
 ### ClientInit Message
 All handshakes begin with the client sending a ClientInit message to the server.
@@ -210,8 +314,6 @@ A client may resend a ClientInit if it has not received a ServerInitAndAttest
 in response within a timeout period.
 There is no requirement that ClientInit retries be identical, as long
 as a client only responds to one ServerInitAndAttest response.
-
-TODO: Explain purpose of this message?
 
 Structure of this message:
 
@@ -227,8 +329,6 @@ struct {
 ~~~
 
 ### ServerInitAndAttest
-
-TODO: Explain purpose of this message?
 
 Structure of this message:
 
@@ -248,31 +348,10 @@ aead_struct<handshake_keys>(
 ~~~
 
 ## Identity Provisioning Protocol
+This handshake provisions a ClientID to a client
+and simultaneously creates an AuthenticatedSession.
 
 ### ClientIdentity_ClientAttest
-
-~~~
-struct {
-    aead_struct<handshake_keys>(
-        MsgType type =
-                MsgType.id_clientattest_noresponse_payload_ip;
-        Version version;
-        SuiteSpec spec;
-        DHKeyShare server_dh_keyshare;  /* echo from server */
-        ServerCookie server_cookie;     /* echo from server */
-    }[
-        DAAGroupKey daa_gpk;
-        ClientID id;
-        DAASignature signature;
-    ];
-    aead_struct<session_keys>(
-        MsgLength length;               /* total length */
-    )[
-        EncapsulatedPayloadType payload_type;
-        byte payload[length - sizeof(rest_of_message)];
-    ];
-} ClientIdentity_ClientAttest_NoResponsePayloadIP;
-~~~
 
 ~~~
 aead_struct<handshake_keys>(
@@ -359,15 +438,11 @@ aead_struct<session_keys>(
 ];
 ~~~
 
-## Session Establishment Protocol
-
-### Session_ClientAttest
-
 ~~~
 struct {
     aead_struct<handshake_keys>(
         MsgType type =
-            MsgType.session_clientattest_noresponse_payload_ip;
+                MsgType.id_clientattest_noresponse_payload_ip;
         Version version;
         SuiteSpec spec;
         DHKeyShare server_dh_keyshare;  /* echo from server */
@@ -377,14 +452,40 @@ struct {
         ClientID id;
         DAASignature signature;
     ];
-    aead_struct<MsgType.session_keys>(
+    aead_struct<session_keys>(
         MsgLength length;               /* total length */
     )[
         EncapsulatedPayloadType payload_type;
         byte payload[length - sizeof(rest_of_message)];
     ];
-} MsgType.session_ClientAttest_NoResponsePayloadIP;
+} ClientIdentity_ClientAttest_NoResponsePayloadIP;
 ~~~
+
+~~~
+struct {
+    aead_struct<handshake_keys>(
+        MsgType type =
+                MsgType.id_clientattest_noresponse_payload_noip;
+        Version version;
+        SuiteSpec spec;
+        DHKeyShare server_dh_keyshare;  /* echo from server */
+        ServerCookie server_cookie;     /* echo from server */
+    }[
+        DAAGroupKey daa_gpk;
+        DAASignature signature;
+    ];
+    aead_struct<session_keys>(
+        MsgLength length;               /* total length */
+    )[
+        EncapsulatedPayloadType payload_type;
+        byte payload[length - sizeof(rest_of_message)];
+    ];
+} ClientIdentity_ClientAttest_NoResponsePayloadNoIP;
+~~~
+
+## Session Establishment Protocol
+
+### Session_ClientAttest
 
 ~~~
 aead_struct<handshake_keys>(
@@ -461,6 +562,29 @@ struct {
 ~~~
 
 ~~~
+struct {
+    aead_struct<handshake_keys>(
+        MsgType type =
+            MsgType.session_clientattest_noresponse_payload_ip;
+        Version version;
+        SuiteSpec spec;
+        DHKeyShare server_dh_keyshare;  /* echo from server */
+        ServerCookie server_cookie;     /* echo from server */
+    }[
+        DAAGroupKey daa_gpk;
+        ClientID id;
+        DAASignature signature;
+    ];
+    aead_struct<MsgType.session_keys>(
+        MsgLength length;               /* total length */
+    )[
+        EncapsulatedPayloadType payload_type;
+        byte payload[length - sizeof(rest_of_message)];
+    ];
+} MsgType.session_ClientAttest_NoResponsePayloadIP;
+~~~
+
+~~~
 aead_struct<MsgType.session_keys>(
     MsgType type = MsgType.session_serverfinished;
     Version version;
@@ -473,6 +597,10 @@ aead_struct<MsgType.session_keys>(
 # Record Protocol
 
 ## Message Header Structure
+
+# Error Handling
+
+(TODO)
 
 # Cryptographic Computations
 
@@ -509,6 +637,7 @@ for the client and server handshakes.  State names (in all capitals,
 e.g., START) have no formal meaning, but are provided for ease of
 comprehension. Messages which are sent only sometimes are indicated in
 [].
+(TODO)
 
 ## Identity Provisioning Handshake
 
@@ -742,18 +871,20 @@ This section describes protocol types and constants.
 enum : uint8 {
     client_init(0x01),
     server_init_and_attest(0x02),
-    id_clientattest_noresponse_payload_ip(0x11),
-    id_clientattest_response_nopayload_ip(0x12),
-    id_clientattest_response_payload_ip(0x13),
-    id_clientattest_response_nopayload_noip(0x14),
-    id_clientattest_response_payload_noip(0x15),
-    id_serverfinished(0x16),
-    session_clientattest_noresponse_payload_ip(0x21),
-    session_clientattest_response_nopayload_ip(0x22),
-    session_clientattest_response_payload_ip(0x23),
-    session_clientattest_response_nopayload_noip(0x24),
-    session_clientattest_response_payload_noip(0x25),
-    session_serverfinished(0x26),
+    id_clientattest_response_nopayload_ip(0x11),
+    id_clientattest_response_payload_ip(0x12),
+    id_clientattest_response_nopayload_noip(0x13),
+    id_clientattest_response_payload_noip(0x14),
+    id_clientattest_noresponse_payload_ip(0x15),
+    id_clientattest_noresponse_payload_noip(0x16),
+    id_serverfinished(0x17),
+    session_clientattest_response_nopayload_ip(0x21),
+    session_clientattest_response_payload_ip(0x22),
+    session_clientattest_response_nopayload_noip(0x23),
+    session_clientattest_response_payload_noip(0x24),
+    session_clientattest_noresponse_payload_ip(0x25),
+    session_clientattest_noresponse_payload_noip(0x26),
+    session_serverfinished(0x27),
     record_regular(0x31),
     alert(0x41)
 } MsgType;
