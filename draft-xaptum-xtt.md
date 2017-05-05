@@ -668,7 +668,18 @@ aead_struct<session_keys>(
 
 # Record Protocol
 
-## Message Header Structure
+~~~
+aead_struct<session_keys>(
+    MsgType type = MsgType.record_regular;
+    Version version;
+    SessionID session_id;
+    SequenceNumber seq_num;
+    MsgLength length;
+)[
+    EncapsulatedPayloadType payload_type;
+    byte payload[length - sizeof(rest_of_message)];
+];
+~~~
 
 # Error Handling
 
@@ -708,7 +719,7 @@ This section provides a summary of the legal state machine transitions
 for the client and server handshakes.  State names (in all capitals,
 e.g., START) have no formal meaning, but are provided for ease of
 comprehension. Messages which are sent only sometimes are indicated in
-[].
+`[]`.
 (TODO)
 
 ## Identity Provisioning Handshake
