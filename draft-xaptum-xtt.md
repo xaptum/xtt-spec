@@ -169,12 +169,37 @@ session: (TODO) (1 sent.)
 requirements.
 
 ### Differences from (D)TLS
+* Heavyweight (heavy use of bandwidth during handshake)
+* Designed around one-way, not mutual, authentication
+* Non-confidential communication of identities during handshake
+* Security session tied to connectivity session
+    * Having to re-run handshake every time underlying connection changes compounds bandwidth problem
 
 (TODO) (1 list) what (D)TLS doesn't offer that IoT requires
 
 ### Differences from QUIC
+* Security session tied to connectivity session
+* Not designed for mutual authentication
 
 (TODO) (1 list) what QUIC doesn't offer that IoT requires
+
+### Differences from IKE/IPSec
+* Pushing data requires performing full Two-Round-Trip handshake first
+* Protects identity of server, not client, which is the opposite of what's needed in IoT
+* Very complex to configure, and easy to get wrong
+
+(TODO) (1 list) what IKE doesn't offer that IoT requires
+
+### Differences from Double-Ratchet-based Protocols
+* Per-message key updating is too heavy for most IoT, which doesn't require per-message forward secrecy
+* Doesn't address identification (uses trust on first use)
+
+(TODO) (1 list) what Double-Ratchet doesn't offer that IoT requires
+
+### Differences from Noise
+* Designed mainly for either pre-shared (or statically-known) keys, or for unauthenticated communication
+
+(TODO) (1 list) what Noise doesn't offer that IoT requires
 
 ### Differences from MinimaLT
 
