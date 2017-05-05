@@ -173,7 +173,7 @@ requirements.
 * Designed around one-way, not mutual, authentication
 * Non-confidential communication of identities during handshake
 * Security session tied to connectivity session
-    * Having to re-run handshake every time underlying connection changes compounds bandwidth problem
+    * Having to re-run handshake every time underlying connection/IP changes compounds bandwidth problem
 
 (TODO) (1 list) what (D)TLS doesn't offer that IoT requires
 
@@ -202,6 +202,9 @@ requirements.
 (TODO) (1 list) what Noise doesn't offer that IoT requires
 
 ### Differences from MinimaLT
+* Requires a highly-available directory service for name-lookup (unnecessary in IoT)
+* Reliable-transport only (can cause issues on lossy networks commonly encountered in IoT)
+* User-level authentication is inappropriate for IoT (devices aren't multi-user)
 
 (TODO) (1 list) what MinimalLT doesn't offer that IoT requires
 
@@ -585,7 +588,7 @@ struct {
         ClientID id;
         DAASignature signature;
     ];
-    aead_struct<MsgType.session_keys>(
+    aead_struct<session_keys>(
         MsgLength length;               /* total length */
     )[
         EncapsulatedPayloadType payload_type;
@@ -621,7 +624,7 @@ struct {
         DAAGroupKey daa_gpk;
         DAASignature signature;
     ];
-    aead_struct<MsgType.session_keys>(
+    aead_struct<session_keys>(
         MsgLength length;               /* total length */
     )[
         EncapsulatedPayloadType payload_type;
@@ -644,7 +647,7 @@ struct {
         ClientID id;
         DAASignature signature;
     ];
-    aead_struct<MsgType.session_keys>(
+    aead_struct<session_keys>(
         MsgLength length;               /* total length */
     )[
         EncapsulatedPayloadType payload_type;
@@ -654,7 +657,7 @@ struct {
 ~~~
 
 ~~~
-aead_struct<MsgType.session_keys>(
+aead_struct<session_keys>(
     MsgType type = MsgType.session_serverfinished;
     Version version;
     SuiteSpec spec;
