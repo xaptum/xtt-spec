@@ -495,9 +495,8 @@ aead_struct<handshake_keys>(
     byte flags[1];
     ServerCookie server_cookie;     /* echo from server */
 }[
-    DAAGroupKey daa_gpk;
     ClientID id;
-    DAASignature signature;
+    PSKSignature signature;
 ] AuthenticatedSession_ClientAttest_NoPayload;
 ~~~
 
@@ -510,9 +509,8 @@ struct {
         byte flags[1];
         ServerCookie server_cookie;     /* echo from server */
     }[
-        DAAGroupKey daa_gpk;
         ClientID id;
-        DAASignature signature;
+        PSKSignature signature;
     ];
     aead_struct<session_keys>(
         MsgLength length;               /* total length */
