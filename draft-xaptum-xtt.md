@@ -467,6 +467,20 @@ struct {
 ~~~
 
 ### ServerInitAndAttest
+Upon receiving a ClientInit, 
+and if the version and suite_spec of the ClientInit are acceptable,
+a server responds with a ServerInitAndAttest message.
+If the version and/or suite_spec of the ClientInit are unacceptable,
+the server MUST respond with the appropriate Alert message.
+
+A server MAY respond to multiple ClientInit messages from the same client
+with not-necessarily identical
+ServerInitAndAttest messages before a full handshake is completed with that client.
+However, if multiple ClientInitAndAttest replies are sent to the same client
+during a handshake and the server is storing state locally after responding
+(rather than storing state only in the ServerCookie),
+the server MUST ensure that response to any one of the ClientInitAndAttest
+is valid.
 
 Structure of this message:
 
@@ -490,6 +504,30 @@ This handshake provisions a ClientID to a client
 and simultaneously creates an AuthenticatedSession.
 
 ### ClientIdentity_ClientAttest
+Once a client receives a ServerInitAndAttest in response to
+its ClientInit, and if that ServerInitAndAttest is validated
+(message authentication code and server signature verified,
+and version and suite_spec match what was sent in the ClientInit),
+the client responds with a ClientAttest message.
+
+If a client times-out waiting for a ServerFinished
+response to its ClientAttest message,
+the client MUST send only identical ClientAttest messages during the handshake,
+or else abort the handshake.
+If multiple non-identical ClientAttest messages are sent during the same handshake,
+the client's and the server's view of the shared secret material negotiated
+during the handshake will differ, and communication will be impossible.
+
+Two variants of the ClientIdentity_ClientAttest message exist: one that
+includes an encapsulated payload and one that does not.
+
+A client may indicate a specific ClientID in the `id_c` field of a ClientAttest
+message, in order to request that specific ClientID be provisioned to it.
+Otherwise, if the client wishes the server to select the ClientID for it,
+the `id_c` field MUST be set to all zeroes.
+
+The structure of a ClientAttest message that does not include an
+encapsulated payload is:
 
 ~~~
 aead_struct<handshake_keys>(
@@ -503,6 +541,9 @@ aead_struct<handshake_keys>(
     DAASignature daa_signature_c;
 ] ClientIdentity_ClientAttest_NoPayload;
 ~~~
+
+The structure of a ClientAttest message that does include an
+encapsulated payload is:
 
 ~~~
 struct {
@@ -525,6 +566,34 @@ struct {
 } ClientIdentity_ClientAttest_Payload;
 ~~~
 
+Note that the `length` field in the ClientAttest_Payload message
+is the total byte-length of the entire ClientAttest_Payload message.
+
+### ClientIdentity_ServerFinished
+Once a server receives a ClientAttest,
+and if that ClientAttest is validated
+(message authentication code and client signature verified,
+and version and suite_spec are acceptable),
+the server responds with a ServerFinished message.
+
+If a server receives a ClientAttest message
+from a client from which it has already received
+a ClientAttest message during this handshake,
+the server MUST ignore the the extra messages.
+
+The ServerFinished message informs the client of the
+ClientID that has been provisioned to it
+(either echoing the same `id_c` requested in the ClientAttest
+message or sending the newly-provisioned id).
+In addition, the ServerFinished message contains
+a hash of the successful handshake, authenticated
+using a key derived from the LongtermSecret that has been provisioned.
+This is to provide 'peer-awareness' to the client, so the client
+and server can confirm they have the same view of the provisioned
+ClientID and LongtermSecret.
+
+Structure of this message:
+
 ~~~
 aead_struct<session_keys>(
     MsgType type = MsgType.id_serverfinished;
@@ -536,10 +605,22 @@ aead_struct<session_keys>(
 ] ClientIdentity_ServerFinished;
 ~~~
 
-
 ## Session Establishment Protocol
+This handshake creates an AuthenticatedSession, and
+requires that a successful ClientIdentity handshake
+has already been run at least once in the past for this client.
+The notes in ({{identity-provisioning-protocol}})
+about message resends apply also to this handshake.
 
 ### Session_ClientAttest
+As for the ClientIdentity handshake, a client responds to
+a ServerInitAndAttest message with a ClientAttest message.
+The only difference from the ClientIdentity handshake
+is that the client uses a PSKSignature, rather than a DAASignature,
+to authenticate its identity.
+
+The structure of a ClientAttest message that does not include an
+encapsulated payload is:
 
 ~~~
 aead_struct<handshake_keys>(
@@ -552,6 +633,9 @@ aead_struct<handshake_keys>(
     PSKSignature signature;
 ] AuthenticatedSession_ClientAttest_NoPayload;
 ~~~
+
+The structure of a ClientAttest message that does include an
+encapsulated payload is:
 
 ~~~
 struct {
@@ -573,6 +657,12 @@ struct {
 } AuthenticatedSession_ClientAttest_Payload;
 ~~~
 
+### Session_ServerFinished
+The structure and function of the Session_ServerFinished
+is nearly-identical to that of the ClientID_ServerFinished,
+with the only difference being that the ClientID of the client
+is not included in the message.
+
 ~~~
 aead_struct<session_keys>(
     MsgType type = MsgType.session_serverfinished;
@@ -584,7 +674,6 @@ aead_struct<session_keys>(
 ~~~
 
 # Record Protocol
-
 ~~~
 aead_struct<session_keys>(
     MsgType type = MsgType.record_regular;
