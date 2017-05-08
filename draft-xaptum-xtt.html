@@ -294,8 +294,10 @@ address {
 <link href="#rfc.section.3.1.2" rel="Chapter" title="3.1.2 ServerInitAndAttest"/>
 <link href="#rfc.section.3.2" rel="Chapter" title="3.2 Identity Provisioning Protocol"/>
 <link href="#rfc.section.3.2.1" rel="Chapter" title="3.2.1 ClientIdentity_ClientAttest"/>
+<link href="#rfc.section.3.2.2" rel="Chapter" title="3.2.2 ClientIdentity_ServerFinished"/>
 <link href="#rfc.section.3.3" rel="Chapter" title="3.3 Session Establishment Protocol"/>
 <link href="#rfc.section.3.3.1" rel="Chapter" title="3.3.1 Session_ClientAttest"/>
+<link href="#rfc.section.3.3.2" rel="Chapter" title="3.3.2 Session_ServerFinished"/>
 <link href="#rfc.section.4" rel="Chapter" title="4 Record Protocol"/>
 <link href="#rfc.section.5" rel="Chapter" title="5 Error Handling"/>
 <link href="#rfc.section.6" rel="Chapter" title="6 Cryptographic Computations"/>
@@ -304,8 +306,9 @@ address {
 <link href="#rfc.section.6.3" rel="Chapter" title="6.3 Key Calculation and Schedule"/>
 <link href="#rfc.section.6.4" rel="Chapter" title="6.4 SessionID Generation"/>
 <link href="#rfc.section.6.5" rel="Chapter" title="6.5 ECDHE Parameters"/>
-<link href="#rfc.section.6.6" rel="Chapter" title="6.6 Signature Algorithms"/>
-<link href="#rfc.section.6.7" rel="Chapter" title="6.7 Per-message Nonce Calculation"/>
+<link href="#rfc.section.6.6" rel="Chapter" title="6.6 DAA Parameters"/>
+<link href="#rfc.section.6.7" rel="Chapter" title="6.7 Signature Algorithms"/>
+<link href="#rfc.section.6.8" rel="Chapter" title="6.8 Per-message Nonce Calculation"/>
 <link href="#rfc.references" rel="Chapter" title="7 References"/>
 <link href="#rfc.references.1" rel="Chapter" title="7.1 Normative References"/>
 <link href="#rfc.references.2" rel="Chapter" title="7.2 Informative References"/>
@@ -415,8 +418,10 @@ address {
 <li>3.1.2.   <a href="#rfc.section.3.1.2">ServerInitAndAttest</a></li>
 </ul><li>3.2.   <a href="#rfc.section.3.2">Identity Provisioning Protocol</a></li>
 <ul><li>3.2.1.   <a href="#rfc.section.3.2.1">ClientIdentity_ClientAttest</a></li>
+<li>3.2.2.   <a href="#rfc.section.3.2.2">ClientIdentity_ServerFinished</a></li>
 </ul><li>3.3.   <a href="#rfc.section.3.3">Session Establishment Protocol</a></li>
 <ul><li>3.3.1.   <a href="#rfc.section.3.3.1">Session_ClientAttest</a></li>
+<li>3.3.2.   <a href="#rfc.section.3.3.2">Session_ServerFinished</a></li>
 </ul></ul><li>4.   <a href="#rfc.section.4">Record Protocol</a></li>
 <li>5.   <a href="#rfc.section.5">Error Handling</a></li>
 <li>6.   <a href="#rfc.section.6">Cryptographic Computations</a></li>
@@ -425,8 +430,9 @@ address {
 <li>6.3.   <a href="#rfc.section.6.3">Key Calculation and Schedule</a></li>
 <li>6.4.   <a href="#rfc.section.6.4">SessionID Generation</a></li>
 <li>6.5.   <a href="#rfc.section.6.5">ECDHE Parameters</a></li>
-<li>6.6.   <a href="#rfc.section.6.6">Signature Algorithms</a></li>
-<li>6.7.   <a href="#rfc.section.6.7">Per-message Nonce Calculation</a></li>
+<li>6.6.   <a href="#rfc.section.6.6">DAA Parameters</a></li>
+<li>6.7.   <a href="#rfc.section.6.7">Signature Algorithms</a></li>
+<li>6.8.   <a href="#rfc.section.6.8">Per-message Nonce Calculation</a></li>
 </ul><li>7.   <a href="#rfc.references">References</a></li>
 <ul><li>7.1.   <a href="#rfc.references.1">Normative References</a></li>
 <li>7.2.   <a href="#rfc.references.2">Informative References</a></li>
@@ -567,38 +573,45 @@ address {
   
          CLIENTINIT
          + version
-         + crypto-spec
+         + suite_spec
          + session_id_seed_c
-         + signing nonce
-         + ECDHE public key      -------&gt;
+         + nonce_c 
+         + dh_keyshare_c         -------&gt;
                                            
                                              SERVERINITANDATTEST ^ &lt; Hk
                                                        version + | 
-                                                   crypto-spec + | 
+                                                    suite_spec + | 
                                              session_id_seed_c + |
-                                              ECDHE public key + | 
+                                                 dh_keyshare_s + | 
                                                  {certificate} + | 
                                            {session_id_seed_s} + | 
-                                                   {signature} + |
-                                 &lt;-------      {server cookie} + v 
+                                                 {signature_s} + |
+                                 &lt;-------      {server_cookie} + v 
 
   Hk &gt; ^ CLIENTATTEST 
-       | + {DAA group key}
-       | + ({identity request})
-       v + {DAA signature}
-  Sk &gt; ^
-       | + ([Application Data])  -------&gt;
-       v
+       | + version
+       | + suite_spec
+       | + server_cookie
+       | + {daa_gpk}
+       | + {id_c}
+       v + {daa_signature_c}
+  Sk &gt; ^ + ([length])
+       | + ([payload_type])
+       v + ([payload])           -------&gt;
 
-                                                                 ^ &lt; Sk
-                                                (SERVERFINISHED) |
-                                 &lt;------- ([identity confirm]) + |
-                                                                 v
+                                                  SERVERFINISHED ^ &lt; Sk
+                                                       version + |
+                                                    suite_spec + |
+                                                        [id_c] + |
+                                 &lt;-------                [ctx] + v
   
-  Sk &gt; ^                                                         ^ &lt; Sk
-       |  RECORDREGULAR                            RECORDREGULAR |
-       |  + [Application Data]   &lt;------&gt;   [Application Data] + |
-       v                                                         v
+  Sk &gt; ^ RECORDREGULAR                             RECORDREGULAR ^ &lt; Sk
+       | + version                                     version + |
+       | + session_id                               session_id + |
+       | + seq_num                                     seq_num + |
+       | + length                                       length + |
+       | + [payload_type]                       [payload_type] + |
+       v + [payload]             &lt;------&gt;            [payload] + v
   
               +  Indicates message subfields
 
@@ -620,36 +633,64 @@ address {
 <div id="rfc.figure.2"/>
 <div id="xtt-session"/>
 <pre>
-      Client                                                Server
-     ^ ClientInit
-     | + version and crypto-spec
-     | + ECDHE public key
-     v + session id seed          -------&gt; 
-                                            
-                                              ServerInitAndAttest ^    
-                                        version and crypto-spec + |
-                                               ECDHE public key + |     
-                                                  {certificate} + |     
-                                              {session id seed} + |     
-                                                    {signature} + v
-                                  &lt;-------
-     ^  ClientAttest 
-     | + {identity}
-     | + {psk signature}
-     v * [Application Data]       -------&gt;
-                                  &lt;------        ServerFinished *
+        Client                                             Server
+        -----------------------             -----------------------
+  
+         CLIENTINIT
+         + version
+         + suite_spec
+         + session_id_seed_c
+         + nonce_c 
+         + dh_keyshare_c         -------&gt;
+                                           
+                                             SERVERINITANDATTEST ^ &lt; Hk
+                                                       version + | 
+                                                    suite_spec + | 
+                                             session_id_seed_c + |
+                                                 dh_keyshare_s + | 
+                                                 {certificate} + | 
+                                           {session_id_seed_s} + | 
+                                                 {signature_s} + |
+                                 &lt;-------      {server_cookie} + v 
 
-       [Application Data]         &lt;------&gt;     [Application Data]
+  Hk &gt; ^ CLIENTATTEST 
+       | + version
+       | + suite_spec
+       | + server_cookie
+       | + {id_c}
+       v + {psk_signature_c}
+  Sk &gt; ^ + ([length])
+       | + ([payload_type])
+       v + ([payload])           -------&gt;
 
-            +  Indicates message subfields
-              
-            *  Indicates optional subfields/messages
-              
-            {} Indicates messages protected using
-               handshake keys
-               
-            [] Indicates messages protected using
-               session keys
+                                                  SERVERFINISHED ^ &lt; Sk
+                                                       version + |
+                                                    suite_spec + |
+                                 &lt;-------                [ctx] + v
+  
+  Sk &gt; ^ RECORDREGULAR                             RECORDREGULAR ^ &lt; Sk
+       | + version                                     version + |
+       | + session_id                               session_id + |
+       | + seq_num                                     seq_num + |
+       | + length                                       length + |
+       | + [payload_type]                       [payload_type] + |
+       v + [payload]             &lt;------&gt;            [payload] + v
+  
+              +  Indicates message subfields
+
+              () Indicates optional messages/subfields
+
+              {} Indicates data encrypted using handshake keys
+  
+              [] Indicates data encrypted using session keys
+  
+         Hk &gt; ^ 
+              | Indicates data MAC'd using handshake keys
+              v  
+  
+         Sk &gt; ^ 
+              | Indicates data MAC'd using session keys
+              v  
 </pre>
 <p class="figure">Figure 2: Message flow for XTT Session Creation Handshake</p>
 <p id="rfc.section.2.p.8">(TODO) record layer</p>
@@ -664,56 +705,62 @@ address {
 struct {
     MsgType type = client_init;
     Version version;
-    SuiteSpec spec;
-    SessionIDSeed session_id_seed;
-    SigningNonce client_nonce;
-    DHKeyShare client_dh_keyshare;
+    SuiteSpec suite_spec;
+    SessionIDSeed session_id_seed_c;
+    SigningNonce nonce_c;
+    DHKeyShare dh_keyshare_c;
 } ClientInit;
 </pre>
 <h3 id="rfc.section.3.1.2"><a href="#rfc.section.3.1.2">3.1.2.</a> <a href="#serverinitandattest" id="serverinitandattest">ServerInitAndAttest</a></h3>
-<p id="rfc.section.3.1.2.p.1">Structure of this message:</p>
+<p id="rfc.section.3.1.2.p.1">Upon receiving a ClientInit, and if the version and suite_spec of the ClientInit are acceptable, a server responds with a ServerInitAndAttest message.  If the version and/or suite_spec of the ClientInit are unacceptable, the server MUST respond with the appropriate Alert message.</p>
+<p id="rfc.section.3.1.2.p.2">A server MAY respond to multiple ClientInit messages from the same client with not-necessarily identical ServerInitAndAttest messages before a full handshake is completed with that client.  However, if multiple ClientInitAndAttest replies are sent to the same client during a handshake and the server is storing state locally after responding (rather than storing state only in the ServerCookie), the server MUST ensure that response to any one of the ClientInitAndAttest is valid.</p>
+<p id="rfc.section.3.1.2.p.3">Structure of this message:</p>
 <pre>
 aead_struct&lt;handshake_keys&gt;(
     MsgType type = server_init_and_attest;
     Version version;
-    SuiteSpec spec;
-    SessionIDSeed session_id_seed;   /* echo from client */
-    DHKeyShare server_dh_keyshare;
+    SuiteSpec suite_spec;
+    SessionIDSeed session_id_seed_c;   /* echo from client */
+    DHKeyShare dh_keyshare_s;
 )[
     ServerCertificate certificate;
-    SessionIDSeed session_id_seed;
-    ServerSignature server_signature;
+    SessionIDSeed session_id_seed_s;
+    ServerSignature signature_s;
     ServerCookie server_cookie;
 ] ServerInitAndAttest;
 </pre>
 <h2 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a> <a href="#identity-provisioning-protocol" id="identity-provisioning-protocol">Identity Provisioning Protocol</a></h2>
 <p id="rfc.section.3.2.p.1">This handshake provisions a ClientID to a client and simultaneously creates an AuthenticatedSession.</p>
 <h3 id="rfc.section.3.2.1"><a href="#rfc.section.3.2.1">3.2.1.</a> <a href="#clientidentityclientattest" id="clientidentityclientattest">ClientIdentity_ClientAttest</a></h3>
+<p id="rfc.section.3.2.1.p.1">Once a client receives a ServerInitAndAttest in response to its ClientInit, and if that ServerInitAndAttest is validated (message authentication code and server signature verified, and version and suite_spec match what was sent in the ClientInit), the client responds with a ClientAttest message.</p>
+<p id="rfc.section.3.2.1.p.2">If a client times-out waiting for a ServerFinished response to its ClientAttest message, the client MUST send only identical ClientAttest messages during the handshake, or else abort the handshake.  If multiple non-identical ClientAttest messages are sent during the same handshake, the client&#8217;s and the server&#8217;s view of the shared secret material negotiated during the handshake will differ, and communication will be impossible.</p>
+<p id="rfc.section.3.2.1.p.3">Two variants of the ClientIdentity_ClientAttest message exist: one that includes an encapsulated payload and one that does not.</p>
+<p id="rfc.section.3.2.1.p.4">A client may indicate a specific ClientID in the <samp>id_c</samp> field of a ClientAttest message, in order to request that specific ClientID be provisioned to it.  Otherwise, if the client wishes the server to select the ClientID for it, the <samp>id_c</samp> field MUST be set to all zeroes.</p>
+<p id="rfc.section.3.2.1.p.5">The structure of a ClientAttest message that does not include an encapsulated payload is:</p>
 <pre>
 aead_struct&lt;handshake_keys&gt;(
     MsgType type =  MsgType.id_clientattest_nopayload;
     Version version;
-    SuiteSpec spec;
-    byte flags[1];
+    SuiteSpec suite_spec;
     ServerCookie server_cookie;     /* echo from server */
 }[
     DAAGroupKey daa_gpk;
-    ClientID id;
-    DAASignature signature;
+    ClientID id_c;
+    DAASignature daa_signature_c;
 ] ClientIdentity_ClientAttest_NoPayload;
 </pre>
+<p id="rfc.section.3.2.1.p.6">The structure of a ClientAttest message that does include an encapsulated payload is:</p>
 <pre>
 struct {
     aead_struct&lt;handshake_keys&gt;(
         MsgType type = MsgType.id_clientattest_payload;
         Version version;
-        SuiteSpec spec;
-        byte flags[1];
+        SuiteSpec suite_spec;
         ServerCookie server_cookie;     /* echo from server */
     }[
         DAAGroupKey daa_gpk;
-        ClientID id;
-        DAASignature signature;
+        ClientID id_c;
+        DAASignature daa_signature_c;
     ];
     aead_struct&lt;session_keys&gt;(
         MsgLength length;               /* total length */
@@ -723,37 +770,45 @@ struct {
     ];
 } ClientIdentity_ClientAttest_Payload;
 </pre>
+<p id="rfc.section.3.2.1.p.7">Note that the <samp>length</samp> field in the ClientAttest_Payload message is the total byte-length of the entire ClientAttest_Payload message.</p>
+<h3 id="rfc.section.3.2.2"><a href="#rfc.section.3.2.2">3.2.2.</a> <a href="#clientidentityserverfinished" id="clientidentityserverfinished">ClientIdentity_ServerFinished</a></h3>
+<p id="rfc.section.3.2.2.p.1">Once a server receives a ClientAttest, and if that ClientAttest is validated (message authentication code and client signature verified, and version and suite_spec are acceptable), the server responds with a ServerFinished message.</p>
+<p id="rfc.section.3.2.2.p.2">If a server receives a ClientAttest message from a client from which it has already received a ClientAttest message during this handshake, the server MUST ignore the the extra messages.</p>
+<p id="rfc.section.3.2.2.p.3">The ServerFinished message informs the client of the ClientID that has been provisioned to it (either echoing the same <samp>id_c</samp> requested in the ClientAttest message or sending the newly-provisioned id).  In addition, the ServerFinished message contains a hash of the successful handshake, authenticated using a key derived from the LongtermSecret that has been provisioned.  This is to provide &#8216;peer-awareness&#8217; to the client, so the client and server can confirm they have the same view of the provisioned ClientID and LongtermSecret.</p>
+<p id="rfc.section.3.2.2.p.4">Structure of this message:</p>
 <pre>
 aead_struct&lt;session_keys&gt;(
     MsgType type = MsgType.id_serverfinished;
     Version version;
-    SuiteSpec spec;
+    SuiteSpec suite_spec;
 )[
-    ClientID client_id;     /* confirm id of client */
+    ClientID id_c;     /* confirm id of client */
     FinishedContext ctx;
 ] ClientIdentity_ServerFinished;
 </pre>
 <h2 id="rfc.section.3.3"><a href="#rfc.section.3.3">3.3.</a> <a href="#session-establishment-protocol" id="session-establishment-protocol">Session Establishment Protocol</a></h2>
+<p id="rfc.section.3.3.p.1">This handshake creates an AuthenticatedSession, and requires that a successful ClientIdentity handshake has already been run at least once in the past for this client.  The notes in (<a href="#identity-provisioning-protocol">Section 3.2</a>) about message resends apply also to this handshake.</p>
 <h3 id="rfc.section.3.3.1"><a href="#rfc.section.3.3.1">3.3.1.</a> <a href="#sessionclientattest" id="sessionclientattest">Session_ClientAttest</a></h3>
+<p id="rfc.section.3.3.1.p.1">As for the ClientIdentity handshake, a client responds to a ServerInitAndAttest message with a ClientAttest message.  The only difference from the ClientIdentity handshake is that the client uses a PSKSignature, rather than a DAASignature, to authenticate its identity.</p>
+<p id="rfc.section.3.3.1.p.2">The structure of a ClientAttest message that does not include an encapsulated payload is:</p>
 <pre>
 aead_struct&lt;handshake_keys&gt;(
     MsgType type =  MsgType.session_clientattest_nopayload;
     Version version;
     SuiteSpec spec;
-    byte flags[1];
     ServerCookie server_cookie;     /* echo from server */
 }[
     ClientID id;
     PSKSignature signature;
 ] AuthenticatedSession_ClientAttest_NoPayload;
 </pre>
+<p id="rfc.section.3.3.1.p.3">The structure of a ClientAttest message that does include an encapsulated payload is:</p>
 <pre>
 struct {
     aead_struct&lt;handshake_keys&gt;(
         MsgType type = MsgType.session_clientattest_payload;
         Version version;
         SuiteSpec spec;
-        byte flags[1];
         ServerCookie server_cookie;     /* echo from server */
     }[
         ClientID id;
@@ -767,6 +822,8 @@ struct {
     ];
 } AuthenticatedSession_ClientAttest_Payload;
 </pre>
+<h3 id="rfc.section.3.3.2"><a href="#rfc.section.3.3.2">3.3.2.</a> <a href="#sessionserverfinished" id="sessionserverfinished">Session_ServerFinished</a></h3>
+<p id="rfc.section.3.3.2.p.1">The structure and function of the Session_ServerFinished is nearly-identical to that of the ClientID_ServerFinished, with the only difference being that the ClientID of the client is not included in the message.</p>
 <pre>
 aead_struct&lt;session_keys&gt;(
     MsgType type = MsgType.session_serverfinished;
@@ -793,16 +850,56 @@ aead_struct&lt;session_keys&gt;(
 <p id="rfc.section.5.p.1">(TODO)</p>
 <h1 id="rfc.section.6"><a href="#rfc.section.6">6.</a> <a href="#cryptographic-computations" id="cryptographic-computations">Cryptographic Computations</a></h1>
 <h2 id="rfc.section.6.1"><a href="#rfc.section.6.1">6.1.</a> <a href="#notation" id="notation">Notation</a></h2>
+<p id="rfc.section.6.1.p.1">The cryptographic computations used in this protocol make heavy use of a pseudo-random function <samp>prf</samp>, defined as:</p>
+<pre>
+prf&lt;N&gt;(key, input) =
+        Keyed pseudo-random function (set during handshake),
+        keyed by "key", with "input" as input, outputting "N" bytes
+</pre>
+<p id="rfc.section.6.1.p.2">The <samp>prf</samp> can be implemented by any keyed hash function, for example an HMAC or a naturally-keyed hash like BLAKE.</p>
 <h2 id="rfc.section.6.2"><a href="#rfc.section.6.2">6.2.</a> <a href="#handshake-contexts" id="handshake-contexts">Handshake Contexts</a></h2>
+<p/>
+
+<ul>
+  <li>ServerInitHash</li>
+  <li>ServerSigHash</li>
+  <li>ClientAttestHash</li>
+  <li>ClientSigHash</li>
+  <li>ServerFinishedHash</li>
+</ul>
 <h2 id="rfc.section.6.3"><a href="#rfc.section.6.3">6.3.</a> <a href="#key-calculation-and-schedule" id="key-calculation-and-schedule">Key Calculation and Schedule</a></h2>
+<p/>
+
+<ul>
+  <li>handshake_secret <ul><li><samp>prf&lt;64&gt;(0, Ephemeral Diffie-Hellman shared-secret)</samp></li></ul></li>
+  <li>handshake_keys <ul><li><samp>prf&lt;sizeof_aead_output&gt;(handshake_secret, context_string | ServerInitHash)</samp></li><li>Where <samp>context_string</samp> is <ul><li>&#8220;XTT handshake client transmit key&#8221; for the client&#8217;s transmit key</li><li>&#8220;XTT handshake client transmit iv&#8221; for the client&#8217;s transmit IV</li><li>&#8220;XTT handshake server transmit key&#8221; for the server&#8217;s transmit key</li><li>&#8220;XTT handshake server transmit iv&#8221; for the server&#8217;s transmit IV</li></ul></li><li>Where <samp>sizeof_aead_output</samp> depends on the AEAD suite chosen in the handshake and on whether a key or an IV is desired</li></ul></li>
+  <li>LongtermSecret <ul><li><samp>prf&lt;64&gt;(handshake_secret, &#8220;XAPTSECT&#8221; | ClientAttestHash)</samp></li></ul></li>
+  <li>session_keys <ul><li><samp>prf&lt;sizeof_aead_output&gt;(LongtermSecret, context_string | ClientAttestHash)</samp></li><li>Where <samp>context_string</samp> is <ul><li>&#8220;XTT session client transmit key&#8221; for the client&#8217;s transmit key</li><li>&#8220;XTT session client transmit iv&#8221; for the client&#8217;s transmit IV</li><li>&#8220;XTT session server transmit key&#8221; for the server&#8217;s transmit key</li><li>&#8220;XTT session server transmit iv&#8221; for the server&#8217;s transmit IV</li></ul></li><li>Where <samp>sizeof_aead_output</samp> depends on the AEAD suite chosen in the handshake and on whether a key or an IV is desired</li></ul></li>
+</ul>
 <h2 id="rfc.section.6.4"><a href="#rfc.section.6.4">6.4.</a> <a href="#sessionid-generation" id="sessionid-generation">SessionID Generation</a></h2>
+<p/>
+
+<ul>
+  <li>SessionID <ul><li><samp>session_id_seed_s | session_id_seed_c</samp></li></ul></li>
+</ul>
 <h2 id="rfc.section.6.5"><a href="#rfc.section.6.5">6.5.</a> <a href="#ecdhe-parameters" id="ecdhe-parameters">ECDHE Parameters</a></h2>
 <p id="rfc.section.6.5.p.1">The size and interpretation of a value of type DHKeyShare depends on the Diffie-Hellman algorithm specified in the handshake messages.</p>
 <p id="rfc.section.6.5.p.2">Currently, only x25519 is supported by the protocol.</p>
 <p id="rfc.section.6.5.p.3">For x25519, the contents are the byte string inputs and outputs of the corresponding functions defined in <a href="#RFC7748">[RFC7748]</a>.  The size of the DHKeyShare in this case is 32 bytes.</p>
-<h2 id="rfc.section.6.6"><a href="#rfc.section.6.6">6.6.</a> <a href="#signature-algorithms" id="signature-algorithms">Signature Algorithms</a></h2>
-<h2 id="rfc.section.6.7"><a href="#rfc.section.6.7">6.7.</a> <a href="#per-message-nonce-calculation" id="per-message-nonce-calculation">Per-message Nonce Calculation</a></h2>
-<p id="rfc.section.6.7.p.1">(TODO)</p>
+<h2 id="rfc.section.6.6"><a href="#rfc.section.6.6">6.6.</a> <a href="#daa-parameters" id="daa-parameters">DAA Parameters</a></h2>
+<p id="rfc.section.6.6.p.1">EPID2, TPM2.0, and FIDO key/signature sizes.</p>
+<h2 id="rfc.section.6.7"><a href="#rfc.section.6.7">6.7.</a> <a href="#signature-algorithms" id="signature-algorithms">Signature Algorithms</a></h2>
+<p/>
+
+<ul>
+  <li>ServerSignature <ul><li>Group Ed255519</li></ul></li>
+  <li>PSKSignature</li>
+  <li>DAASignature</li>
+</ul>
+<h2 id="rfc.section.6.8"><a href="#rfc.section.6.8">6.8.</a> <a href="#per-message-nonce-calculation" id="per-message-nonce-calculation">Per-message Nonce Calculation</a></h2>
+<p id="rfc.section.6.8.p.1">A per-session pair of key and IV are created for both sending and receiving data, upon the successful completion of a handshake.  The client and server each get a pair of sending and receiving keys/IVs (of course, the server&#8217;s sending key/IV matches the client&#8217;s receiving key/IV, and vice-versa).  The byte-length of the IVs is that of the nonce for the negotiated AEAD algorithm.</p>
+<p id="rfc.section.6.8.p.2">At the start of a new session (after a successful handshake), the two sequence numbers (client-to-server and server-to-client) are set to 0.  The first Authenticated Session record payload the client sends after authenticating in its ClientAttest must have sequence number 0.  Note, any AuthenticatedSessionPayload included with the ClientAttest will have the sequence number 0.  Similarly, the first packet sent by the server after sending its ServerAttest must have sequence number 0, meaning that if the server sends a ServerFinished packet this packet will have sequence number 0.</p>
+<p id="rfc.section.6.8.p.3">A per-message nonce is generated before AEAD encryption by left-padding the sequence number (in network byte order) to the length of the nonce/IV, then XOR&#8217;ing the appropriate IV with this padded sequence number.</p>
 <h1 id="rfc.references"><a href="#rfc.references">7.</a> References</h1>
 <h2 id="rfc.references.1"><a href="#rfc.references.1">7.1.</a> Normative References</h2>
 <table>
@@ -1012,20 +1109,12 @@ struct {
 enum : uint8 {
     client_init(0x01),
     server_init_and_attest(0x02),
-    id_clientattest_response_nopayload_ip(0x11),
-    id_clientattest_response_payload_ip(0x12),
-    id_clientattest_response_nopayload_noip(0x13),
-    id_clientattest_response_payload_noip(0x14),
-    id_clientattest_noresponse_payload_ip(0x15),
-    id_clientattest_noresponse_payload_noip(0x16),
-    id_serverfinished(0x17),
-    session_clientattest_response_nopayload_ip(0x21),
-    session_clientattest_response_payload_ip(0x22),
-    session_clientattest_response_nopayload_noip(0x23),
-    session_clientattest_response_payload_noip(0x24),
-    session_clientattest_noresponse_payload_ip(0x25),
-    session_clientattest_noresponse_payload_noip(0x26),
-    session_serverfinished(0x27),
+    id_clientattest_nopayload(0x11),
+    id_clientattest_payload(0x12),
+    id_serverfinished(0x13),
+    session_clientattest_nopayload(0x21),
+    session_clientattest_payload(0x22),
+    session_serverfinished(0x23),
     record_regular(0x31),
     alert(0x41)
 } MsgType;
