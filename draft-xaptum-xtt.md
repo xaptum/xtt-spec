@@ -479,7 +479,7 @@ aead_struct<session_keys>(
 )[
     ClientID client_id;     /* confirm id of client */
     FinishedContext ctx;
-];
+] ClientIdentity_ServerFinished;
 ~~~
 
 
@@ -498,7 +498,7 @@ aead_struct<handshake_keys>(
     DAAGroupKey daa_gpk;
     ClientID id;
     DAASignature signature;
-] MsgType.session_ClientAttest_NoPayload;
+] AuthenticatedSession_ClientAttest_NoPayload;
 ~~~
 
 ~~~
@@ -520,7 +520,7 @@ struct {
         EncapsulatedPayloadType payload_type;
         byte payload[length - sizeof(rest_of_message)];
     ];
-} MsgType.session_ClientAttest_Payload;
+} AuthenticatedSession_ClientAttest_Payload;
 ~~~
 
 ~~~
@@ -530,7 +530,7 @@ aead_struct<session_keys>(
     SuiteSpec spec;
 )[
     FinishedContext ctx;
-];
+] AuthenticatedSession_ServerFinished;
 ~~~
 
 # Record Protocol
@@ -545,7 +545,7 @@ aead_struct<session_keys>(
 )[
     EncapsulatedPayloadType payload_type;
     byte payload[length - sizeof(rest_of_message)];
-];
+] Record_Regular;
 ~~~
 
 # Error Handling
