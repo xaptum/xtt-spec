@@ -1,0 +1,17 @@
+language: python
+sudo: false
+addons:
+  apt:
+    packages:
+      - python-pip
+dist: trusty
+
+install:
+  - gem install kramdown-rfc2629
+  - pip install xml2rfc
+
+script: make ghpages
+
+env:
+  global:
+    secure: Bj+Z7mSABJq8D1SQJ1G0U/UYruFbxbaAM5ED2BFNuprqVkLeBem8Hygwi981dbBOYaESBVsvke9qMK9KQxw6cPX8BfpXb6HfMNya8AE+S+MpWAatKm4QuSLPddLASAVBHTKUSLr0900Mv7daKsUk3ZITrUVCj+31Yqr88rYO4i1z6ZpMBxZ04GxJ8aa7xAX8suFO1rjq48cXfy76B3F7rmOfWntF1+Dfw9+fUnQy4ZVTAQop5Hm1MHPyXY2Pbz8ka8Y0n/qBzzAY+fadBDHAaav1Xce+B0wTDiaujpCyL2+UW47g2vBiW8Wj+S2usTFIqHHpN6+iS73BmM7rN+hqn/KbO+ZN6i/SaZ954+yopOJv1KqOy9+v4w6WJ88P6YF049eGX1Na5hIFmngca0KbXa3wWxLxeGovjInE/Wa27jiKPDw0Ce6729NCnQ0o9/lMCPf2KX8vqI195P/Qug9ctGWp7y+XB5h7DoBIj2XLZr2yKxQdGYo72/NGgTYntkeIwpEb/DLwk/aMn0GsJj1ElIsv5zCBYOh4DTdyl8gwLX+9B7//yrTRklzt3R+g9m51Xf9PTBqS4XxkV8BmK8RHcL55tkfwv6tzdtIbYUnTliFG/uLVN3ziOBROxMP2pg4WdK4hvAWxvNbOOHlrLDhAD9risHx061lLXvJxPzR8yrA=
