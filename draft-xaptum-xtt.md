@@ -52,6 +52,7 @@ normative:
 
 informative:
   RFC2119:
+  RFC3552:
   RFC5246:
   RFC6347:
   RFC7296:
@@ -105,25 +106,41 @@ integrity and confidentiality.
 DISCLAIMER: This is a WIP draft and has not yet seen significant
 security analysis.
 
-(TODO) (1 par.) Describe primary goals of XTT
+The primary goal of the XTT protocol is to provide a secure communication
+channel between an Internet of Things (IoT) device in the field and a backend
+network or server. The nature of the IoT imposes several constraints different
+from traditional transport layer security:
 
-- Identity Provisioning: (TODO) (1 par.) describe desired provisioning
-  properites
+- Identity Provisioning: IoT devices will be numerous and must be low-cost, so
+  manual provisioning of preshared keys (PSKs) or client certificates will not
+  scale. Instead, devices must be provisioned long-term cryptographic
+  identities in the field on first use. XTT leverages the Direct Anonymous
+  Attestation {DAA} capabilties of modern processors to enable this.
 
-- Authenticiation: (TODO) (1 par.) describe desired authentication
-  properties
+- IP Address Mobility: The last-mile Internet access can change frequently for
+  IoT devices. Needing to reestablish the secure channel after every IP
+  address change is bad for energy- and bandwidth-constrained devices.  XTT
+  decouples the secure channel from the underlying TCP or UDP transport
+  socket.
 
-- Integrity: (TODO) (1 par.) describe desired integrity properties
+- DoS Resistance: The secure communication channel is established over the
+  public Internet, so the protocol must be designed to help the server-side
+  resist denial of service (DoS) attacks.
 
-- Confidentiality: (TODO) (1 par.) describe desired confidentiality
-  properties
-  
-- IP-address Mobility: (TODO) (1 par.) describe desired mobility properties
+The protocol must also provide the following traditional security properties:
 
-- DoS Protection: (TODO) (1 par.) describe desired DoS protection desires
+- Mutual Authentication: Both the client and server sides are always
+  authenticated. Server authentication happens via ECDSA and client
+  authentication happens via PSK or DAA.
 
-(TODO) (1 par.) Describe attack/threat model. What view/control does
-the attacker have, e.g., RFC3552.
+- Integrity: Data sent over the channel cannot be modified by an attacker.
+
+- Confidentiality: Data sent over the channel is visible only to the
+  endpoints. This property is optional; encryption may be disabled if the
+  channel is tunneling data that was already encrypted.
+
+The protocol must resist an attacker with complete control of the network, as
+described in {{RFC3552}}.
 
 XTT consists of three primary components:
 
@@ -162,6 +179,10 @@ sender: (TODO) (1 sent.)
 server: (TODO) (1 sent.)
 
 session: (TODO) (1 sent.)
+
+## Use Cases
+
+(TODO)
 
 ## Security Requirements for the IoT
 
