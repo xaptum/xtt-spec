@@ -714,8 +714,26 @@ The size of the DHKeyShare in this case is 32 bytes.
 ## Signature Algorithms
 
 ## Per-message Nonce Calculation
+A per-session pair of key and IV are created for both sending and receiving data,
+upon the successful completion of a handshake.
+The client and server each get a pair of sending and receiving keys/IVs
+(of course, the server’s sending key/IV matches the client’s receiving key/IV, and vice-versa).
+The byte-length of the IVs is that of the nonce for the negotiated AEAD algorithm.
 
-(TODO)
+At the start of a new session (after a successful handshake),
+the two sequence numbers (client-to-server and server-to-client) are set to 0.
+The first Authenticated Session record payload the client sends after
+authenticating in its ClientAttest must have sequence number 0.
+Note, any AuthenticatedSessionPayload included with the ClientAttest
+will have the sequence number 0.
+Similarly, the first packet sent by the server after
+sending its ServerAttest must have sequence number 0,
+meaning that if the server sends a ServerFinished packet this packet will have sequence number 0.
+
+A per-message nonce is generated before AEAD encryption
+by left-padding the sequence number (in network byte order)
+to the length of the nonce/IV,
+then XOR’ing the appropriate IV with this padded sequence number.
 
 --- back
 
