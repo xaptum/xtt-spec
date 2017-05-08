@@ -307,38 +307,45 @@ while protecting the server's identity from passive attackers
   
          CLIENTINIT
          + version
-         + crypto-spec
+         + suite_spec
          + session_id_seed_c
-         + signing nonce
-         + ECDHE public key      ------->
+         + nonce_c 
+         + dh_keyshare_c         ------->
                                            
                                              SERVERINITANDATTEST ^ < Hk
                                                        version + | 
-                                                   crypto-spec + | 
+                                                    suite_spec + | 
                                              session_id_seed_c + |
-                                              ECDHE public key + | 
+                                                 dh_keyshare_s + | 
                                                  {certificate} + | 
                                            {session_id_seed_s} + | 
-                                                   {signature} + |
-                                 <-------      {server cookie} + v 
+                                                 {signature_s} + |
+                                 <-------      {server_cookie} + v 
 
   Hk > ^ CLIENTATTEST 
-       | + {DAA group key}
-       | + ({identity request})
-       v + {DAA signature}
-  Sk > ^
-       | + ([Application Data])  ------->
-       v
+       | + version
+       | + suite_spec
+       | + server_cookie
+       | + {daa_gpk}
+       | + {id_c}
+       v + {daa_signature_c}
+  Sk > ^ + ([length])
+       | + ([payload_type])
+       v + ([payload])           ------->
 
-                                                                 ^ < Sk
-                                                (SERVERFINISHED) |
-                                 <------- ([identity confirm]) + |
-                                                                 v
+                                                  SERVERFINISHED ^ < Sk
+                                                       version + |
+                                                    suite_spec + |
+                                                        [id_c] + |
+                                 <-------                [ctx] + v
   
-  Sk > ^                                                         ^ < Sk
-       |  RECORDREGULAR                            RECORDREGULAR |
-       |  + [Application Data]   <------>   [Application Data] + |
-       v                                                         v
+  Sk > ^ RECORDREGULAR                             RECORDREGULAR ^ < Sk
+       | + version                                     version + |
+       | + session_id                               session_id + |
+       | + seq_num                                     seq_num + |
+       | + length                                       length + |
+       | + [payload_type]                       [payload_type] + |
+       v + [payload]             <------>            [payload] + v
   
               +  Indicates message subfields
 
@@ -359,36 +366,64 @@ while protecting the server's identity from passive attackers
 {: #xtt-provisioning title="Message flow for XTT Identity Provisioning Handshake"}
 
 ~~~
-      Client                                                Server
-     ^ ClientInit
-     | + version and crypto-spec
-     | + ECDHE public key
-     v + session id seed          -------> 
-                                            
-                                              ServerInitAndAttest ^    
-                                        version and crypto-spec + |
-                                               ECDHE public key + |     
-                                                  {certificate} + |     
-                                              {session id seed} + |     
-                                                    {signature} + v
-                                  <-------
-     ^  ClientAttest 
-     | + {identity}
-     | + {psk signature}
-     v * [Application Data]       ------->
-                                  <------        ServerFinished *
+        Client                                             Server
+        -----------------------             -----------------------
+  
+         CLIENTINIT
+         + version
+         + suite_spec
+         + session_id_seed_c
+         + nonce_c 
+         + dh_keyshare_c         ------->
+                                           
+                                             SERVERINITANDATTEST ^ < Hk
+                                                       version + | 
+                                                    suite_spec + | 
+                                             session_id_seed_c + |
+                                                 dh_keyshare_s + | 
+                                                 {certificate} + | 
+                                           {session_id_seed_s} + | 
+                                                 {signature_s} + |
+                                 <-------      {server_cookie} + v 
 
-       [Application Data]         <------>     [Application Data]
+  Hk > ^ CLIENTATTEST 
+       | + version
+       | + suite_spec
+       | + server_cookie
+       | + {id_c}
+       v + {psk_signature_c}
+  Sk > ^ + ([length])
+       | + ([payload_type])
+       v + ([payload])           ------->
 
-            +  Indicates message subfields
-              
-            *  Indicates optional subfields/messages
-              
-            {} Indicates messages protected using
-               handshake keys
-               
-            [] Indicates messages protected using
-               session keys
+                                                  SERVERFINISHED ^ < Sk
+                                                       version + |
+                                                    suite_spec + |
+                                 <-------                [ctx] + v
+  
+  Sk > ^ RECORDREGULAR                             RECORDREGULAR ^ < Sk
+       | + version                                     version + |
+       | + session_id                               session_id + |
+       | + seq_num                                     seq_num + |
+       | + length                                       length + |
+       | + [payload_type]                       [payload_type] + |
+       v + [payload]             <------>            [payload] + v
+  
+              +  Indicates message subfields
+
+              () Indicates optional messages/subfields
+
+              {} Indicates data encrypted using handshake keys
+  
+              [] Indicates data encrypted using session keys
+  
+         Hk > ^ 
+              | Indicates data MAC'd using handshake keys
+              v  
+  
+         Sk > ^ 
+              | Indicates data MAC'd using session keys
+              v  
 ~~~
 {: #xtt-session title="Message flow for XTT Session Creation Handshake"}
 
@@ -424,10 +459,10 @@ Structure of this message:
 struct {
     MsgType type = client_init;
     Version version;
-    SuiteSpec spec;
-    SessionIDSeed session_id_seed;
-    SigningNonce client_nonce;
-    DHKeyShare client_dh_keyshare;
+    SuiteSpec suite_spec;
+    SessionIDSeed session_id_seed_c;
+    SigningNonce nonce_c;
+    DHKeyShare dh_keyshare_c;
 } ClientInit;
 ~~~
 
@@ -439,13 +474,13 @@ Structure of this message:
 aead_struct<handshake_keys>(
     MsgType type = server_init_and_attest;
     Version version;
-    SuiteSpec spec;
-    SessionIDSeed session_id_seed;   /* echo from client */
-    DHKeyShare server_dh_keyshare;
+    SuiteSpec suite_spec;
+    SessionIDSeed session_id_seed_c;   /* echo from client */
+    DHKeyShare dh_keyshare_s;
 )[
     ServerCertificate certificate;
-    SessionIDSeed session_id_seed;
-    ServerSignature server_signature;
+    SessionIDSeed session_id_seed_s;
+    ServerSignature signature_s;
     ServerCookie server_cookie;
 ] ServerInitAndAttest;
 ~~~
@@ -460,13 +495,12 @@ and simultaneously creates an AuthenticatedSession.
 aead_struct<handshake_keys>(
     MsgType type =  MsgType.id_clientattest_nopayload;
     Version version;
-    SuiteSpec spec;
-    byte flags[1];
+    SuiteSpec suite_spec;
     ServerCookie server_cookie;     /* echo from server */
 }[
     DAAGroupKey daa_gpk;
-    ClientID id;
-    DAASignature signature;
+    ClientID id_c;
+    DAASignature daa_signature_c;
 ] ClientIdentity_ClientAttest_NoPayload;
 ~~~
 
@@ -475,13 +509,12 @@ struct {
     aead_struct<handshake_keys>(
         MsgType type = MsgType.id_clientattest_payload;
         Version version;
-        SuiteSpec spec;
-        byte flags[1];
+        SuiteSpec suite_spec;
         ServerCookie server_cookie;     /* echo from server */
     }[
         DAAGroupKey daa_gpk;
-        ClientID id;
-        DAASignature signature;
+        ClientID id_c;
+        DAASignature daa_signature_c;
     ];
     aead_struct<session_keys>(
         MsgLength length;               /* total length */
@@ -496,9 +529,9 @@ struct {
 aead_struct<session_keys>(
     MsgType type = MsgType.id_serverfinished;
     Version version;
-    SuiteSpec spec;
+    SuiteSpec suite_spec;
 )[
-    ClientID client_id;     /* confirm id of client */
+    ClientID id_c;     /* confirm id of client */
     FinishedContext ctx;
 ] ClientIdentity_ServerFinished;
 ~~~
@@ -513,7 +546,6 @@ aead_struct<handshake_keys>(
     MsgType type =  MsgType.session_clientattest_nopayload;
     Version version;
     SuiteSpec spec;
-    byte flags[1];
     ServerCookie server_cookie;     /* echo from server */
 }[
     ClientID id;
@@ -527,7 +559,6 @@ struct {
         MsgType type = MsgType.session_clientattest_payload;
         Version version;
         SuiteSpec spec;
-        byte flags[1];
         ServerCookie server_cookie;     /* echo from server */
     }[
         ClientID id;
