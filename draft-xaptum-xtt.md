@@ -694,12 +694,54 @@ aead_struct<session_keys>(
 # Cryptographic Computations
 
 ## Notation
+The cryptographic computations used in this protocol make heavy use
+of a pseudo-random function `prf`, defined as:
+
+~~~
+prf<N>(key, input) =
+        Keyed pseudo-random function (set during handshake),
+        keyed by "key", with "input" as input, outputting "N" bytes
+~~~
+
+The `prf` can be implemented by any keyed hash function, for example
+an HMAC or a naturally-keyed hash like BLAKE.
 
 ## Handshake Contexts
 
+* ServerInitHash
+* ServerSigHash
+* ClientAttestHash
+* ClientSigHash
+* ServerFinishedHash
+
 ## Key Calculation and Schedule
 
+* handshake_secret
+  * `prf<64>(0, Ephemeral Diffie-Hellman shared-secret)`
+* handshake_keys
+  * `prf<sizeof_aead_output>(handshake_secret, context_string | ServerInitHash)`
+  * Where `context_string` is
+    * “XTT handshake client transmit key” for the client’s transmit key
+    * “XTT handshake client transmit iv” for the client’s transmit IV
+    * “XTT handshake server transmit key” for the server’s transmit key
+    * “XTT handshake server transmit iv” for the server’s transmit IV
+  * Where `sizeof_aead_output` depends on the AEAD suite chosen
+    in the handshake and on whether a key or an IV is desired
+* LongtermSecret
+  * `prf<64>(handshake_secret, “XAPTSECT” | ClientAttestHash)`
+* session_keys
+  * `prf<sizeof_aead_output>(LongtermSecret, context_string | ClientAttestHash)`
+  * Where `context_string` is
+    * “XTT session client transmit key” for the client’s transmit key
+    * “XTT session client transmit iv” for the client’s transmit IV
+    * “XTT session server transmit key” for the server’s transmit key
+    * “XTT session server transmit iv” for the server’s transmit IV
+  * Where `sizeof_aead_output` depends on the AEAD suite chosen
+    in the handshake and on whether a key or an IV is desired
+
 ## SessionID Generation
+* SessionID
+  * `session_id_seed_s | session_id_seed_c`
 
 ## ECDHE Parameters
 The size and interpretation of a value of type DHKeyShare
