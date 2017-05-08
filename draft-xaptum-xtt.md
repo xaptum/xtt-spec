@@ -753,7 +753,14 @@ For x25519, the contents are the byte string inputs and
 outputs of the corresponding functions defined in {{RFC7748}}.
 The size of the DHKeyShare in this case is 32 bytes.
 
+## DAA Parameters
+EPID2, TPM2.0, and FIDO key/signature sizes.
+
 ## Signature Algorithms
+* ServerSignature
+  * Group Ed255519
+* PSKSignature
+* DAASignature
 
 ## Per-message Nonce Calculation
 A per-session pair of key and IV are created for both sending and receiving data,
