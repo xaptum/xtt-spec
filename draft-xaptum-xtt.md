@@ -57,6 +57,17 @@ informative:
   RFC6347:
   RFC7296:
 
+  DAA:
+       title: "Direct Anonymous Attestation"
+       date: 2014-02-11
+       author:
+       -
+         ins: Ernie Brickell
+       -
+         ins: Jan Camenisch
+       -
+         ins: Liqun Chen
+
   MINIMALT:
        title: "MinimalLT: Minimal-latency Networking Through Better Security"
        date: 2013-11
@@ -115,7 +126,7 @@ from traditional transport layer security:
   manual provisioning of preshared keys (PSKs) or client certificates will not
   scale. Instead, devices must be provisioned long-term cryptographic
   identities in the field on first use. XTT leverages the Direct Anonymous
-  Attestation {DAA} capabilties of modern processors to enable this.
+  Attestation {{DAA}} capabilties of modern processors to enable this.
 
 - IP Address Mobility: The last-mile Internet access can change frequently for
   IoT devices. Needing to reestablish the secure channel after every IP
