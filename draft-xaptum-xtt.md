@@ -304,14 +304,12 @@ while protecting the server's identity from passive attackers
 ~~~
         Client                                             Server
         -----------------------             -----------------------
-  
          CLIENTINIT
          + version
          + suite_spec
          + session_id_seed_c
          + nonce_c 
          + dh_keyshare_c         ------->
-                                           
                                              SERVERINITANDATTEST ^ < Hk
                                                        version + | 
                                                     suite_spec + | 
@@ -321,7 +319,6 @@ while protecting the server's identity from passive attackers
                                            {session_id_seed_s} + | 
                                                  {signature_s} + |
                                  <-------      {server_cookie} + v 
-
   Hk > ^ CLIENTATTEST 
        | + version
        | + suite_spec
@@ -332,13 +329,11 @@ while protecting the server's identity from passive attackers
   Sk > ^ + ([length])
        | + ([payload_type])
        v + ([payload])           ------->
-
                                                   SERVERFINISHED ^ < Sk
                                                        version + |
                                                     suite_spec + |
                                                         [id_c] + |
                                  <-------                [ctx] + v
-  
   Sk > ^ RECORDREGULAR                             RECORDREGULAR ^ < Sk
        | + version                                     version + |
        | + session_id                               session_id + |
@@ -347,35 +342,24 @@ while protecting the server's identity from passive attackers
        | + [payload_type]                       [payload_type] + |
        v + [payload]             <------>            [payload] + v
   
-              +  Indicates message subfields
-
-              () Indicates optional messages/subfields
-
-              {} Indicates data encrypted using handshake keys
-  
-              [] Indicates data encrypted using session keys
-  
-         Hk > ^ 
-              | Indicates data MAC'd using handshake keys
-              v  
-  
-         Sk > ^ 
-              | Indicates data MAC'd using session keys
-              v  
+              +    Indicates message subfields
+              ()   Indicates optional messages/subfields
+              {}   Indicates data encrypted using handshake keys
+              []   Indicates data encrypted using session keys
+              Hk > Indicates data MAC'd using handshake keys
+              Sk > Indicates data MAC'd using session keys
 ~~~
 {: #xtt-provisioning title="Message flow for XTT Identity Provisioning Handshake"}
 
 ~~~
         Client                                             Server
         -----------------------             -----------------------
-  
          CLIENTINIT
          + version
          + suite_spec
          + session_id_seed_c
          + nonce_c 
          + dh_keyshare_c         ------->
-                                           
                                              SERVERINITANDATTEST ^ < Hk
                                                        version + | 
                                                     suite_spec + | 
@@ -385,7 +369,6 @@ while protecting the server's identity from passive attackers
                                            {session_id_seed_s} + | 
                                                  {signature_s} + |
                                  <-------      {server_cookie} + v 
-
   Hk > ^ CLIENTATTEST 
        | + version
        | + suite_spec
@@ -395,12 +378,10 @@ while protecting the server's identity from passive attackers
   Sk > ^ + ([length])
        | + ([payload_type])
        v + ([payload])           ------->
-
                                                   SERVERFINISHED ^ < Sk
                                                        version + |
                                                     suite_spec + |
                                  <-------                [ctx] + v
-  
   Sk > ^ RECORDREGULAR                             RECORDREGULAR ^ < Sk
        | + version                                     version + |
        | + session_id                               session_id + |
@@ -409,21 +390,12 @@ while protecting the server's identity from passive attackers
        | + [payload_type]                       [payload_type] + |
        v + [payload]             <------>            [payload] + v
   
-              +  Indicates message subfields
-
-              () Indicates optional messages/subfields
-
-              {} Indicates data encrypted using handshake keys
-  
-              [] Indicates data encrypted using session keys
-  
-         Hk > ^ 
-              | Indicates data MAC'd using handshake keys
-              v  
-  
-         Sk > ^ 
-              | Indicates data MAC'd using session keys
-              v  
+              +    Indicates message subfields
+              ()   Indicates optional messages/subfields
+              {}   Indicates data encrypted using handshake keys
+              []   Indicates data encrypted using session keys
+              Hk > Indicates data MAC'd using handshake keys
+              Sk > Indicates data MAC'd using session keys
 ~~~
 {: #xtt-session title="Message flow for XTT Session Creation Handshake"}
 
