@@ -592,6 +592,9 @@ This is to provide 'peer-awareness' to the client, so the client
 and server can confirm they have the same view of the provisioned
 ClientID and LongtermSecret.
 
+A client MUST wait until successful receipt of a ServerFinished
+message before sending any record layer payloads.
+
 Structure of this message:
 
 ~~~
