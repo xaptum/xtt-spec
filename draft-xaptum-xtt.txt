@@ -76,36 +76,36 @@ Table of Contents
    2.  Protocol Overview . . . . . . . . . . . . . . . . . . . . . .   6
    3.  Handshake Protocols . . . . . . . . . . . . . . . . . . . . .  10
      3.1.  Features Common to All Handshakes . . . . . . . . . . . .  10
-       3.1.1.  ClientInit Message  . . . . . . . . . . . . . . . . .  11
-       3.1.2.  ServerInitAndAttest . . . . . . . . . . . . . . . . .  11
-     3.2.  Identity Provisioning Protocol  . . . . . . . . . . . . .  12
-       3.2.1.  ClientIdentity_ClientAttest . . . . . . . . . . . . .  12
-       3.2.2.  ClientIdentity_ServerFinished . . . . . . . . . . . .  13
-     3.3.  Session Establishment Protocol  . . . . . . . . . . . . .  14
-       3.3.1.  Session_ClientAttest  . . . . . . . . . . . . . . . .  14
-       3.3.2.  Session_ServerFinished  . . . . . . . . . . . . . . .  15
-   4.  Record Protocol . . . . . . . . . . . . . . . . . . . . . . .  16
-   5.  Error Handling  . . . . . . . . . . . . . . . . . . . . . . .  16
-   6.  Cryptographic Computations  . . . . . . . . . . . . . . . . .  16
-     6.1.  Notation  . . . . . . . . . . . . . . . . . . . . . . . .  16
-     6.2.  Handshake Contexts  . . . . . . . . . . . . . . . . . . .  16
-     6.3.  Key Calculation and Schedule  . . . . . . . . . . . . . .  16
-     6.4.  SessionID Generation  . . . . . . . . . . . . . . . . . .  18
-     6.5.  ECDHE Parameters  . . . . . . . . . . . . . . . . . . . .  18
-     6.6.  DAA Parameters  . . . . . . . . . . . . . . . . . . . . .  18
-     6.7.  Signature Algorithms  . . . . . . . . . . . . . . . . . .  18
-     6.8.  Per-message Nonce Calculation . . . . . . . . . . . . . .  18
-   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  19
-     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  19
-     7.2.  Informative References  . . . . . . . . . . . . . . . . .  19
-   Appendix A.  State Machine  . . . . . . . . . . . . . . . . . . .  20
-     A.1.  Identity Provisioning Handshake . . . . . . . . . . . . .  20
-       A.1.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  20
-       A.1.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  20
-     A.2.  Session Establishment Handshake . . . . . . . . . . . . .  21
-       A.2.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  21
-       A.2.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  21
-   Appendix B.  Presentation Language  . . . . . . . . . . . . . . .  21
+       3.1.1.  ClientInit Message  . . . . . . . . . . . . . . . . .  10
+       3.1.2.  ServerInitAndAttest . . . . . . . . . . . . . . . . .  10
+     3.2.  Identity Provisioning Protocol  . . . . . . . . . . . . .  11
+       3.2.1.  ClientIdentity_ClientAttest . . . . . . . . . . . . .  11
+       3.2.2.  ClientIdentity_ServerFinished . . . . . . . . . . . .  12
+     3.3.  Session Establishment Protocol  . . . . . . . . . . . . .  13
+       3.3.1.  Session_ClientAttest  . . . . . . . . . . . . . . . .  13
+       3.3.2.  Session_ServerFinished  . . . . . . . . . . . . . . .  14
+   4.  Record Protocol . . . . . . . . . . . . . . . . . . . . . . .  15
+   5.  Error Handling  . . . . . . . . . . . . . . . . . . . . . . .  15
+   6.  Cryptographic Computations  . . . . . . . . . . . . . . . . .  15
+     6.1.  Notation  . . . . . . . . . . . . . . . . . . . . . . . .  15
+     6.2.  Handshake Contexts  . . . . . . . . . . . . . . . . . . .  15
+     6.3.  Key Calculation and Schedule  . . . . . . . . . . . . . .  15
+     6.4.  SessionID Generation  . . . . . . . . . . . . . . . . . .  17
+     6.5.  ECDHE Parameters  . . . . . . . . . . . . . . . . . . . .  17
+     6.6.  DAA Parameters  . . . . . . . . . . . . . . . . . . . . .  17
+     6.7.  Signature Algorithms  . . . . . . . . . . . . . . . . . .  17
+     6.8.  Per-message Nonce Calculation . . . . . . . . . . . . . .  17
+   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  18
+     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  18
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .  18
+   Appendix A.  State Machine  . . . . . . . . . . . . . . . . . . .  19
+     A.1.  Identity Provisioning Handshake . . . . . . . . . . . . .  19
+       A.1.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  19
+       A.1.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  19
+     A.2.  Session Establishment Handshake . . . . . . . . . . . . .  20
+       A.2.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  20
+       A.2.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  20
+   Appendix B.  Presentation Language  . . . . . . . . . . . . . . .  20
 
 
 
@@ -114,22 +114,22 @@ Beckwith & Bild         Expires November 10, 2017               [Page 2]
 Internet-Draft                     XTT                          May 2017
 
 
-     B.1.  Miscellaneous . . . . . . . . . . . . . . . . . . . . . .  21
-     B.2.  Definition of Byte  . . . . . . . . . . . . . . . . . . .  21
-     B.3.  Byte Arrays . . . . . . . . . . . . . . . . . . . . . . .  21
-     B.4.  Numeric Data  . . . . . . . . . . . . . . . . . . . . . .  22
-     B.5.  Enumerateds . . . . . . . . . . . . . . . . . . . . . . .  22
-     B.6.  Constructed Types . . . . . . . . . . . . . . . . . . . .  23
-     B.7.  AEAD-Encrypted Constructed Types  . . . . . . . . . . . .  23
-     B.8.  Constants . . . . . . . . . . . . . . . . . . . . . . . .  24
-     B.9.  Variants  . . . . . . . . . . . . . . . . . . . . . . . .  24
-   Appendix C.  Protocol Data Structures and Constant Values . . . .  25
-     C.1.  Common Message Header . . . . . . . . . . . . . . . . . .  25
-     C.2.  Handshakes  . . . . . . . . . . . . . . . . . . . . . . .  26
-       C.2.1.  DAA Types . . . . . . . . . . . . . . . . . . . . . .  26
-       C.2.2.  Server Certificates . . . . . . . . . . . . . . . . .  27
-     C.3.  Record Layer  . . . . . . . . . . . . . . . . . . . . . .  27
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  28
+     B.1.  Miscellaneous . . . . . . . . . . . . . . . . . . . . . .  20
+     B.2.  Definition of Byte  . . . . . . . . . . . . . . . . . . .  20
+     B.3.  Byte Arrays . . . . . . . . . . . . . . . . . . . . . . .  20
+     B.4.  Numeric Data  . . . . . . . . . . . . . . . . . . . . . .  21
+     B.5.  Enumerateds . . . . . . . . . . . . . . . . . . . . . . .  21
+     B.6.  Constructed Types . . . . . . . . . . . . . . . . . . . .  22
+     B.7.  AEAD-Encrypted Constructed Types  . . . . . . . . . . . .  22
+     B.8.  Constants . . . . . . . . . . . . . . . . . . . . . . . .  23
+     B.9.  Variants  . . . . . . . . . . . . . . . . . . . . . . . .  23
+   Appendix C.  Protocol Data Structures and Constant Values . . . .  24
+     C.1.  Common Message Header . . . . . . . . . . . . . . . . . .  24
+     C.2.  Handshakes  . . . . . . . . . . . . . . . . . . . . . . .  25
+       C.2.1.  DAA Types . . . . . . . . . . . . . . . . . . . . . .  25
+       C.2.2.  Server Certificates . . . . . . . . . . . . . . . . .  26
+     C.3.  Record Layer  . . . . . . . . . . . . . . . . . . . . . .  26
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  27
 
 1.  Introduction
 
@@ -383,8 +383,8 @@ Internet-Draft                     XTT                          May 2017
    (TODO) Specific handshake design aspects * Small, fixed-size messages
    during handshake * No arbitrary-length certificate chains
 
-         Client                                             Server
-         -----------------------             -----------------------
+
+
 
 
 
@@ -394,13 +394,14 @@ Beckwith & Bild         Expires November 10, 2017               [Page 7]
 Internet-Draft                     XTT                          May 2017
 
 
+         Client                                             Server
+         -----------------------             -----------------------
           CLIENTINIT
           + version
           + suite_spec
           + session_id_seed_c
           + nonce_c
           + dh_keyshare_c         ------->
-
                                               SERVERINITANDATTEST ^ < Hk
                                                         version + |
                                                      suite_spec + |
@@ -410,7 +411,6 @@ Internet-Draft                     XTT                          May 2017
                                             {session_id_seed_s} + |
                                                   {signature_s} + |
                                   <-------      {server_cookie} + v
-
    Hk > ^ CLIENTATTEST
         | + version
         | + suite_spec
@@ -421,13 +421,11 @@ Internet-Draft                     XTT                          May 2017
    Sk > ^ + ([length])
         | + ([payload_type])
         v + ([payload])           ------->
-
                                                    SERVERFINISHED ^ < Sk
                                                         version + |
                                                      suite_spec + |
                                                          [id_c] + |
                                   <-------                [ctx] + v
-
    Sk > ^ RECORDREGULAR                             RECORDREGULAR ^ < Sk
         | + version                                     version + |
         | + session_id                               session_id + |
@@ -436,12 +434,14 @@ Internet-Draft                     XTT                          May 2017
         | + [payload_type]                       [payload_type] + |
         v + [payload]             <------>            [payload] + v
 
-               +  Indicates message subfields
+               +    Indicates message subfields
+               ()   Indicates optional messages/subfields
+               {}   Indicates data encrypted using handshake keys
+               []   Indicates data encrypted using session keys
+               Hk > Indicates data MAC'd using handshake keys
+               Sk > Indicates data MAC'd using session keys
 
-               () Indicates optional messages/subfields
-
-               {} Indicates data encrypted using handshake keys
-
+      Figure 1: Message flow for XTT Identity Provisioning Handshake
 
 
 
@@ -450,28 +450,14 @@ Beckwith & Bild         Expires November 10, 2017               [Page 8]
 Internet-Draft                     XTT                          May 2017
 
 
-               [] Indicates data encrypted using session keys
-
-          Hk > ^
-               | Indicates data MAC'd using handshake keys
-               v
-
-          Sk > ^
-               | Indicates data MAC'd using session keys
-               v
-
-      Figure 1: Message flow for XTT Identity Provisioning Handshake
-
          Client                                             Server
          -----------------------             -----------------------
-
           CLIENTINIT
           + version
           + suite_spec
           + session_id_seed_c
           + nonce_c
           + dh_keyshare_c         ------->
-
                                               SERVERINITANDATTEST ^ < Hk
                                                         version + |
                                                      suite_spec + |
@@ -481,7 +467,6 @@ Internet-Draft                     XTT                          May 2017
                                             {session_id_seed_s} + |
                                                   {signature_s} + |
                                   <-------      {server_cookie} + v
-
    Hk > ^ CLIENTATTEST
         | + version
         | + suite_spec
@@ -491,21 +476,11 @@ Internet-Draft                     XTT                          May 2017
    Sk > ^ + ([length])
         | + ([payload_type])
         v + ([payload])           ------->
-
                                                    SERVERFINISHED ^ < Sk
                                                         version + |
                                                      suite_spec + |
                                   <-------                [ctx] + v
-
    Sk > ^ RECORDREGULAR                             RECORDREGULAR ^ < Sk
-
-
-
-Beckwith & Bild         Expires November 10, 2017               [Page 9]
-
-Internet-Draft                     XTT                          May 2017
-
-
         | + version                                     version + |
         | + session_id                               session_id + |
         | + seq_num                                     seq_num + |
@@ -513,25 +488,23 @@ Internet-Draft                     XTT                          May 2017
         | + [payload_type]                       [payload_type] + |
         v + [payload]             <------>            [payload] + v
 
-               +  Indicates message subfields
-
-               () Indicates optional messages/subfields
-
-               {} Indicates data encrypted using handshake keys
-
-               [] Indicates data encrypted using session keys
-
-          Hk > ^
-               | Indicates data MAC'd using handshake keys
-               v
-
-          Sk > ^
-               | Indicates data MAC'd using session keys
-               v
+               +    Indicates message subfields
+               ()   Indicates optional messages/subfields
+               {}   Indicates data encrypted using handshake keys
+               []   Indicates data encrypted using session keys
+               Hk > Indicates data MAC'd using handshake keys
+               Sk > Indicates data MAC'd using session keys
 
          Figure 2: Message flow for XTT Session Creation Handshake
 
    (TODO) record layer
+
+
+
+Beckwith & Bild         Expires November 10, 2017               [Page 9]
+
+Internet-Draft                     XTT                          May 2017
+
 
 3.  Handshake Protocols
 
@@ -550,17 +523,6 @@ Internet-Draft                     XTT                          May 2017
    AuthenticatedSession handshake.  For each handshake type, the two
    variants indicate whether or not a payload is included with the
    message.
-
-
-
-
-
-
-
-Beckwith & Bild         Expires November 10, 2017              [Page 10]
-
-Internet-Draft                     XTT                          May 2017
-
 
 3.1.1.  ClientInit Message
 
@@ -592,6 +554,14 @@ Internet-Draft                     XTT                          May 2017
    A server MAY respond to multiple ClientInit messages from the same
    client with not-necessarily identical ServerInitAndAttest messages
    before a full handshake is completed with that client.  However, if
+
+
+
+Beckwith & Bild         Expires November 10, 2017              [Page 10]
+
+Internet-Draft                     XTT                          May 2017
+
+
    multiple ClientInitAndAttest replies are sent to the same client
    during a handshake and the server is storing state locally after
    responding (rather than storing state only in the ServerCookie), the
@@ -599,24 +569,6 @@ Internet-Draft                     XTT                          May 2017
    ClientInitAndAttest is valid.
 
    Structure of this message:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Beckwith & Bild         Expires November 10, 2017              [Page 11]
-
-Internet-Draft                     XTT                          May 2017
-
 
    aead_struct<handshake_keys>(
        MsgType type = server_init_and_attest;
@@ -658,21 +610,19 @@ Internet-Draft                     XTT                          May 2017
    A client may indicate a specific ClientID in the "id_c" field of a
    ClientAttest message, in order to request that specific ClientID be
    provisioned to it.  Otherwise, if the client wishes the server to
+
+
+
+Beckwith & Bild         Expires November 10, 2017              [Page 11]
+
+Internet-Draft                     XTT                          May 2017
+
+
    select the ClientID for it, the "id_c" field MUST be set to all
    zeroes.
 
    The structure of a ClientAttest message that does not include an
    encapsulated payload is:
-
-
-
-
-
-
-Beckwith & Bild         Expires November 10, 2017              [Page 12]
-
-Internet-Draft                     XTT                          May 2017
-
 
    aead_struct<handshake_keys>(
        MsgType type =  MsgType.id_clientattest_nopayload;
@@ -717,18 +667,16 @@ Internet-Draft                     XTT                          May 2017
    and version and suite_spec are acceptable), the server responds with
    a ServerFinished message.
 
-   If a server receives a ClientAttest message from a client from which
-   it has already received a ClientAttest message during this handshake,
-   the server MUST ignore the the extra messages.
 
 
-
-
-
-Beckwith & Bild         Expires November 10, 2017              [Page 13]
+Beckwith & Bild         Expires November 10, 2017              [Page 12]
 
 Internet-Draft                     XTT                          May 2017
 
+
+   If a server receives a ClientAttest message from a client from which
+   it has already received a ClientAttest message during this handshake,
+   the server MUST ignore the the extra messages.
 
    The ServerFinished message informs the client of the ClientID that
    has been provisioned to it (either echoing the same "id_c" requested
@@ -777,11 +725,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-
-
-
-
-Beckwith & Bild         Expires November 10, 2017              [Page 14]
+Beckwith & Bild         Expires November 10, 2017              [Page 13]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -837,7 +781,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 15]
+Beckwith & Bild         Expires November 10, 2017              [Page 14]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -893,7 +837,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 16]
+Beckwith & Bild         Expires November 10, 2017              [Page 15]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -949,7 +893,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 17]
+Beckwith & Bild         Expires November 10, 2017              [Page 16]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1005,7 +949,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 18]
+Beckwith & Bild         Expires November 10, 2017              [Page 17]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1061,7 +1005,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 19]
+Beckwith & Bild         Expires November 10, 2017              [Page 18]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1117,7 +1061,7 @@ A.1.2.  Server
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 20]
+Beckwith & Bild         Expires November 10, 2017              [Page 19]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1173,7 +1117,7 @@ B.3.  Byte Arrays
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 21]
+Beckwith & Bild         Expires November 10, 2017              [Page 20]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1229,7 +1173,7 @@ B.5.  Enumerateds
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 22]
+Beckwith & Bild         Expires November 10, 2017              [Page 21]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1285,7 +1229,7 @@ B.7.  AEAD-Encrypted Constructed Types
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 23]
+Beckwith & Bild         Expires November 10, 2017              [Page 22]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1341,7 +1285,7 @@ B.9.  Variants
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 24]
+Beckwith & Bild         Expires November 10, 2017              [Page 23]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1397,7 +1341,7 @@ C.1.  Common Message Header
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 25]
+Beckwith & Bild         Expires November 10, 2017              [Page 24]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1453,7 +1397,7 @@ C.2.1.  DAA Types
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 26]
+Beckwith & Bild         Expires November 10, 2017              [Page 25]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1509,7 +1453,7 @@ C.3.  Record Layer
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 27]
+Beckwith & Bild         Expires November 10, 2017              [Page 26]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1565,4 +1509,4 @@ Authors' Addresses
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 28]
+Beckwith & Bild         Expires November 10, 2017              [Page 27]

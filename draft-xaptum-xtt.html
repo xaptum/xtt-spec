@@ -570,14 +570,12 @@ address {
 <pre>
         Client                                             Server
         -----------------------             -----------------------
-  
          CLIENTINIT
          + version
          + suite_spec
          + session_id_seed_c
          + nonce_c 
          + dh_keyshare_c         -------&gt;
-                                           
                                              SERVERINITANDATTEST ^ &lt; Hk
                                                        version + | 
                                                     suite_spec + | 
@@ -587,7 +585,6 @@ address {
                                            {session_id_seed_s} + | 
                                                  {signature_s} + |
                                  &lt;-------      {server_cookie} + v 
-
   Hk &gt; ^ CLIENTATTEST 
        | + version
        | + suite_spec
@@ -598,13 +595,11 @@ address {
   Sk &gt; ^ + ([length])
        | + ([payload_type])
        v + ([payload])           -------&gt;
-
                                                   SERVERFINISHED ^ &lt; Sk
                                                        version + |
                                                     suite_spec + |
                                                         [id_c] + |
                                  &lt;-------                [ctx] + v
-  
   Sk &gt; ^ RECORDREGULAR                             RECORDREGULAR ^ &lt; Sk
        | + version                                     version + |
        | + session_id                               session_id + |
@@ -613,21 +608,12 @@ address {
        | + [payload_type]                       [payload_type] + |
        v + [payload]             &lt;------&gt;            [payload] + v
   
-              +  Indicates message subfields
-
-              () Indicates optional messages/subfields
-
-              {} Indicates data encrypted using handshake keys
-  
-              [] Indicates data encrypted using session keys
-  
-         Hk &gt; ^ 
-              | Indicates data MAC'd using handshake keys
-              v  
-  
-         Sk &gt; ^ 
-              | Indicates data MAC'd using session keys
-              v  
+              +    Indicates message subfields
+              ()   Indicates optional messages/subfields
+              {}   Indicates data encrypted using handshake keys
+              []   Indicates data encrypted using session keys
+              Hk &gt; Indicates data MAC'd using handshake keys
+              Sk &gt; Indicates data MAC'd using session keys
 </pre>
 <p class="figure">Figure 1: Message flow for XTT Identity Provisioning Handshake</p>
 <div id="rfc.figure.2"/>
@@ -635,14 +621,12 @@ address {
 <pre>
         Client                                             Server
         -----------------------             -----------------------
-  
          CLIENTINIT
          + version
          + suite_spec
          + session_id_seed_c
          + nonce_c 
          + dh_keyshare_c         -------&gt;
-                                           
                                              SERVERINITANDATTEST ^ &lt; Hk
                                                        version + | 
                                                     suite_spec + | 
@@ -652,7 +636,6 @@ address {
                                            {session_id_seed_s} + | 
                                                  {signature_s} + |
                                  &lt;-------      {server_cookie} + v 
-
   Hk &gt; ^ CLIENTATTEST 
        | + version
        | + suite_spec
@@ -662,12 +645,10 @@ address {
   Sk &gt; ^ + ([length])
        | + ([payload_type])
        v + ([payload])           -------&gt;
-
                                                   SERVERFINISHED ^ &lt; Sk
                                                        version + |
                                                     suite_spec + |
                                  &lt;-------                [ctx] + v
-  
   Sk &gt; ^ RECORDREGULAR                             RECORDREGULAR ^ &lt; Sk
        | + version                                     version + |
        | + session_id                               session_id + |
@@ -676,21 +657,12 @@ address {
        | + [payload_type]                       [payload_type] + |
        v + [payload]             &lt;------&gt;            [payload] + v
   
-              +  Indicates message subfields
-
-              () Indicates optional messages/subfields
-
-              {} Indicates data encrypted using handshake keys
-  
-              [] Indicates data encrypted using session keys
-  
-         Hk &gt; ^ 
-              | Indicates data MAC'd using handshake keys
-              v  
-  
-         Sk &gt; ^ 
-              | Indicates data MAC'd using session keys
-              v  
+              +    Indicates message subfields
+              ()   Indicates optional messages/subfields
+              {}   Indicates data encrypted using handshake keys
+              []   Indicates data encrypted using session keys
+              Hk &gt; Indicates data MAC'd using handshake keys
+              Sk &gt; Indicates data MAC'd using session keys
 </pre>
 <p class="figure">Figure 2: Message flow for XTT Session Creation Handshake</p>
 <p id="rfc.section.2.p.8">(TODO) record layer</p>
