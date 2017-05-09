@@ -41,6 +41,7 @@ normative:
   RFC7539:
   RFC7693:
   RFC7748:
+  RFC8032:
   
   SHS:
        title: Secure Hash Standard
@@ -750,7 +751,7 @@ EPID2, TPM2.0, and FIDO key/signature sizes.
 
 ## Signature Algorithms
 * ServerSignature
-  * Group Ed255519
+  * Group Ed255519 {{RFC8032}}
 * PSKSignature
 * DAASignature
 
