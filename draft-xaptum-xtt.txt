@@ -101,7 +101,7 @@ Table of Contents
    Appendix A.  State Machine  . . . . . . . . . . . . . . . . . . .  19
      A.1.  Identity Provisioning Handshake . . . . . . . . . . . . .  19
        A.1.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  19
-       A.1.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  19
+       A.1.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  20
      A.2.  Session Establishment Handshake . . . . . . . . . . . . .  20
        A.2.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  20
        A.2.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  20
@@ -146,7 +146,7 @@ Internet-Draft                     XTT                          May 2017
       low-cost, so manual provisioning of preshared keys (PSKs) or
       client certificates will not scale.  Instead, devices must be
       provisioned long-term cryptographic identities in the field on
-      first use.  XTT leverages the Direct Anonymous Attestation {DAA}
+      first use.  XTT leverages the Direct Anonymous Attestation [DAA]
       capabilties of modern processors to enable this.
 
    -  IP Address Mobility: The last-mile Internet access can change
@@ -993,15 +993,15 @@ Internet-Draft                     XTT                          May 2017
 
 7.2.  Informative References
 
+   [DAA]      Ernie Brickell, ., Jan Camenisch, ., and . Liqun Chen,
+              "Direct Anonymous Attestation", February 2014.
+
    [MINIMALT]
               Petullo, W., Zhang, X., Solworth, J., Bernstein, D., and
               T. Lange, "MinimalLT: Minimal-latency Networking Through
               Better Security", November 2013.
 
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119,
-              DOI 10.17487/RFC2119, March 1997,
-              <http://www.rfc-editor.org/info/rfc2119>.
+
 
 
 
@@ -1009,6 +1009,11 @@ Beckwith & Bild         Expires November 10, 2017              [Page 18]
 
 Internet-Draft                     XTT                          May 2017
 
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
 
    [RFC3552]  Rescorla, E. and B. Korver, "Guidelines for Writing RFC
               Text on Security Considerations", BCP 72, RFC 3552,
@@ -1051,11 +1056,6 @@ A.1.1.  Client
 
    (TODO)
 
-A.1.2.  Server
-
-   (TODO)
-
-
 
 
 
@@ -1065,6 +1065,10 @@ Beckwith & Bild         Expires November 10, 2017              [Page 19]
 
 Internet-Draft                     XTT                          May 2017
 
+
+A.1.2.  Server
+
+   (TODO)
 
 A.2.  Session Establishment Handshake
 
@@ -1110,10 +1114,6 @@ B.3.  Byte Arrays
 
    Unless defined as a numeric data type, the bytes comprising a byte-
    array are not to be interpreted by the protocol in any way.
-
-
-
-
 
 
 

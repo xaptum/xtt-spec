@@ -470,7 +470,7 @@ address {
 <p/>
 
 <ul>
-  <li>Identity Provisioning: IoT devices will be numerous and must be low-cost, so manual provisioning of preshared keys (PSKs) or client certificates will not scale. Instead, devices must be provisioned long-term cryptographic identities in the field on first use. XTT leverages the Direct Anonymous Attestation {DAA} capabilties of modern processors to enable this.</li>
+  <li>Identity Provisioning: IoT devices will be numerous and must be low-cost, so manual provisioning of preshared keys (PSKs) or client certificates will not scale. Instead, devices must be provisioned long-term cryptographic identities in the field on first use. XTT leverages the Direct Anonymous Attestation <a href="#DAA">[DAA]</a> capabilties of modern processors to enable this.</li>
   <li>IP Address Mobility: The last-mile Internet access can change frequently for IoT devices. Needing to reestablish the secure channel after every IP address change is bad for energy- and bandwidth-constrained devices.  XTT decouples the secure channel from the underlying TCP or UDP transport socket.</li>
   <li>DoS Resistance: The secure communication channel is established over the public Internet, so the protocol must be designed to help the server-side resist denial of service (DoS) attacks.</li>
 </ul>
@@ -918,6 +918,12 @@ prf&lt;N&gt;(key, input) =
 <h2 id="rfc.references.2"><a href="#rfc.references.2">7.2.</a> Informative References</h2>
 <table>
   <tbody>
+    <tr>
+      <td class="reference">
+        <b id="DAA">[DAA]</b>
+      </td>
+      <td class="top"><a>Ernie Brickell, .</a>, <a>Jan Camenisch, .</a> and <a>. Liqun Chen</a>, "<a>Direct Anonymous Attestation</a>", February 2014.</td>
+    </tr>
     <tr>
       <td class="reference">
         <b id="MINIMALT">[MINIMALT]</b>
