@@ -750,10 +750,24 @@ The size of the DHKeyShare in this case is 32 bytes.
 EPID2, TPM2.0, and FIDO key/signature sizes.
 
 ## Signature Algorithms
-* ServerSignature
-  * Group Ed255519 {{RFC8032}}
-* PSKSignature
-* DAASignature
+The size and interpretation of signature types (signatures and public keys)
+depends on the signature algorithm.
+
+### ServerSignature
+Currently, the only supported algorithm for the
+server's signature in a ServerInitAndAttest is
+an EdDSA signature (described in {{RFC8032}}) using the X25519 elliptic curve
+(this combination is known as Ed25519).
+
+For Ed25519, the contents of ServerSignaturePublicKey are the byte string
+output of the key generation described in {{RFC8032}}, where the byte string
+format is defined in {{RFC7748}}.
+Similarly, the content of ServerSignature are the byte string output
+of the signature algorithm of {{RFC8032}} in the format of {{RFC7748}}.
+
+### PSKSignature
+
+### DAASignature
 
 ## Per-message Nonce Calculation
 A per-session pair of key and IV are created for both sending and receiving data,
@@ -1041,12 +1055,12 @@ enum : uint8 {
 
 ~~~
 enum : uint16 {
-    x25519_epid2_chacha20poly1305_sha512(1),
-    x25519_epid2_chacha20poly1305_blake2b(2),
-    x25519_epid2_aes256gcm_sha512(3),
-    x25519_epid2_aes256gcm_blake2b(4),
-    x25519_epid2_null_sha512(5),
-    x25519_epid2_null_blake2b(6)
+    x25519_epid2_ed25519_chacha20poly1305_sha512(1),
+    x25519_epid2_ed25519_chacha20poly1305_blake2b(2),
+    x25519_epid2_ed25519_aes256gcm_sha512(3),
+    x25519_epid2_ed25519_aes256gcm_blake2b(4),
+    x25519_epid2_ed25519_null_sha512(5),
+    x25519_epid2_ed25519_null_blake2b(6)
 } SuiteSpec;
 ~~~
 
@@ -1071,41 +1085,25 @@ byte LongtermSecret[64];
 ~~~
 
 ~~~
-select(dh_algorithm) {
-    byte[<size of public key for this algorithm>];
-} DHKeyShare;
+byte DHKeyShare[<size of public key for this algorithm>];
+~~~
+
+### Signature Types
+
+~~~
+byte ServerSignature[<size of signature for this algorithm>];
 ~~~
 
 ~~~
-enum : uint8 {
-    Ed25519(1)
-} ServerSignatureType;
+byte ServerSignaturePublicKey[<size of public key for this algorithm>];
 ~~~
 
 ~~~
-select(server_signature_algorithm) {
-    byte[<size of signature for this algorithm>];
-} ServerSignature;
+byte DAAGroupKey[<size of group public key for this algorithm>];
 ~~~
 
 ~~~
-select(server_signature_algorithm) {
-    byte[<size of public key for this algorithm>];
-} ServerSignaturePublicKey;
-~~~
-
-### DAA Types
-
-~~~
-select(dh_algorithm) {
-    byte[<size of group public key for this algorithm>];
-} DAAGroupKey;
-~~~
-
-~~~
-select(dh_algorithm) {
-    byte[<size of signature for this algorithm>];
-} DAASignature;
+byte DAASignature[<size of signature for this algorithm>];
 ~~~
 
 ### Server Certificates
@@ -1123,7 +1121,6 @@ byte Date[8];   /* YYYYMMDD according to UTC */
 ~~~
 struct {
     ServerCertificateVersion version;
-    ServerSignatureType algorithm;
     Date expiry;
     ClientID id;
     ServerSignature signature;
@@ -1135,7 +1132,6 @@ struct {
 ~~~
 struct {
     ServerSignatureVersion version;
-    ServerSignatureType algorithm;
     Date expiry;
     ServerSignaturePublicKey public_key;
     byte root_id[32];       /* ServerRootCertificate to use */
@@ -1146,7 +1142,6 @@ struct {
 ~~~
 struct {
     ServerSignatureVersion version;
-    ServerSignatureType algorithm;
     Date expiry;
     ServerSignaturePublicKey public_key;
     byte id[32];
