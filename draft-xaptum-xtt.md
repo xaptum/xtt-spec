@@ -61,14 +61,19 @@ informative:
 
   DAA:
        title: "Direct Anonymous Attestation"
-       date: 2014-02-11
+       date: 2004-02-11
        author:
        -
-         ins: Ernie Brickell
+         ins: E. Brickell
+         name: Ernie Brickell
        -
-         ins: Jan Camenisch
+         ins: J. Camenisch
+         name: Jan Camenisch
        -
-         ins: Liqun Chen
+         ins: L. Chen
+         name: Liqun Chen
+
+       seriesinfo: Proceedings of the 11th ACM conference on Computer and communications security
 
   MINIMALT:
        title: "MinimalLT: Minimal-latency Networking Through Better Security"
