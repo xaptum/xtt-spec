@@ -195,6 +195,12 @@ session: (TODO) (1 sent.)
 
 (TODO)
 
+
+## Design Goals
+
+(TODO)
+
+
 ## Security Requirements for the IoT
 
 (TODO) How IoT security differs from old world. What are the unique
