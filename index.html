@@ -303,12 +303,15 @@ address {
 <link href="#rfc.section.5" rel="Chapter" title="5 Error Handling"/>
 <link href="#rfc.section.6" rel="Chapter" title="6 Cryptographic Computations"/>
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 Notation"/>
-<link href="#rfc.section.6.2" rel="Chapter" title="6.2 Handshake Contexts"/>
+<link href="#rfc.section.6.2" rel="Chapter" title="6.2 Transcript Hashes"/>
 <link href="#rfc.section.6.3" rel="Chapter" title="6.3 Key Calculation and Schedule"/>
 <link href="#rfc.section.6.4" rel="Chapter" title="6.4 SessionID Generation"/>
 <link href="#rfc.section.6.5" rel="Chapter" title="6.5 ECDHE Parameters"/>
 <link href="#rfc.section.6.6" rel="Chapter" title="6.6 DAA Parameters"/>
 <link href="#rfc.section.6.7" rel="Chapter" title="6.7 Signature Algorithms"/>
+<link href="#rfc.section.6.7.1" rel="Chapter" title="6.7.1 ServerSignature"/>
+<link href="#rfc.section.6.7.2" rel="Chapter" title="6.7.2 SymmetricSignature"/>
+<link href="#rfc.section.6.7.3" rel="Chapter" title="6.7.3 DAASignature"/>
 <link href="#rfc.section.6.8" rel="Chapter" title="6.8 Per-message Nonce Calculation"/>
 <link href="#rfc.references" rel="Chapter" title="7 References"/>
 <link href="#rfc.references.1" rel="Chapter" title="7.1 Normative References"/>
@@ -333,7 +336,7 @@ address {
 <link href="#rfc.appendix.C" rel="Chapter" title="C Protocol Data Structures and Constant Values"/>
 <link href="#rfc.appendix.C.1" rel="Chapter" title="C.1 Common Message Header"/>
 <link href="#rfc.appendix.C.2" rel="Chapter" title="C.2 Handshakes"/>
-<link href="#rfc.appendix.C.2.1" rel="Chapter" title="C.2.1 DAA Types"/>
+<link href="#rfc.appendix.C.2.1" rel="Chapter" title="C.2.1 Signature Types"/>
 <link href="#rfc.appendix.C.2.2" rel="Chapter" title="C.2.2 Server Certificates"/>
 <link href="#rfc.appendix.C.3" rel="Chapter" title="C.3 Record Layer"/>
 <link href="#rfc.authors" rel="Chapter"/>
@@ -428,13 +431,16 @@ address {
 <li>5.   <a href="#rfc.section.5">Error Handling</a></li>
 <li>6.   <a href="#rfc.section.6">Cryptographic Computations</a></li>
 <ul><li>6.1.   <a href="#rfc.section.6.1">Notation</a></li>
-<li>6.2.   <a href="#rfc.section.6.2">Handshake Contexts</a></li>
+<li>6.2.   <a href="#rfc.section.6.2">Transcript Hashes</a></li>
 <li>6.3.   <a href="#rfc.section.6.3">Key Calculation and Schedule</a></li>
 <li>6.4.   <a href="#rfc.section.6.4">SessionID Generation</a></li>
 <li>6.5.   <a href="#rfc.section.6.5">ECDHE Parameters</a></li>
 <li>6.6.   <a href="#rfc.section.6.6">DAA Parameters</a></li>
 <li>6.7.   <a href="#rfc.section.6.7">Signature Algorithms</a></li>
-<li>6.8.   <a href="#rfc.section.6.8">Per-message Nonce Calculation</a></li>
+<ul><li>6.7.1.   <a href="#rfc.section.6.7.1">ServerSignature</a></li>
+<li>6.7.2.   <a href="#rfc.section.6.7.2">SymmetricSignature</a></li>
+<li>6.7.3.   <a href="#rfc.section.6.7.3">DAASignature</a></li>
+</ul><li>6.8.   <a href="#rfc.section.6.8">Per-message Nonce Calculation</a></li>
 </ul><li>7.   <a href="#rfc.references">References</a></li>
 <ul><li>7.1.   <a href="#rfc.references.1">Normative References</a></li>
 <li>7.2.   <a href="#rfc.references.2">Informative References</a></li>
@@ -458,7 +464,7 @@ address {
 </ul><li>Appendix C.   <a href="#rfc.appendix.C">Protocol Data Structures and Constant Values</a></li>
 <ul><li>C.1.   <a href="#rfc.appendix.C.1">Common Message Header</a></li>
 <li>C.2.   <a href="#rfc.appendix.C.2">Handshakes</a></li>
-<ul><li>C.2.1.   <a href="#rfc.appendix.C.2.1">DAA Types</a></li>
+<ul><li>C.2.1.   <a href="#rfc.appendix.C.2.1">Signature Types</a></li>
 <li>C.2.2.   <a href="#rfc.appendix.C.2.2">Server Certificates</a></li>
 </ul><li>C.3.   <a href="#rfc.appendix.C.3">Record Layer</a></li>
 </ul><li><a href="#rfc.authors">Authors' Addresses</a></li>
@@ -480,7 +486,7 @@ address {
 <p/>
 
 <ul>
-  <li>Mutual Authentication: Both the client and server sides are always authenticated. Server authentication happens via ECDSA and client authentication happens via PSK or DAA.</li>
+  <li>Mutual Authentication: Both the client and server sides are always authenticated. Server authentication happens via ECDSA and client authentication happens via symmetric-key-signature or DAA.</li>
   <li>Integrity: Data sent over the channel cannot be modified by an attacker.</li>
   <li>Confidentiality: Data sent over the channel is visible only to the endpoints. This property is optional; encryption may be disabled if the channel is tunneling data that was already encrypted.</li>
 </ul>
@@ -645,7 +651,7 @@ address {
        | + suite_spec
        | + server_cookie
        | + {id_c}
-       v + {psk_signature_c}
+       v + {signature_c}
   Sk &gt; ^ + ([length])
        | + ([payload_type])
        v + ([payload])           -------&gt;
@@ -766,7 +772,7 @@ aead_struct&lt;session_keys&gt;(
 <h2 id="rfc.section.3.3"><a href="#rfc.section.3.3">3.3.</a> <a href="#session-establishment-protocol" id="session-establishment-protocol">Session Establishment Protocol</a></h2>
 <p id="rfc.section.3.3.p.1">This handshake creates an AuthenticatedSession, and requires that a successful ClientIdentity handshake has already been run at least once in the past for this client.  The notes in (<a href="#identity-provisioning-protocol">Section 3.2</a>) about message resends apply also to this handshake.</p>
 <h3 id="rfc.section.3.3.1"><a href="#rfc.section.3.3.1">3.3.1.</a> <a href="#sessionclientattest" id="sessionclientattest">Session_ClientAttest</a></h3>
-<p id="rfc.section.3.3.1.p.1">As for the ClientIdentity handshake, a client responds to a ServerInitAndAttest message with a ClientAttest message.  The only difference from the ClientIdentity handshake is that the client uses a PSKSignature, rather than a DAASignature, to authenticate its identity.</p>
+<p id="rfc.section.3.3.1.p.1">As for the ClientIdentity handshake, a client responds to a ServerInitAndAttest message with a ClientAttest message.  The only difference from the ClientIdentity handshake is that the client uses a SymmetricSignature, rather than a DAASignature, to authenticate its identity.</p>
 <p id="rfc.section.3.3.1.p.2">The structure of a ClientAttest message that does not include an encapsulated payload is:</p>
 <pre>
 aead_struct&lt;handshake_keys&gt;(
@@ -776,7 +782,7 @@ aead_struct&lt;handshake_keys&gt;(
     ServerCookie server_cookie;     /* echo from server */
 }[
     ClientID id;
-    PSKSignature signature;
+    SymmetricSignature signature_c;
 ] AuthenticatedSession_ClientAttest_NoPayload;
 </pre>
 <p id="rfc.section.3.3.1.p.3">The structure of a ClientAttest message that does include an encapsulated payload is:</p>
@@ -789,7 +795,7 @@ struct {
         ServerCookie server_cookie;     /* echo from server */
     }[
         ClientID id;
-        PSKSignature signature;
+        SymmetricSignature signature_c;
     ];
     aead_struct&lt;session_keys&gt;(
         MsgLength length;               /* total length */
@@ -833,32 +839,150 @@ prf&lt;N&gt;(key, input) =
         Keyed pseudo-random function (set during handshake),
         keyed by "key", with "input" as input, outputting "N" bytes
 </pre>
-<p id="rfc.section.6.1.p.2">The <samp>prf</samp> can be implemented by any keyed hash function, for example an HMAC or a naturally-keyed hash like BLAKE.</p>
-<h2 id="rfc.section.6.2"><a href="#rfc.section.6.2">6.2.</a> <a href="#handshake-contexts" id="handshake-contexts">Handshake Contexts</a></h2>
-<p/>
-
-<ul>
-  <li>ServerInitHash</li>
-  <li>ServerSigHash</li>
-  <li>ClientAttestHash</li>
-  <li>ClientSigHash</li>
-  <li>ServerFinishedHash</li>
-</ul>
+<p id="rfc.section.6.1.p.2">The <samp>prf</samp> can be implemented by any keyed hash function.  For the case of the SHA512-based suite_spec options, <samp>prf</samp> is HMAC, as specified in <a href="#RFC2104">[RFC2104]</a>, using SHA-512, defined in <a href="#SHS">[SHS]</a>, as the underlying hash function.  For the case of the BLAKE2b-based suite_spec options, <samp>prf</samp> is the BLAKE2b keyed-hash function, as defined in <a href="#RFC7693">[RFC7693]</a>.</p>
+<p id="rfc.section.6.1.p.3">In addition, a non-keyed hash, denoted <samp>hash</samp>, will be referenced here.  For the SHA512-based suite_spec options, this is just SHA-512.  For the BLAKE2b-based suite_specs, this is Blake2b with a zero-length key.</p>
+<h2 id="rfc.section.6.2"><a href="#rfc.section.6.2">6.2.</a> <a href="#transcript-hashes" id="transcript-hashes">Transcript Hashes</a></h2>
+<p id="rfc.section.6.2.p.1">The computation of the shared secret materials requires various hashes of the handshake messages, in order to bind these secret materials to the specific handshake.  The definitions of these hash values follow below.  When included in these hashes, the messages are unencrypted.</p>
+<p><samp>length-of-hash-output</samp> is the output length of <samp>hash</samp> expressed as an 8-byte numeric value.</p>
+<pre>
+ServerSigHash =
+    hash(
+        ClientInit
+        | ServerInitAndAttest-up-to-signature
+    )
+</pre>
+<pre>
+HandshakeKeyHash =
+    hash(
+        length-of-hash-output
+        | hash(
+            ClientInit
+            | ServerInitAndAttest-up-to-cookie
+        )
+        | server_cookie
+    )
+</pre>
+<pre>
+ClientSigHash =
+    hash(
+        length-of-hash-output
+        | hash(
+            ClientInit
+            | ServerInitAndAttest-up-to-cookie
+        )
+        | server_cookie
+        | ClientAttest-up-to-signature
+    )
+</pre>
+<pre>
+SessionHash =
+    hash(
+        length-of-hash-output
+        | hash(
+            ClientInit
+            | ServerInitAndAttest-up-to-cookie
+        )
+        | server_cookie
+        | ClientAttest
+    )
+</pre>
+<pre>
+ServerFinishedHash =
+    hash(
+        length-of-hash-output
+        | hash(
+            ClientInit
+            | ServerInitAndAttest-up-to-cookie
+        )
+        | server_cookie
+        | ClientAttest
+        | ServerFinished-up-to-ctx
+    )
+</pre>
 <h2 id="rfc.section.6.3"><a href="#rfc.section.6.3">6.3.</a> <a href="#key-calculation-and-schedule" id="key-calculation-and-schedule">Key Calculation and Schedule</a></h2>
-<p/>
-
-<ul>
-  <li>handshake_secret <ul><li><samp>prf&lt;64&gt;(0, Ephemeral Diffie-Hellman shared-secret)</samp></li></ul></li>
-  <li>handshake_keys <ul><li><samp>prf&lt;sizeof_aead_output&gt;(handshake_secret, context_string | ServerInitHash)</samp></li><li>Where <samp>context_string</samp> is <ul><li>&#8220;XTT handshake client transmit key&#8221; for the client&#8217;s transmit key</li><li>&#8220;XTT handshake client transmit iv&#8221; for the client&#8217;s transmit IV</li><li>&#8220;XTT handshake server transmit key&#8221; for the server&#8217;s transmit key</li><li>&#8220;XTT handshake server transmit iv&#8221; for the server&#8217;s transmit IV</li></ul></li><li>Where <samp>sizeof_aead_output</samp> depends on the AEAD suite chosen in the handshake and on whether a key or an IV is desired</li></ul></li>
-  <li>LongtermSecret <ul><li><samp>prf&lt;64&gt;(handshake_secret, &#8220;XAPTSECT&#8221; | ClientAttestHash)</samp></li></ul></li>
-  <li>session_keys <ul><li><samp>prf&lt;sizeof_aead_output&gt;(LongtermSecret, context_string | ClientAttestHash)</samp></li><li>Where <samp>context_string</samp> is <ul><li>&#8220;XTT session client transmit key&#8221; for the client&#8217;s transmit key</li><li>&#8220;XTT session client transmit iv&#8221; for the client&#8217;s transmit IV</li><li>&#8220;XTT session server transmit key&#8221; for the server&#8217;s transmit key</li><li>&#8220;XTT session server transmit iv&#8221; for the server&#8217;s transmit IV</li></ul></li><li>Where <samp>sizeof_aead_output</samp> depends on the AEAD suite chosen in the handshake and on whether a key or an IV is desired</li></ul></li>
-</ul>
+<p id="rfc.section.6.3.p.1">The prf is drawn as taking the key argument from the left and outputting downward.  <samp>DH-shared-secret</samp> is the result of running Diffie-Hellman using the keys exchanged during the handshake, and <samp>key_size</samp> and <samp>iv_size</samp> are the key- and nonce-sizes (respectively) for the AEAD algorithm determined by the suite_spec.</p>
+<div id="rfc.figure.3"/>
+<div id="xtt-handshake-schedule"/>
+<pre>
+  (nonce_c | server_cookie)
+     |      
+     |      
+     +--&gt; prf&lt;sizeof(LongtermSecret)&gt;(DH-shared-secret)
+           |
+           +--&gt; prf&lt;key_size&gt;(&#8220;XTT handshake client key&#8221;
+           |                  | HandshakeKeyHash)
+           |       = client_handshake_send_key
+           |       = server_handshake_receive_key
+           |
+           +--&gt; prf&lt;iv_size&gt;(&#8220;XTT handshake client iv&#8221;
+           |                  | HandshakeKeyHash)
+           |       = client_handshake_send_iv
+           |       = server_handshake_receive_iv
+           |
+           +--&gt; prf&lt;key_size&gt;(&#8220;XTT handshake server key&#8221;
+           |                  | HandshakeKeyHash)
+           |       = client_handshake_receive_key
+           |       = server_handshake_send_key
+           |
+           +--&gt; prf&lt;iv_size&gt;(&#8220;XTT handshake server iv&#8221;
+           |                  | HandshakeKeyHash)
+           |       = client_handshake_receive_iv
+           |       = server_handshake_send_iv
+           |
+           +--&gt; handshake_secret
+</pre>
+<p class="figure">Figure 3: Key Schedule for Handshake Keys</p>
+<div id="rfc.figure.4"/>
+<div id="xtt-psk-schedule"/>
+<pre>
+  handshake_secret
+     |      
+     |      
+     +--&gt; prf&lt;sizeof(LongtermSecret)&gt;(ClientID)
+           |
+           +--&gt; prf&lt;sizeof(LongTermSecret)&gt;(&#8220;XTT long-term secret&#8221;
+           |                  | SessionHash)
+           |       = longterm_client_shared_secret
+           +--&gt; prf&lt;sizeof(LongtermSignatureKey)&gt;(&#8220;XTT long-term signature key&#8221;
+                              | SessionHash)
+                   = longterm_client_shared_secret_key
+</pre>
+<p class="figure">Figure 4: Derivation of Longterm-Shared-Secret</p>
+<div id="rfc.figure.5"/>
+<div id="xtt-session-schedule"/>
+<pre>
+  handshake_secret
+     |      
+     |      
+     +--&gt; prf&lt;sizeof(LongtermSecret)&gt;(longterm_client_shared_secret)
+           |
+           +--&gt; prf&lt;key_size&gt;(&#8220;XTT session client key&#8221;
+           |                  | SessionHash)
+           |       = client_session_send_key
+           |       = server_session_receive_key
+           |
+           +--&gt; prf&lt;iv_size&gt;(&#8220;XTT session client iv&#8221;
+           |                  | SessionHash)
+           |       = client_session_send_iv
+           |       = server_session_receive_iv
+           |
+           +--&gt; prf&lt;key_size&gt;(&#8220;XTT session server key&#8221;
+           |                  | SessionHash)
+           |       = client_session_receive_key
+           |       = server_session_send_key
+           |
+           +--&gt; prf&lt;iv_size&gt;(&#8220;XTT session server iv&#8221;
+                              | SessionHash)
+                   = client_session_receive_iv
+                   = server_session_send_iv
+</pre>
+<p class="figure">Figure 5: Key Schedule for Handshake Keys</p>
 <h2 id="rfc.section.6.4"><a href="#rfc.section.6.4">6.4.</a> <a href="#sessionid-generation" id="sessionid-generation">SessionID Generation</a></h2>
-<p/>
-
-<ul>
-  <li>SessionID <ul><li><samp>session_id_seed_s | session_id_seed_c</samp></li></ul></li>
-</ul>
+<p id="rfc.section.6.4.p.1">The SessionID for an AuthenticatedSession is simply the concatenation of the two SessionIDSeeds exchanged by the client and server, with the server&#8217;s seed first:</p>
+<pre>
+SessionID =
+    session_id_seed_s | session_id_seed_c
+</pre>
 <h2 id="rfc.section.6.5"><a href="#rfc.section.6.5">6.5.</a> <a href="#ecdhe-parameters" id="ecdhe-parameters">ECDHE Parameters</a></h2>
 <p id="rfc.section.6.5.p.1">The size and interpretation of a value of type DHKeyShare depends on the Diffie-Hellman algorithm specified in the handshake messages.</p>
 <p id="rfc.section.6.5.p.2">Currently, only x25519 is supported by the protocol.</p>
@@ -866,13 +990,12 @@ prf&lt;N&gt;(key, input) =
 <h2 id="rfc.section.6.6"><a href="#rfc.section.6.6">6.6.</a> <a href="#daa-parameters" id="daa-parameters">DAA Parameters</a></h2>
 <p id="rfc.section.6.6.p.1">EPID2, TPM2.0, and FIDO key/signature sizes.</p>
 <h2 id="rfc.section.6.7"><a href="#rfc.section.6.7">6.7.</a> <a href="#signature-algorithms" id="signature-algorithms">Signature Algorithms</a></h2>
-<p/>
-
-<ul>
-  <li>ServerSignature <ul><li>Group Ed255519</li></ul></li>
-  <li>PSKSignature</li>
-  <li>DAASignature</li>
-</ul>
+<p id="rfc.section.6.7.p.1">The size and interpretation of signature types (signatures and public keys) depends on the signature algorithm.</p>
+<h3 id="rfc.section.6.7.1"><a href="#rfc.section.6.7.1">6.7.1.</a> <a href="#serversignature" id="serversignature">ServerSignature</a></h3>
+<p id="rfc.section.6.7.1.p.1">Currently, the only supported algorithm for the server&#8217;s signature in a ServerInitAndAttest is an EdDSA signature (described in <a href="#RFC8032">[RFC8032]</a>) using the X25519 elliptic curve (this combination is known as Ed25519).</p>
+<p id="rfc.section.6.7.1.p.2">For Ed25519, the contents of ServerSignaturePublicKey are the byte string output of the key generation described in <a href="#RFC8032">[RFC8032]</a>, where the byte string format is defined in <a href="#RFC7748">[RFC7748]</a>.  Similarly, the content of ServerSignature are the byte string output of the signature algorithm of <a href="#RFC8032">[RFC8032]</a> in the format of <a href="#RFC7748">[RFC7748]</a>.</p>
+<h3 id="rfc.section.6.7.2"><a href="#rfc.section.6.7.2">6.7.2.</a> <a href="#symmetricsignature" id="symmetricsignature">SymmetricSignature</a></h3>
+<h3 id="rfc.section.6.7.3"><a href="#rfc.section.6.7.3">6.7.3.</a> <a href="#daasignature" id="daasignature">DAASignature</a></h3>
 <h2 id="rfc.section.6.8"><a href="#rfc.section.6.8">6.8.</a> <a href="#per-message-nonce-calculation" id="per-message-nonce-calculation">Per-message Nonce Calculation</a></h2>
 <p id="rfc.section.6.8.p.1">A per-session pair of key and IV are created for both sending and receiving data, upon the successful completion of a handshake.  The client and server each get a pair of sending and receiving keys/IVs (of course, the server&#8217;s sending key/IV matches the client&#8217;s receiving key/IV, and vice-versa).  The byte-length of the IVs is that of the nonce for the negotiated AEAD algorithm.</p>
 <p id="rfc.section.6.8.p.2">At the start of a new session (after a successful handshake), the two sequence numbers (client-to-server and server-to-client) are set to 0.  The first Authenticated Session record payload the client sends after authenticating in its ClientAttest must have sequence number 0.  Note, any AuthenticatedSessionPayload included with the ClientAttest will have the sequence number 0.  Similarly, the first packet sent by the server after sending its ServerAttest must have sequence number 0, meaning that if the server sends a ServerFinished packet this packet will have sequence number 0.</p>
@@ -881,6 +1004,12 @@ prf&lt;N&gt;(key, input) =
 <h2 id="rfc.references.1"><a href="#rfc.references.1">7.1.</a> Normative References</h2>
 <table>
   <tbody>
+    <tr>
+      <td class="reference">
+        <b id="RFC2104">[RFC2104]</b>
+      </td>
+      <td class="top"><a>Krawczyk, H.</a>, <a>Bellare, M.</a> and <a>R. Canetti</a>, "<a href="http://tools.ietf.org/html/rfc2104">HMAC: Keyed-Hashing for Message Authentication</a>", RFC 2104, DOI 10.17487/RFC2104, February 1997.</td>
+    </tr>
     <tr>
       <td class="reference">
         <b id="RFC5116">[RFC5116]</b>
@@ -913,6 +1042,12 @@ prf&lt;N&gt;(key, input) =
     </tr>
     <tr>
       <td class="reference">
+        <b id="RFC8032">[RFC8032]</b>
+      </td>
+      <td class="top"><a>Josefsson, S.</a> and <a>I. Liusvaara</a>, "<a href="http://tools.ietf.org/html/rfc8032">Edwards-Curve Digital Signature Algorithm (EdDSA)</a>", RFC 8032, DOI 10.17487/RFC8032, January 2017.</td>
+    </tr>
+    <tr>
+      <td class="reference">
         <b id="SHS">[SHS]</b>
       </td>
       <td class="top"><a>National Institute of Standards and Technology</a>, "<a>Secure Hash Standard</a>", NIST FIPS PUB 180-4, March 2012.</td>
@@ -926,7 +1061,7 @@ prf&lt;N&gt;(key, input) =
       <td class="reference">
         <b id="DAA">[DAA]</b>
       </td>
-      <td class="top"><a>Ernie Brickell, .</a>, <a>Jan Camenisch, .</a> and <a>. Liqun Chen</a>, "<a>Direct Anonymous Attestation</a>", February 2014.</td>
+      <td class="top"><a>Brickell, E.</a>, <a>Camenisch, J.</a> and <a>L. Chen</a>, "<a>Direct Anonymous Attestation</a>", Proceedings of the 11th ACM conference on Computer and communications security , February 2004.</td>
     </tr>
     <tr>
       <td class="reference">
@@ -1110,12 +1245,12 @@ enum : uint8 {
 <h2 id="rfc.appendix.C.2"><a href="#rfc.appendix.C.2">C.2.</a> <a href="#handshakes" id="handshakes">Handshakes</a></h2>
 <pre>
 enum : uint16 {
-    x25519_epid2_chacha20poly1305_sha512(1),
-    x25519_epid2_chacha20poly1305_blake2b(2),
-    x25519_epid2_aes256gcm_sha512(3),
-    x25519_epid2_aes256gcm_blake2b(4),
-    x25519_epid2_null_sha512(5),
-    x25519_epid2_null_blake2b(6)
+    x25519_epid2_ed25519_chacha20poly1305_sha512(1),
+    x25519_epid2_ed25519_chacha20poly1305_blake2b(2),
+    x25519_epid2_ed25519_aes256gcm_sha512(3),
+    x25519_epid2_ed25519_aes256gcm_blake2b(4),
+    x25519_epid2_ed25519_null_sha512(5),
+    x25519_epid2_ed25519_null_blake2b(6)
 } SuiteSpec;
 </pre>
 <pre>
@@ -1134,35 +1269,26 @@ byte ClientID[16];
 byte LongtermSecret[64];
 </pre>
 <pre>
-select(dh_algorithm) {
-    byte[&lt;size of public key for this algorithm&gt;];
-} DHKeyShare;
+byte DHKeyShare[&lt;size of public key for this algorithm&gt;];
+</pre>
+<h3 id="rfc.appendix.C.2.1"><a href="#rfc.appendix.C.2.1">C.2.1.</a> <a href="#signature-types" id="signature-types">Signature Types</a></h3>
+<pre>
+byte SymmetricSignature[&lt;size of prf output&gt;];
 </pre>
 <pre>
-enum : uint8 {
-    Ed25519(1)
-} ServerSignatureType;
+byte SymmetricSignatureKey[64];
 </pre>
 <pre>
-select(server_signature_algorithm) {
-    byte[&lt;size of signature for this algorithm&gt;];
-} ServerSignature;
+byte ServerSignature[&lt;size of signature for this algorithm&gt;];
 </pre>
 <pre>
-select(server_signature_algorithm) {
-    byte[&lt;size of public key for this algorithm&gt;];
-} ServerSignaturePublicKey;
-</pre>
-<h3 id="rfc.appendix.C.2.1"><a href="#rfc.appendix.C.2.1">C.2.1.</a> <a href="#daa-types" id="daa-types">DAA Types</a></h3>
-<pre>
-select(dh_algorithm) {
-    byte[&lt;size of group public key for this algorithm&gt;];
-} DAAGroupKey;
+byte ServerSignaturePublicKey[&lt;size of public key for this algorithm&gt;];
 </pre>
 <pre>
-select(dh_algorithm) {
-    byte[&lt;size of signature for this algorithm&gt;];
-} DAASignature;
+byte DAAGroupKey[&lt;size of group public key for this algorithm&gt;];
+</pre>
+<pre>
+byte DAASignature[&lt;size of signature for this algorithm&gt;];
 </pre>
 <h3 id="rfc.appendix.C.2.2"><a href="#rfc.appendix.C.2.2">C.2.2.</a> <a href="#server-certificates" id="server-certificates">Server Certificates</a></h3>
 <pre>
@@ -1176,7 +1302,6 @@ byte Date[8];   /* YYYYMMDD according to UTC */
 <pre>
 struct {
     ServerCertificateVersion version;
-    ServerSignatureType algorithm;
     Date expiry;
     ClientID id;
     ServerSignature signature;
@@ -1187,7 +1312,6 @@ struct {
 <pre>
 struct {
     ServerSignatureVersion version;
-    ServerSignatureType algorithm;
     Date expiry;
     ServerSignaturePublicKey public_key;
     byte root_id[32];       /* ServerRootCertificate to use */
@@ -1197,7 +1321,6 @@ struct {
 <pre>
 struct {
     ServerSignatureVersion version;
-    ServerSignatureType algorithm;
     Date expiry;
     ServerSignaturePublicKey public_key;
     byte id[32];
