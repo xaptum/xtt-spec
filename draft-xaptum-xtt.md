@@ -36,6 +36,7 @@ author:
         email: david.bild@xaptum.com
 
 normative:
+  RFC2104:
   RFC5116:
   RFC5869:
   RFC7539:
@@ -143,7 +144,7 @@ The protocol must also provide the following traditional security properties:
 
 - Mutual Authentication: Both the client and server sides are always
   authenticated. Server authentication happens via ECDSA and client
-  authentication happens via PSK or DAA.
+  authentication happens via symmetric-key-signature or DAA.
 
 - Integrity: Data sent over the channel cannot be modified by an attacker.
 
@@ -392,7 +393,7 @@ while protecting the server's identity from passive attackers
        | + suite_spec
        | + server_cookie
        | + {id_c}
-       v + {psk_signature_c}
+       v + {signature_c}
   Sk > ^ + ([length])
        | + ([payload_type])
        v + ([payload])           ------->
@@ -609,7 +610,7 @@ about message resends apply also to this handshake.
 As for the ClientIdentity handshake, a client responds to
 a ServerInitAndAttest message with a ClientAttest message.
 The only difference from the ClientIdentity handshake
-is that the client uses a PSKSignature, rather than a DAASignature,
+is that the client uses a SymmetricSignature, rather than a DAASignature,
 to authenticate its identity.
 
 The structure of a ClientAttest message that does not include an
@@ -623,7 +624,7 @@ aead_struct<handshake_keys>(
     ServerCookie server_cookie;     /* echo from server */
 }[
     ClientID id;
-    PSKSignature signature;
+    SymmetricSignature signature_c;
 ] AuthenticatedSession_ClientAttest_NoPayload;
 ~~~
 
@@ -639,7 +640,7 @@ struct {
         ServerCookie server_cookie;     /* echo from server */
     }[
         ClientID id;
-        PSKSignature signature;
+        SymmetricSignature signature_c;
     ];
     aead_struct<session_keys>(
         MsgLength length;               /* total length */
@@ -696,45 +697,179 @@ prf<N>(key, input) =
         keyed by "key", with "input" as input, outputting "N" bytes
 ~~~
 
-The `prf` can be implemented by any keyed hash function, for example
-an HMAC or a naturally-keyed hash like BLAKE.
+The `prf` can be implemented by any keyed hash function.
+For the case of the SHA512-based suite_spec options,
+`prf` is HMAC, as specified in {{RFC2104}}, using SHA-512,
+defined in {{SHS}}, as the underlying hash function.
+For the case of the BLAKE2b-based suite_spec options,
+`prf` is the BLAKE2b keyed-hash function, as defined in {{RFC7693}}.
 
-## Handshake Contexts
+In addition, a non-keyed hash, denoted `hash`, will be referenced here.
+For the SHA512-based suite_spec options, this is just SHA-512.
+For the BLAKE2b-based suite_specs, this is Blake2b with
+a zero-length key.
 
-* ServerInitHash
-* ServerSigHash
-* ClientAttestHash
-* ClientSigHash
-* ServerFinishedHash
+## Transcript Hashes
+
+The computation of the shared secret materials requires
+various hashes of the handshake messages, in order to bind
+these secret materials to the specific handshake.
+The definitions of these hash values follow below.
+When included in these hashes, the messages are unencrypted.
+
+`length-of-hash-output` is the output length of `hash`
+expressed as an 8-byte numeric value.
+
+~~~
+ServerSigHash =
+    hash(
+        ClientInit
+        | ServerInitAndAttest-up-to-signature
+    )
+~~~
+
+~~~
+HandshakeKeyHash =
+    hash(
+        length-of-hash-output
+        | hash(
+            ClientInit
+            | ServerInitAndAttest-up-to-cookie
+        )
+        | server_cookie
+    )
+~~~
+
+~~~
+ClientSigHash =
+    hash(
+        length-of-hash-output
+        | hash(
+            ClientInit
+            | ServerInitAndAttest-up-to-cookie
+        )
+        | server_cookie
+        | ClientAttest-up-to-signature
+    )
+~~~
+
+~~~
+SessionHash =
+    hash(
+        length-of-hash-output
+        | hash(
+            ClientInit
+            | ServerInitAndAttest-up-to-cookie
+        )
+        | server_cookie
+        | ClientAttest
+    )
+~~~
+
+~~~
+ServerFinishedHash =
+    hash(
+        length-of-hash-output
+        | hash(
+            ClientInit
+            | ServerInitAndAttest-up-to-cookie
+        )
+        | server_cookie
+        | ClientAttest
+        | ServerFinished-up-to-ctx
+    )
+~~~
 
 ## Key Calculation and Schedule
+The prf is drawn as taking the key argument from the left
+and outputting downward.
+`DH-shared-secret` is the result of running Diffie-Hellman
+using the keys exchanged during the handshake,
+and `key_size` and `iv_size` are the key- and nonce-sizes
+(respectively) for the AEAD algorithm determined by the suite_spec.
 
-* handshake_secret
-  * `prf<64>(0, Ephemeral Diffie-Hellman shared-secret)`
-* handshake_keys
-  * `prf<sizeof_aead_output>(handshake_secret, context_string | ServerInitHash)`
-  * Where `context_string` is
-    * “XTT handshake client transmit key” for the client’s transmit key
-    * “XTT handshake client transmit iv” for the client’s transmit IV
-    * “XTT handshake server transmit key” for the server’s transmit key
-    * “XTT handshake server transmit iv” for the server’s transmit IV
-  * Where `sizeof_aead_output` depends on the AEAD suite chosen
-    in the handshake and on whether a key or an IV is desired
-* LongtermSecret
-  * `prf<64>(handshake_secret, “XAPTSECT” | ClientAttestHash)`
-* session_keys
-  * `prf<sizeof_aead_output>(LongtermSecret, context_string | ClientAttestHash)`
-  * Where `context_string` is
-    * “XTT session client transmit key” for the client’s transmit key
-    * “XTT session client transmit iv” for the client’s transmit IV
-    * “XTT session server transmit key” for the server’s transmit key
-    * “XTT session server transmit iv” for the server’s transmit IV
-  * Where `sizeof_aead_output` depends on the AEAD suite chosen
-    in the handshake and on whether a key or an IV is desired
+~~~
+  (nonce_c | server_cookie)
+     |      
+     |      
+     +--> prf<sizeof(LongtermSecret)>(DH-shared-secret)
+           |
+           +--> prf<key_size>(“XTT handshake client key”
+           |                  | HandshakeKeyHash)
+           |       = client_handshake_send_key
+           |       = server_handshake_receive_key
+           |
+           +--> prf<iv_size>(“XTT handshake client iv”
+           |                  | HandshakeKeyHash)
+           |       = client_handshake_send_iv
+           |       = server_handshake_receive_iv
+           |
+           +--> prf<key_size>(“XTT handshake server key”
+           |                  | HandshakeKeyHash)
+           |       = client_handshake_receive_key
+           |       = server_handshake_send_key
+           |
+           +--> prf<iv_size>(“XTT handshake server iv”
+           |                  | HandshakeKeyHash)
+           |       = client_handshake_receive_iv
+           |       = server_handshake_send_iv
+           |
+           +--> handshake_secret
+~~~
+{: #xtt-handshake-schedule title="Key Schedule for Handshake Keys"}
+
+~~~
+  handshake_secret
+     |      
+     |      
+     +--> prf<sizeof(LongtermSecret)>(ClientID)
+           |
+           +--> prf<sizeof(LongTermSecret)>(“XTT long-term secret”
+           |                  | SessionHash)
+           |       = longterm_client_shared_secret
+           +--> prf<sizeof(LongtermSignatureKey)>(“XTT long-term signature key”
+                              | SessionHash)
+                   = longterm_client_shared_secret_key
+~~~
+{: #xtt-psk-schedule title="Derivation of Longterm-Shared-Secret"}
+
+~~~
+  handshake_secret
+     |      
+     |      
+     +--> prf<sizeof(LongtermSecret)>(longterm_client_shared_secret)
+           |
+           +--> prf<key_size>(“XTT session client key”
+           |                  | SessionHash)
+           |       = client_session_send_key
+           |       = server_session_receive_key
+           |
+           +--> prf<iv_size>(“XTT session client iv”
+           |                  | SessionHash)
+           |       = client_session_send_iv
+           |       = server_session_receive_iv
+           |
+           +--> prf<key_size>(“XTT session server key”
+           |                  | SessionHash)
+           |       = client_session_receive_key
+           |       = server_session_send_key
+           |
+           +--> prf<iv_size>(“XTT session server iv”
+                              | SessionHash)
+                   = client_session_receive_iv
+                   = server_session_send_iv
+~~~
+{: #xtt-session-schedule title="Key Schedule for Handshake Keys"}
 
 ## SessionID Generation
-* SessionID
-  * `session_id_seed_s | session_id_seed_c`
+The SessionID for an AuthenticatedSession is simply the concatenation
+of the two SessionIDSeeds exchanged by the client and server,
+with the server's seed first:
+
+~~~
+SessionID =
+    session_id_seed_s | session_id_seed_c
+~~~
 
 ## ECDHE Parameters
 The size and interpretation of a value of type DHKeyShare
@@ -765,7 +900,7 @@ format is defined in {{RFC7748}}.
 Similarly, the content of ServerSignature are the byte string output
 of the signature algorithm of {{RFC8032}} in the format of {{RFC7748}}.
 
-### PSKSignature
+### SymmetricSignature
 
 ### DAASignature
 
@@ -1089,6 +1224,14 @@ byte DHKeyShare[<size of public key for this algorithm>];
 ~~~
 
 ### Signature Types
+
+~~~
+byte SymmetricSignature[<size of prf output>];
+~~~
+
+~~~
+byte SymmetricSignatureKey[64];
+~~~
 
 ~~~
 byte ServerSignature[<size of signature for this algorithm>];
