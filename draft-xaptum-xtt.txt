@@ -5,7 +5,7 @@
 Network Working Group                                        Z. Beckwith
 Internet-Draft                                                   D. Bild
 Intended status: Informational                              Xaptum, Inc.
-Expires: November 10, 2017                                  May 09, 2017
+Expires: November 11, 2017                                  May 10, 2017
 
 
          The Xaptum Trusted Transit (XTT) Protocol Version 1.0
@@ -33,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on November 10, 2017.
+   This Internet-Draft will expire on November 11, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Beckwith & Bild         Expires November 10, 2017               [Page 1]
+Beckwith & Bild         Expires November 11, 2017               [Page 1]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -66,13 +66,14 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
      1.1.  Conventions and Terminology . . . . . . . . . . . . . . .   4
      1.2.  Use Cases . . . . . . . . . . . . . . . . . . . . . . . .   5
-     1.3.  Security Requirements for the IoT . . . . . . . . . . . .   5
-       1.3.1.  Differences from (D)TLS . . . . . . . . . . . . . . .   5
-       1.3.2.  Differences from QUIC . . . . . . . . . . . . . . . .   5
-       1.3.3.  Differences from IKE/IPSec  . . . . . . . . . . . . .   5
-       1.3.4.  Differences from Double-Ratchet-based Protocols . . .   6
-       1.3.5.  Differences from Noise  . . . . . . . . . . . . . . .   6
-       1.3.6.  Differences from MinimaLT . . . . . . . . . . . . . .   6
+     1.3.  Design Goals  . . . . . . . . . . . . . . . . . . . . . .   5
+     1.4.  Security Requirements for the IoT . . . . . . . . . . . .   5
+       1.4.1.  Differences from (D)TLS . . . . . . . . . . . . . . .   5
+       1.4.2.  Differences from QUIC . . . . . . . . . . . . . . . .   5
+       1.4.3.  Differences from IKE/IPSec  . . . . . . . . . . . . .   5
+       1.4.4.  Differences from Double-Ratchet-based Protocols . . .   6
+       1.4.5.  Differences from Noise  . . . . . . . . . . . . . . .   6
+       1.4.6.  Differences from MinimaLT . . . . . . . . . . . . . .   6
    2.  Protocol Overview . . . . . . . . . . . . . . . . . . . . . .   6
    3.  Handshake Protocols . . . . . . . . . . . . . . . . . . . . .  10
      3.1.  Features Common to All Handshakes . . . . . . . . . . . .  10
@@ -105,15 +106,15 @@ Table of Contents
      A.2.  Session Establishment Handshake . . . . . . . . . . . . .  20
        A.2.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  20
        A.2.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  20
-   Appendix B.  Presentation Language  . . . . . . . . . . . . . . .  20
 
 
 
-Beckwith & Bild         Expires November 10, 2017               [Page 2]
+Beckwith & Bild         Expires November 11, 2017               [Page 2]
 
 Internet-Draft                     XTT                          May 2017
 
 
+   Appendix B.  Presentation Language  . . . . . . . . . . . . . . .  20
      B.1.  Miscellaneous . . . . . . . . . . . . . . . . . . . . . .  20
      B.2.  Definition of Byte  . . . . . . . . . . . . . . . . . . .  20
      B.3.  Byte Arrays . . . . . . . . . . . . . . . . . . . . . . .  20
@@ -164,8 +165,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-
-Beckwith & Bild         Expires November 10, 2017               [Page 3]
+Beckwith & Bild         Expires November 11, 2017               [Page 3]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -221,7 +221,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017               [Page 4]
+Beckwith & Bild         Expires November 11, 2017               [Page 4]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -232,12 +232,16 @@ Internet-Draft                     XTT                          May 2017
 
    (TODO)
 
-1.3.  Security Requirements for the IoT
+1.3.  Design Goals
+
+   (TODO)
+
+1.4.  Security Requirements for the IoT
 
    (TODO) How IoT security differs from old world.  What are the unique
    requirements.
 
-1.3.1.  Differences from (D)TLS
+1.4.1.  Differences from (D)TLS
 
    -  Heavyweight (heavy use of bandwidth during handshake)
 
@@ -252,7 +256,7 @@ Internet-Draft                     XTT                          May 2017
 
    (TODO) (1 list) what (D)TLS doesn't offer that IoT requires
 
-1.3.2.  Differences from QUIC
+1.4.2.  Differences from QUIC
 
    -  Security session tied to connectivity session
 
@@ -260,7 +264,7 @@ Internet-Draft                     XTT                          May 2017
 
    (TODO) (1 list) what QUIC doesn't offer that IoT requires
 
-1.3.3.  Differences from IKE/IPSec
+1.4.3.  Differences from IKE/IPSec
 
    -  Pushing data requires performing full Two-Round-Trip handshake
       first
@@ -270,19 +274,17 @@ Internet-Draft                     XTT                          May 2017
 
    -  Very complex to configure, and easy to get wrong
 
-   (TODO) (1 list) what IKE doesn't offer that IoT requires
 
 
 
-
-
-
-Beckwith & Bild         Expires November 10, 2017               [Page 5]
+Beckwith & Bild         Expires November 11, 2017               [Page 5]
 
 Internet-Draft                     XTT                          May 2017
 
 
-1.3.4.  Differences from Double-Ratchet-based Protocols
+   (TODO) (1 list) what IKE doesn't offer that IoT requires
+
+1.4.4.  Differences from Double-Ratchet-based Protocols
 
    -  Per-message key updating is too heavy for most IoT, which doesn't
       require per-message forward secrecy
@@ -291,14 +293,14 @@ Internet-Draft                     XTT                          May 2017
 
    (TODO) (1 list) what Double-Ratchet doesn't offer that IoT requires
 
-1.3.5.  Differences from Noise
+1.4.5.  Differences from Noise
 
    -  Designed mainly for either pre-shared (or statically-known) keys,
       or for unauthenticated communication
 
    (TODO) (1 list) what Noise doesn't offer that IoT requires
 
-1.3.6.  Differences from MinimaLT
+1.4.6.  Differences from MinimaLT
 
    -  Requires a highly-available directory service for name-lookup
       (unnecessary in IoT)
@@ -328,15 +330,16 @@ Internet-Draft                     XTT                          May 2017
    ClientID handshake, the server provisions to the client a ClientID, a
    unique identifier within the client's group.  In addition, the client
    and server have now negotiated shared secret material that can be
-   used for future authentication, without requiring the public-
-   cryptography-based authentication of the ClientID handshake.
 
 
 
-Beckwith & Bild         Expires November 10, 2017               [Page 6]
+Beckwith & Bild         Expires November 11, 2017               [Page 6]
 
 Internet-Draft                     XTT                          May 2017
 
+
+   used for future authentication, without requiring the public-
+   cryptography-based authentication of the ClientID handshake.
 
    Note that the lifetime of a given ClientID, i.e. the time between
    successive ClientID handshakes, is up to the discretion of the
@@ -386,10 +389,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-
-
-
-Beckwith & Bild         Expires November 10, 2017               [Page 7]
+Beckwith & Bild         Expires November 11, 2017               [Page 7]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -445,7 +445,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017               [Page 8]
+Beckwith & Bild         Expires November 11, 2017               [Page 8]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -501,7 +501,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017               [Page 9]
+Beckwith & Bild         Expires November 11, 2017               [Page 9]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -557,7 +557,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 10]
+Beckwith & Bild         Expires November 11, 2017              [Page 10]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -613,7 +613,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 11]
+Beckwith & Bild         Expires November 11, 2017              [Page 11]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -669,7 +669,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 12]
+Beckwith & Bild         Expires November 11, 2017              [Page 12]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -725,7 +725,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 13]
+Beckwith & Bild         Expires November 11, 2017              [Page 13]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -781,7 +781,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 14]
+Beckwith & Bild         Expires November 11, 2017              [Page 14]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -837,7 +837,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 15]
+Beckwith & Bild         Expires November 11, 2017              [Page 15]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -893,7 +893,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 16]
+Beckwith & Bild         Expires November 11, 2017              [Page 16]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -949,7 +949,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 17]
+Beckwith & Bild         Expires November 11, 2017              [Page 17]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1005,7 +1005,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 18]
+Beckwith & Bild         Expires November 11, 2017              [Page 18]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1061,7 +1061,7 @@ A.1.1.  Client
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 19]
+Beckwith & Bild         Expires November 11, 2017              [Page 19]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1117,7 +1117,7 @@ B.3.  Byte Arrays
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 20]
+Beckwith & Bild         Expires November 11, 2017              [Page 20]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1173,7 +1173,7 @@ B.5.  Enumerateds
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 21]
+Beckwith & Bild         Expires November 11, 2017              [Page 21]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1229,7 +1229,7 @@ B.7.  AEAD-Encrypted Constructed Types
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 22]
+Beckwith & Bild         Expires November 11, 2017              [Page 22]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1285,7 +1285,7 @@ B.9.  Variants
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 23]
+Beckwith & Bild         Expires November 11, 2017              [Page 23]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1341,7 +1341,7 @@ C.1.  Common Message Header
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 24]
+Beckwith & Bild         Expires November 11, 2017              [Page 24]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1397,7 +1397,7 @@ C.2.1.  DAA Types
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 25]
+Beckwith & Bild         Expires November 11, 2017              [Page 25]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1453,7 +1453,7 @@ C.3.  Record Layer
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 26]
+Beckwith & Bild         Expires November 11, 2017              [Page 26]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1509,4 +1509,4 @@ Authors' Addresses
 
 
 
-Beckwith & Bild         Expires November 10, 2017              [Page 27]
+Beckwith & Bild         Expires November 11, 2017              [Page 27]
