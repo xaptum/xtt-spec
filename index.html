@@ -347,7 +347,7 @@ address {
 
   <meta name="dct.creator" content="Beckwith, Z. and D. Bild" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-xaptum-xtt-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2017-5-10" />
+  <meta name="dct.issued" scheme="ISO8601" content="2017-5-11" />
   <meta name="dct.abstract" content="This document specifies version 1.0 of the Xaptum Trusted Transit (XTT) protocol for securing the Internet of Things (IoT). It provides scalable identitiy provisioning, device authentication, and data integrity and confidentiality." />
   <meta name="description" content="This document specifies version 1.0 of the Xaptum Trusted Transit (XTT) protocol for securing the Internet of Things (IoT). It provides scalable identitiy provisioning, device authentication, and data integrity and confidentiality." />
 
@@ -371,8 +371,8 @@ address {
   <td class="right">Xaptum, Inc.</td>
 </tr>
 <tr>
-  <td class="left">Expires: November 11, 2017</td>
-  <td class="right">May 10, 2017</td>
+  <td class="left">Expires: November 12, 2017</td>
+  <td class="right">May 11, 2017</td>
 </tr>
 
     	
@@ -392,7 +392,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on November 11, 2017.</p>
+<p>This Internet-Draft will expire on November 12, 2017.</p>
 <h1 id="rfc.copyrightnotice">
   <a href="#rfc.copyrightnotice">Copyright Notice</a>
 </h1>
@@ -833,74 +833,144 @@ aead_struct&lt;session_keys&gt;(
 <p id="rfc.section.5.p.1">(TODO)</p>
 <h1 id="rfc.section.6"><a href="#rfc.section.6">6.</a> <a href="#cryptographic-computations" id="cryptographic-computations">Cryptographic Computations</a></h1>
 <h2 id="rfc.section.6.1"><a href="#rfc.section.6.1">6.1.</a> <a href="#notation" id="notation">Notation</a></h2>
-<p id="rfc.section.6.1.p.1">The cryptographic computations used in this protocol make heavy use of a pseudo-random function <samp>prf</samp>, defined as:</p>
+<p id="rfc.section.6.1.p.1">The cryptographic computations used in this protocol make use of a pseudo-random function <samp>prf</samp>, defined as:</p>
 <pre>
-prf&lt;N&gt;(key, input) =
-        Keyed pseudo-random function (set during handshake),
-        keyed by "key", with "input" as input, outputting "N" bytes
+prf&lt;N&gt;(Key, Input) =
+    Keyed pseudo-random function (set during handshake),
+    keyed by "Key", with "Input" as input, outputting "N" bytes
 </pre>
-<p id="rfc.section.6.1.p.2">The <samp>prf</samp> can be implemented by any keyed hash function.  For the case of the SHA512-based suite_spec options, <samp>prf</samp> is HMAC, as specified in <a href="#RFC2104">[RFC2104]</a>, using SHA-512, defined in <a href="#SHS">[SHS]</a>, as the underlying hash function.  For the case of the BLAKE2b-based suite_spec options, <samp>prf</samp> is the BLAKE2b keyed-hash function, as defined in <a href="#RFC7693">[RFC7693]</a>.</p>
+<p id="rfc.section.6.1.p.2">The <samp>prf</samp> is implemented by a keyed hash function.  For the case of the SHA512-based suite_spec options, <samp>prf</samp> is HMAC, as specified in <a href="#RFC2104">[RFC2104]</a>, using SHA-512, defined in <a href="#SHS">[SHS]</a>, as the underlying hash function.  For the case of the BLAKE2b-based suite_spec options, <samp>prf</samp> is the BLAKE2b keyed-hash function, as defined in <a href="#RFC7693">[RFC7693]</a>.</p>
 <p id="rfc.section.6.1.p.3">In addition, a non-keyed hash, denoted <samp>hash</samp>, will be referenced here.  For the SHA512-based suite_spec options, this is just SHA-512.  For the BLAKE2b-based suite_specs, this is Blake2b with a zero-length key.</p>
+<p id="rfc.section.6.1.p.4">The hashes used in the cryptographic computations described below use a construction denoted <samp>hash_ext</samp>, which appends the input length to its input before hashing:</p>
+<pre>
+hash_ext(Input) =
+    hash(
+        struct {
+            uint16 length = Input.length;
+            byte input[&lt;input.length&gt;] = Input;
+        };
+    )
+</pre>
+<p id="rfc.section.6.1.p.5">Similarly, <samp>prf_ext</samp> is defined as the <samp>prf</samp> function with the output length appended to its input:</p>
+<pre>
+prf_ext&lt;N&gt;(Key, Input) =
+    prf&lt;N&gt;(Key,
+           struct {
+               uint16 out_length = N;
+               byte input[&lt;input.length&gt;] = Input;
+           };
+    )
+</pre>
 <h2 id="rfc.section.6.2"><a href="#rfc.section.6.2">6.2.</a> <a href="#transcript-hashes" id="transcript-hashes">Transcript Hashes</a></h2>
-<p id="rfc.section.6.2.p.1">The computation of the shared secret materials requires various hashes of the handshake messages, in order to bind these secret materials to the specific handshake.  The definitions of these hash values follow below.  When included in these hashes, the messages are unencrypted.</p>
-<p><samp>length-of-hash-output</samp> is the output length of <samp>hash</samp> expressed as an 8-byte numeric value.</p>
+<p id="rfc.section.6.2.p.1">The computation of the shared secret materials requires various hashes of the handshake messages, in order to bind these secret materials to the specific handshake.  The definitions of these hash values follow below.</p>
+<p id="rfc.section.6.2.p.2">When included in a hash, handshake messages are unencrypted.</p>
 <pre>
 ServerSigHash =
-    hash(
-        ClientInit
-        | ServerInitAndAttest-up-to-signature
+    hash_ext(
+        ClientInit ||
+        ServerInitAndAttest-up-to-signature
     )
 </pre>
 <pre>
 HandshakeKeyHash =
-    hash(
-        length-of-hash-output
-        | hash(
-            ClientInit
-            | ServerInitAndAttest-up-to-cookie
-        )
-        | server_cookie
+    hash_ext(
+        hash_ext(
+            ClientInit ||
+            ServerInitAndAttest-up-to-cookie
+        ) ||
+        server_cookie
     )
 </pre>
 <pre>
 ClientSigHash =
-    hash(
-        length-of-hash-output
-        | hash(
-            ClientInit
-            | ServerInitAndAttest-up-to-cookie
-        )
-        | server_cookie
-        | ClientAttest-up-to-signature
+    hash_ext(
+        hash_ext(
+            ClientInit ||
+            ServerInitAndAttest-up-to-cookie
+        ) ||
+        server_cookie ||
+        ClientAttest-up-to-signature
     )
 </pre>
 <pre>
 SessionHash =
-    hash(
-        length-of-hash-output
-        | hash(
-            ClientInit
-            | ServerInitAndAttest-up-to-cookie
-        )
-        | server_cookie
-        | ClientAttest
+    hash_ext(
+        hash_ext(
+            ClientInit ||
+            ServerInitAndAttest-up-to-cookie
+        ) ||
+        server_cookie ||
+        ClientAttest
     )
 </pre>
 <pre>
 ServerFinishedHash =
-    hash(
-        length-of-hash-output
-        | hash(
-            ClientInit
-            | ServerInitAndAttest-up-to-cookie
-        )
-        | server_cookie
-        | ClientAttest
-        | ServerFinished-up-to-ctx
+    hash_ext(
+        hash_ext(
+            ClientInit ||
+            ServerInitAndAttest-up-to-cookie
+        ) ||
+        server_cookie ||
+        ClientAttest-up-through-signature ||
+        ServerFinished-up-to-ctx
     )
 </pre>
 <h2 id="rfc.section.6.3"><a href="#rfc.section.6.3">6.3.</a> <a href="#key-calculation-and-schedule" id="key-calculation-and-schedule">Key Calculation and Schedule</a></h2>
-<p id="rfc.section.6.3.p.1">The prf is drawn as taking the key argument from the left and outputting downward.  <samp>DH-shared-secret</samp> is the result of running Diffie-Hellman using the keys exchanged during the handshake, and <samp>key_size</samp> and <samp>iv_size</samp> are the key- and nonce-sizes (respectively) for the AEAD algorithm determined by the suite_spec.</p>
+<p id="rfc.section.6.3.p.1">Multiple secret materials are derived from the same input key by including different handshake context into the call to <samp>prf</samp>.  These contexts are defined in <a href="#xtt-context-table">Table 1</a> below, and their use is shown in <a href="#xtt-handshake-schedule">Figure 3</a>, <a href="#xtt-psk-schedule">Figure 4</a>, and <a href="#xtt-session-schedule">Figure 5</a>.</p>
+<div id="rfc.table.1"/>
+<div id="xtt-context-table"/>
+<table cellpadding="3" cellspacing="0" class="tt full center">
+  <caption>Context Strings for Secret Material Derivation</caption>
+  <thead>
+    <tr>
+      <th class="left">Context</th>
+      <th class="right">Definition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="left">ClientHandshakeKeyContext</td>
+      <td class="right">&#8220;XTT handshake client key&#8221; || HandshakeKeyHash</td>
+    </tr>
+    <tr>
+      <td class="left">ClientHandshakeIVContext</td>
+      <td class="right">&#8220;XTT handshake client iv&#8221; || HandshakeKeyHash</td>
+    </tr>
+    <tr>
+      <td class="left">ServerHandshakeKeyContext</td>
+      <td class="right">&#8220;XTT handshake server key&#8221; || HandshakeKeyHash</td>
+    </tr>
+    <tr>
+      <td class="left">ServerHandshakeIVContext</td>
+      <td class="right">&#8220;XTT handshake server iv&#8221; || HandshakeKeyHash</td>
+    </tr>
+    <tr>
+      <td class="left">LongtermSharedSecretContext</td>
+      <td class="right">&#8220;XTT long-term secret&#8221; || SessionHash</td>
+    </tr>
+    <tr>
+      <td class="left">LongtermSecretKeyContext</td>
+      <td class="right">&#8220;XTT long-term secret key&#8221; || SessionHash</td>
+    </tr>
+    <tr>
+      <td class="left">ClientSessionKeyContext</td>
+      <td class="right">&#8220;XTT session client key&#8221; || SessionHash</td>
+    </tr>
+    <tr>
+      <td class="left">ClientSessionIVContext</td>
+      <td class="right">&#8220;XTT session client iv&#8221; || SessionHash</td>
+    </tr>
+    <tr>
+      <td class="left">ServerSessionKeyContext</td>
+      <td class="right">&#8220;XTT session server key&#8221; || SessionHash</td>
+    </tr>
+    <tr>
+      <td class="left">ServerSessionIVContext</td>
+      <td class="right">&#8220;XTT session server iv&#8221; || SessionHash</td>
+    </tr>
+  </tbody>
+</table>
+<p id="rfc.section.6.3.p.2">The prf is drawn as taking the key argument from the left and outputting downward.  <samp>DH-shared-secret</samp> is the result of running Diffie-Hellman using the keys exchanged during the handshake, and <samp>key_size</samp> and <samp>iv_size</samp> are the key- and nonce-sizes (respectively) for the AEAD algorithm determined by the suite_spec.</p>
 <div id="rfc.figure.3"/>
 <div id="xtt-handshake-schedule"/>
 <pre>
@@ -909,25 +979,29 @@ ServerFinishedHash =
      |      
      +--&gt; prf&lt;sizeof(LongtermSecret)&gt;(DH-shared-secret)
            |
-           +--&gt; prf&lt;key_size&gt;(&#8220;XTT handshake client key&#8221;
-           |                  | HandshakeKeyHash)
-           |       = client_handshake_send_key
-           |       = server_handshake_receive_key
+           +--&gt; prf&lt;key_size&gt;(ClientHandshakeKeyContext)
+           |     |
+           |     +--&gt; client_handshake_send_key
+           |     |
+           |     +--&gt; server_handshake_receive_key
            |
-           +--&gt; prf&lt;iv_size&gt;(&#8220;XTT handshake client iv&#8221;
-           |                  | HandshakeKeyHash)
-           |       = client_handshake_send_iv
-           |       = server_handshake_receive_iv
+           +--&gt; prf&lt;iv_size&gt;(ClientHandshakeIVContext)
+           |     |
+           |     +--&gt; client_handshake_send_iv
+           |     |
+           |     +--&gt; server_handshake_receive_iv
            |
-           +--&gt; prf&lt;key_size&gt;(&#8220;XTT handshake server key&#8221;
-           |                  | HandshakeKeyHash)
-           |       = client_handshake_receive_key
-           |       = server_handshake_send_key
+           +--&gt; prf&lt;key_size&gt;(ServerHandshakeKeyContext)
+           |     |
+           |     +--&gt; client_handshake_receive_key
+           |     |
+           |     +--&gt; server_handshake_send_key
            |
-           +--&gt; prf&lt;iv_size&gt;(&#8220;XTT handshake server iv&#8221;
-           |                  | HandshakeKeyHash)
-           |       = client_handshake_receive_iv
-           |       = server_handshake_send_iv
+           +--&gt; prf&lt;iv_size&gt;(ServerHandshakeIVContext)
+           |     |
+           |     +--&gt; client_handshake_receive_iv
+           |     |
+           |     +--&gt; server_handshake_send_iv
            |
            +--&gt; handshake_secret
 </pre>
@@ -940,12 +1014,13 @@ ServerFinishedHash =
      |      
      +--&gt; prf&lt;sizeof(LongtermSecret)&gt;(ClientID)
            |
-           +--&gt; prf&lt;sizeof(LongTermSecret)&gt;(&#8220;XTT long-term secret&#8221;
-           |                  | SessionHash)
-           |       = longterm_client_shared_secret
-           +--&gt; prf&lt;sizeof(LongtermSignatureKey)&gt;(&#8220;XTT long-term signature key&#8221;
-                              | SessionHash)
-                   = longterm_client_shared_secret_key
+           +--&gt; prf&lt;sizeof(LongtermSecret)&gt;(LongtermSharedSecretContext)
+           |     |
+           |     +--&gt; longterm_client_shared_secret
+           |
+           +--&gt; prf&lt;sizeof(LongtermSignatureKey)&gt;(LongtermSecretKeyContext)
+                 |
+                 +--&gt; longterm_client_shared_secret_key
 </pre>
 <p class="figure">Figure 4: Derivation of Longterm-Shared-Secret</p>
 <div id="rfc.figure.5"/>
@@ -956,32 +1031,36 @@ ServerFinishedHash =
      |      
      +--&gt; prf&lt;sizeof(LongtermSecret)&gt;(longterm_client_shared_secret)
            |
-           +--&gt; prf&lt;key_size&gt;(&#8220;XTT session client key&#8221;
-           |                  | SessionHash)
-           |       = client_session_send_key
-           |       = server_session_receive_key
+           +--&gt; prf&lt;key_size&gt;(ClientSessionKeyContext)
+           |     |
+           |     +--&gt; client_session_send_key
+           |     |
+           |     +--&gt; server_session_receive_key
            |
-           +--&gt; prf&lt;iv_size&gt;(&#8220;XTT session client iv&#8221;
-           |                  | SessionHash)
-           |       = client_session_send_iv
-           |       = server_session_receive_iv
+           +--&gt; prf&lt;iv_size&gt;(ClientSessionIVContext)
+           |     |
+           |     +--&gt; client_session_send_iv
+           |     |
+           |     +--&gt; server_session_receive_iv
            |
-           +--&gt; prf&lt;key_size&gt;(&#8220;XTT session server key&#8221;
-           |                  | SessionHash)
-           |       = client_session_receive_key
-           |       = server_session_send_key
+           +--&gt; prf&lt;key_size&gt;(ServerSessionKeyContext)
+           |     |
+           |     +--&gt; client_session_receive_key
+           |     |
+           |     +--&gt; server_session_send_key
            |
-           +--&gt; prf&lt;iv_size&gt;(&#8220;XTT session server iv&#8221;
-                              | SessionHash)
-                   = client_session_receive_iv
-                   = server_session_send_iv
+           +--&gt; prf&lt;iv_size&gt;(ServerSessionIVContext)
+                 |
+                 +--&gt; client_session_receive_iv
+                 |
+                 +--&gt; server_session_send_iv
 </pre>
 <p class="figure">Figure 5: Key Schedule for Handshake Keys</p>
 <h2 id="rfc.section.6.4"><a href="#rfc.section.6.4">6.4.</a> <a href="#sessionid-generation" id="sessionid-generation">SessionID Generation</a></h2>
 <p id="rfc.section.6.4.p.1">The SessionID for an AuthenticatedSession is simply the concatenation of the two SessionIDSeeds exchanged by the client and server, with the server&#8217;s seed first:</p>
 <pre>
 SessionID =
-    session_id_seed_s | session_id_seed_c
+    session_id_seed_s || session_id_seed_c
 </pre>
 <h2 id="rfc.section.6.5"><a href="#rfc.section.6.5">6.5.</a> <a href="#ecdhe-parameters" id="ecdhe-parameters">ECDHE Parameters</a></h2>
 <p id="rfc.section.6.5.p.1">The size and interpretation of a value of type DHKeyShare depends on the Diffie-Hellman algorithm specified in the handshake messages.</p>
@@ -1127,7 +1206,7 @@ SessionID =
 <p id="rfc.section.A.2.2.p.1">(TODO)</p>
 <h1 id="rfc.appendix.B"><a href="#rfc.appendix.B">Appendix B.</a> <a href="#presentation-language" id="presentation-language">Presentation Language</a></h1>
 <h2 id="rfc.appendix.B.1"><a href="#rfc.appendix.B.1">B.1.</a> <a href="#miscellaneous" id="miscellaneous">Miscellaneous</a></h2>
-<p id="rfc.section.B.1.p.1">Comments begin with &#8220;/*&#8221; and end with &#8220;*/&#8221;.</p>
+<p id="rfc.section.B.1.p.1">Comments begin with <samp>/\*</samp> and end with <samp>\*/</samp>.  Concatenation of byte strings is denoted <samp>||</samp></p>
 <p id="rfc.section.B.1.p.2">To indicate the number of bytes taken up in the byte stream by a type or value, the expression <samp>sizeof(value-or-type)</samp> is used.</p>
 <p id="rfc.section.B.1.p.3">Optional components are denoted by enclosing them in <samp>[[ ]]</samp> double brackets.</p>
 <h2 id="rfc.appendix.B.2"><a href="#rfc.appendix.B.2">B.2.</a> <a href="#definition-of-byte" id="definition-of-byte">Definition of Byte</a></h2>

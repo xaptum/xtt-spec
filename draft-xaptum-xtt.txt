@@ -5,7 +5,7 @@
 Network Working Group                                        Z. Beckwith
 Internet-Draft                                                   D. Bild
 Intended status: Informational                              Xaptum, Inc.
-Expires: November 11, 2017                                  May 10, 2017
+Expires: November 12, 2017                                  May 11, 2017
 
 
          The Xaptum Trusted Transit (XTT) Protocol Version 1.0
@@ -33,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on November 11, 2017.
+   This Internet-Draft will expire on November 12, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Beckwith & Bild         Expires November 11, 2017               [Page 1]
+Beckwith & Bild         Expires November 12, 2017               [Page 1]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -89,51 +89,51 @@ Table of Contents
    5.  Error Handling  . . . . . . . . . . . . . . . . . . . . . . .  16
    6.  Cryptographic Computations  . . . . . . . . . . . . . . . . .  16
      6.1.  Notation  . . . . . . . . . . . . . . . . . . . . . . . .  16
-     6.2.  Transcript Hashes . . . . . . . . . . . . . . . . . . . .  16
+     6.2.  Transcript Hashes . . . . . . . . . . . . . . . . . . . .  17
      6.3.  Key Calculation and Schedule  . . . . . . . . . . . . . .  18
-     6.4.  SessionID Generation  . . . . . . . . . . . . . . . . . .  19
-     6.5.  ECDHE Parameters  . . . . . . . . . . . . . . . . . . . .  20
-     6.6.  DAA Parameters  . . . . . . . . . . . . . . . . . . . . .  20
-     6.7.  Signature Algorithms  . . . . . . . . . . . . . . . . . .  20
-       6.7.1.  ServerSignature . . . . . . . . . . . . . . . . . . .  20
-       6.7.2.  SymmetricSignature  . . . . . . . . . . . . . . . . .  20
-       6.7.3.  DAASignature  . . . . . . . . . . . . . . . . . . . .  20
-     6.8.  Per-message Nonce Calculation . . . . . . . . . . . . . .  20
-   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
-     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  21
-     7.2.  Informative References  . . . . . . . . . . . . . . . . .  22
-   Appendix A.  State Machine  . . . . . . . . . . . . . . . . . . .  23
-     A.1.  Identity Provisioning Handshake . . . . . . . . . . . . .  23
-       A.1.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  23
-       A.1.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  23
+     6.4.  SessionID Generation  . . . . . . . . . . . . . . . . . .  21
+     6.5.  ECDHE Parameters  . . . . . . . . . . . . . . . . . . . .  21
+     6.6.  DAA Parameters  . . . . . . . . . . . . . . . . . . . . .  22
+     6.7.  Signature Algorithms  . . . . . . . . . . . . . . . . . .  22
+       6.7.1.  ServerSignature . . . . . . . . . . . . . . . . . . .  22
+       6.7.2.  SymmetricSignature  . . . . . . . . . . . . . . . . .  22
+       6.7.3.  DAASignature  . . . . . . . . . . . . . . . . . . . .  22
+     6.8.  Per-message Nonce Calculation . . . . . . . . . . . . . .  22
+   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  23
+     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  23
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .  24
+   Appendix A.  State Machine  . . . . . . . . . . . . . . . . . . .  25
+     A.1.  Identity Provisioning Handshake . . . . . . . . . . . . .  25
+       A.1.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  25
+       A.1.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  25
 
 
 
-Beckwith & Bild         Expires November 11, 2017               [Page 2]
+Beckwith & Bild         Expires November 12, 2017               [Page 2]
 
 Internet-Draft                     XTT                          May 2017
 
 
-     A.2.  Session Establishment Handshake . . . . . . . . . . . . .  23
-       A.2.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  23
-       A.2.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  23
-   Appendix B.  Presentation Language  . . . . . . . . . . . . . . .  23
-     B.1.  Miscellaneous . . . . . . . . . . . . . . . . . . . . . .  23
-     B.2.  Definition of Byte  . . . . . . . . . . . . . . . . . . .  24
-     B.3.  Byte Arrays . . . . . . . . . . . . . . . . . . . . . . .  24
-     B.4.  Numeric Data  . . . . . . . . . . . . . . . . . . . . . .  24
-     B.5.  Enumerateds . . . . . . . . . . . . . . . . . . . . . . .  24
-     B.6.  Constructed Types . . . . . . . . . . . . . . . . . . . .  25
-     B.7.  AEAD-Encrypted Constructed Types  . . . . . . . . . . . .  26
-     B.8.  Constants . . . . . . . . . . . . . . . . . . . . . . . .  26
-     B.9.  Variants  . . . . . . . . . . . . . . . . . . . . . . . .  27
-   Appendix C.  Protocol Data Structures and Constant Values . . . .  27
-     C.1.  Common Message Header . . . . . . . . . . . . . . . . . .  27
-     C.2.  Handshakes  . . . . . . . . . . . . . . . . . . . . . . .  28
-       C.2.1.  Signature Types . . . . . . . . . . . . . . . . . . .  28
-       C.2.2.  Server Certificates . . . . . . . . . . . . . . . . .  29
-     C.3.  Record Layer  . . . . . . . . . . . . . . . . . . . . . .  29
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  30
+     A.2.  Session Establishment Handshake . . . . . . . . . . . . .  25
+       A.2.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  25
+       A.2.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  25
+   Appendix B.  Presentation Language  . . . . . . . . . . . . . . .  25
+     B.1.  Miscellaneous . . . . . . . . . . . . . . . . . . . . . .  25
+     B.2.  Definition of Byte  . . . . . . . . . . . . . . . . . . .  25
+     B.3.  Byte Arrays . . . . . . . . . . . . . . . . . . . . . . .  26
+     B.4.  Numeric Data  . . . . . . . . . . . . . . . . . . . . . .  26
+     B.5.  Enumerateds . . . . . . . . . . . . . . . . . . . . . . .  26
+     B.6.  Constructed Types . . . . . . . . . . . . . . . . . . . .  27
+     B.7.  AEAD-Encrypted Constructed Types  . . . . . . . . . . . .  28
+     B.8.  Constants . . . . . . . . . . . . . . . . . . . . . . . .  28
+     B.9.  Variants  . . . . . . . . . . . . . . . . . . . . . . . .  28
+   Appendix C.  Protocol Data Structures and Constant Values . . . .  29
+     C.1.  Common Message Header . . . . . . . . . . . . . . . . . .  29
+     C.2.  Handshakes  . . . . . . . . . . . . . . . . . . . . . . .  30
+       C.2.1.  Signature Types . . . . . . . . . . . . . . . . . . .  30
+       C.2.2.  Server Certificates . . . . . . . . . . . . . . . . .  30
+     C.3.  Record Layer  . . . . . . . . . . . . . . . . . . . . . .  31
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  31
 
 1.  Introduction
 
@@ -165,7 +165,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017               [Page 3]
+Beckwith & Bild         Expires November 12, 2017               [Page 3]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -221,7 +221,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017               [Page 4]
+Beckwith & Bild         Expires November 12, 2017               [Page 4]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -277,7 +277,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017               [Page 5]
+Beckwith & Bild         Expires November 12, 2017               [Page 5]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -333,7 +333,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017               [Page 6]
+Beckwith & Bild         Expires November 12, 2017               [Page 6]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -389,7 +389,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017               [Page 7]
+Beckwith & Bild         Expires November 12, 2017               [Page 7]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -445,7 +445,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017               [Page 8]
+Beckwith & Bild         Expires November 12, 2017               [Page 8]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -501,7 +501,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017               [Page 9]
+Beckwith & Bild         Expires November 12, 2017               [Page 9]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -557,7 +557,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017              [Page 10]
+Beckwith & Bild         Expires November 12, 2017              [Page 10]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -613,7 +613,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017              [Page 11]
+Beckwith & Bild         Expires November 12, 2017              [Page 11]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -669,7 +669,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017              [Page 12]
+Beckwith & Bild         Expires November 12, 2017              [Page 12]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -725,7 +725,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017              [Page 13]
+Beckwith & Bild         Expires November 12, 2017              [Page 13]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -781,7 +781,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017              [Page 14]
+Beckwith & Bild         Expires November 12, 2017              [Page 14]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -837,7 +837,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 11, 2017              [Page 15]
+Beckwith & Bild         Expires November 12, 2017              [Page 15]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -863,80 +863,82 @@ Internet-Draft                     XTT                          May 2017
 
 6.1.  Notation
 
-   The cryptographic computations used in this protocol make heavy use
-   of a pseudo-random function "prf", defined as:
+   The cryptographic computations used in this protocol make use of a
+   pseudo-random function "prf", defined as:
 
-   prf<N>(key, input) =
-           Keyed pseudo-random function (set during handshake),
-           keyed by "key", with "input" as input, outputting "N" bytes
+   prf<N>(Key, Input) =
+       Keyed pseudo-random function (set during handshake),
+       keyed by "Key", with "Input" as input, outputting "N" bytes
 
-   The "prf" can be implemented by any keyed hash function.  For the
-   case of the SHA512-based suite_spec options, "prf" is HMAC, as
-   specified in [RFC2104], using SHA-512, defined in [SHS], as the
-   underlying hash function.  For the case of the BLAKE2b-based
-   suite_spec options, "prf" is the BLAKE2b keyed-hash function, as
-   defined in [RFC7693].
+   The "prf" is implemented by a keyed hash function.  For the case of
+   the SHA512-based suite_spec options, "prf" is HMAC, as specified in
+   [RFC2104], using SHA-512, defined in [SHS], as the underlying hash
+   function.  For the case of the BLAKE2b-based suite_spec options,
+   "prf" is the BLAKE2b keyed-hash function, as defined in [RFC7693].
 
    In addition, a non-keyed hash, denoted "hash", will be referenced
    here.  For the SHA512-based suite_spec options, this is just SHA-512.
    For the BLAKE2b-based suite_specs, this is Blake2b with a zero-length
    key.
 
+   The hashes used in the cryptographic computations described below use
+   a construction denoted "hash_ext", which appends the input length to
+   its input before hashing:
+
+
+
+
+
+
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 16]
+
+Internet-Draft                     XTT                          May 2017
+
+
+   hash_ext(Input) =
+       hash(
+           struct {
+               uint16 length = Input.length;
+               byte input[<input.length>] = Input;
+           };
+       )
+
+   Similarly, "prf_ext" is defined as the "prf" function with the output
+   length appended to its input:
+
+   prf_ext<N>(Key, Input) =
+       prf<N>(Key,
+              struct {
+                  uint16 out_length = N;
+                  byte input[<input.length>] = Input;
+              };
+       )
+
 6.2.  Transcript Hashes
 
    The computation of the shared secret materials requires various
    hashes of the handshake messages, in order to bind these secret
    materials to the specific handshake.  The definitions of these hash
-   values follow below.  When included in these hashes, the messages are
-   unencrypted.
+   values follow below.
 
-
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 16]
-
-Internet-Draft                     XTT                          May 2017
-
-
-   "length-of-hash-output" is the output length of "hash" expressed as
-   an 8-byte numeric value.
+   When included in a hash, handshake messages are unencrypted.
 
    ServerSigHash =
-       hash(
-           ClientInit
-           | ServerInitAndAttest-up-to-signature
+       hash_ext(
+           ClientInit ||
+           ServerInitAndAttest-up-to-signature
        )
 
    HandshakeKeyHash =
-       hash(
-           length-of-hash-output
-           | hash(
-               ClientInit
-               | ServerInitAndAttest-up-to-cookie
-           )
-           | server_cookie
-       )
-
-   ClientSigHash =
-       hash(
-           length-of-hash-output
-           | hash(
-               ClientInit
-               | ServerInitAndAttest-up-to-cookie
-           )
-           | server_cookie
-           | ClientAttest-up-to-signature
-       )
-
-   SessionHash =
-       hash(
-           length-of-hash-output
-           | hash(
-               ClientInit
-               | ServerInitAndAttest-up-to-cookie
-           )
-           | server_cookie
-           | ClientAttest
+       hash_ext(
+           hash_ext(
+               ClientInit ||
+               ServerInitAndAttest-up-to-cookie
+           ) ||
+           server_cookie
        )
 
 
@@ -947,26 +949,102 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 17]
+Beckwith & Bild         Expires November 12, 2017              [Page 17]
 
 Internet-Draft                     XTT                          May 2017
 
 
+   ClientSigHash =
+       hash_ext(
+           hash_ext(
+               ClientInit ||
+               ServerInitAndAttest-up-to-cookie
+           ) ||
+           server_cookie ||
+           ClientAttest-up-to-signature
+       )
+
+   SessionHash =
+       hash_ext(
+           hash_ext(
+               ClientInit ||
+               ServerInitAndAttest-up-to-cookie
+           ) ||
+           server_cookie ||
+           ClientAttest
+       )
+
    ServerFinishedHash =
-       hash(
-           length-of-hash-output
-           | hash(
-               ClientInit
-               | ServerInitAndAttest-up-to-cookie
-           )
-           | server_cookie
-           | ClientAttest
-           | ServerFinished-up-to-ctx
+       hash_ext(
+           hash_ext(
+               ClientInit ||
+               ServerInitAndAttest-up-to-cookie
+           ) ||
+           server_cookie ||
+           ClientAttest-up-through-signature ||
+           ServerFinished-up-to-ctx
        )
 
 6.3.  Key Calculation and Schedule
+
+   Multiple secret materials are derived from the same input key by
+   including different handshake context into the call to "prf".  These
+   contexts are defined in Table 1 below, and their use is shown in
+   Figure 3, Figure 4, and Figure 5.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 18]
+
+Internet-Draft                     XTT                          May 2017
+
+
+   +-----------------------------+-------------------------------------+
+   | Context                     |                          Definition |
+   +-----------------------------+-------------------------------------+
+   | ClientHandshakeKeyContext   |       "XTT handshake client key" || |
+   |                             |                    HandshakeKeyHash |
+   |                             |                                     |
+   | ClientHandshakeIVContext    |        "XTT handshake client iv" || |
+   |                             |                    HandshakeKeyHash |
+   |                             |                                     |
+   | ServerHandshakeKeyContext   |       "XTT handshake server key" || |
+   |                             |                    HandshakeKeyHash |
+   |                             |                                     |
+   | ServerHandshakeIVContext    |        "XTT handshake server iv" || |
+   |                             |                    HandshakeKeyHash |
+   |                             |                                     |
+   | LongtermSharedSecretContext |           "XTT long-term secret" || |
+   |                             |                         SessionHash |
+   |                             |                                     |
+   | LongtermSecretKeyContext    |       "XTT long-term secret key" || |
+   |                             |                         SessionHash |
+   |                             |                                     |
+   | ClientSessionKeyContext     |         "XTT session client key" || |
+   |                             |                         SessionHash |
+   |                             |                                     |
+   | ClientSessionIVContext      |          "XTT session client iv" || |
+   |                             |                         SessionHash |
+   |                             |                                     |
+   | ServerSessionKeyContext     |         "XTT session server key" || |
+   |                             |                         SessionHash |
+   |                             |                                     |
+   | ServerSessionIVContext      |          "XTT session server iv" || |
+   |                             |                         SessionHash |
+   +-----------------------------+-------------------------------------+
+
+          Table 1: Context Strings for Secret Material Derivation
 
    The prf is drawn as taking the key argument from the left and
    outputting downward.  "DH-shared-secret" is the result of running
@@ -974,80 +1052,104 @@ Internet-Draft                     XTT                          May 2017
    "key_size" and "iv_size" are the key- and nonce-sizes (respectively)
    for the AEAD algorithm determined by the suite_spec.
 
+
+
+
+
+
+
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 19]
+
+Internet-Draft                     XTT                          May 2017
+
+
      (nonce_c | server_cookie)
         |
         |
         +--> prf<sizeof(LongtermSecret)>(DH-shared-secret)
               |
-              +--> prf<key_size>("XTT handshake client key"
-              |                  | HandshakeKeyHash)
-              |       = client_handshake_send_key
-              |       = server_handshake_receive_key
+              +--> prf<key_size>(ClientHandshakeKeyContext)
+              |     |
+              |     +--> client_handshake_send_key
+              |     |
+              |     +--> server_handshake_receive_key
               |
-              +--> prf<iv_size>("XTT handshake client iv"
-              |                  | HandshakeKeyHash)
-              |       = client_handshake_send_iv
-              |       = server_handshake_receive_iv
+              +--> prf<iv_size>(ClientHandshakeIVContext)
+              |     |
+              |     +--> client_handshake_send_iv
+              |     |
+              |     +--> server_handshake_receive_iv
               |
-              +--> prf<key_size>("XTT handshake server key"
-              |                  | HandshakeKeyHash)
-              |       = client_handshake_receive_key
-              |       = server_handshake_send_key
+              +--> prf<key_size>(ServerHandshakeKeyContext)
+              |     |
+              |     +--> client_handshake_receive_key
+              |     |
+              |     +--> server_handshake_send_key
               |
-              +--> prf<iv_size>("XTT handshake server iv"
-              |                  | HandshakeKeyHash)
-              |       = client_handshake_receive_iv
-              |       = server_handshake_send_iv
+              +--> prf<iv_size>(ServerHandshakeIVContext)
+              |     |
+              |     +--> client_handshake_receive_iv
+              |     |
+              |     +--> server_handshake_send_iv
               |
               +--> handshake_secret
 
                  Figure 3: Key Schedule for Handshake Keys
-
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 18]
-
-Internet-Draft                     XTT                          May 2017
-
 
   handshake_secret
      |
      |
      +--> prf<sizeof(LongtermSecret)>(ClientID)
            |
-           +--> prf<sizeof(LongTermSecret)>("XTT long-term secret"
-           |                  | SessionHash)
-           |       = longterm_client_shared_secret
-           +--> prf<sizeof(LongtermSignatureKey)>("XTT long-term signature key"
-                              | SessionHash)
-                   = longterm_client_shared_secret_key
+           +--> prf<sizeof(LongtermSecret)>(LongtermSharedSecretContext)
+           |     |
+           |     +--> longterm_client_shared_secret
+           |
+           +--> prf<sizeof(LongtermSignatureKey)>(LongtermSecretKeyContext)
+                 |
+                 +--> longterm_client_shared_secret_key
 
               Figure 4: Derivation of Longterm-Shared-Secret
+
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 20]
+
+Internet-Draft                     XTT                          May 2017
+
 
      handshake_secret
         |
         |
         +--> prf<sizeof(LongtermSecret)>(longterm_client_shared_secret)
               |
-              +--> prf<key_size>("XTT session client key"
-              |                  | SessionHash)
-              |       = client_session_send_key
-              |       = server_session_receive_key
+              +--> prf<key_size>(ClientSessionKeyContext)
+              |     |
+              |     +--> client_session_send_key
+              |     |
+              |     +--> server_session_receive_key
               |
-              +--> prf<iv_size>("XTT session client iv"
-              |                  | SessionHash)
-              |       = client_session_send_iv
-              |       = server_session_receive_iv
+              +--> prf<iv_size>(ClientSessionIVContext)
+              |     |
+              |     +--> client_session_send_iv
+              |     |
+              |     +--> server_session_receive_iv
               |
-              +--> prf<key_size>("XTT session server key"
-              |                  | SessionHash)
-              |       = client_session_receive_key
-              |       = server_session_send_key
+              +--> prf<key_size>(ServerSessionKeyContext)
+              |     |
+              |     +--> client_session_receive_key
+              |     |
+              |     +--> server_session_send_key
               |
-              +--> prf<iv_size>("XTT session server iv"
-                                 | SessionHash)
-                      = client_session_receive_iv
-                      = server_session_send_iv
+              +--> prf<iv_size>(ServerSessionIVContext)
+                    |
+                    +--> client_session_receive_iv
+                    |
+                    +--> server_session_send_iv
 
                  Figure 5: Key Schedule for Handshake Keys
 
@@ -1057,17 +1159,8 @@ Internet-Draft                     XTT                          May 2017
    of the two SessionIDSeeds exchanged by the client and server, with
    the server's seed first:
 
-
-
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 19]
-
-Internet-Draft                     XTT                          May 2017
-
-
    SessionID =
-       session_id_seed_s | session_id_seed_c
+       session_id_seed_s || session_id_seed_c
 
 6.5.  ECDHE Parameters
 
@@ -1075,6 +1168,15 @@ Internet-Draft                     XTT                          May 2017
    the Diffie-Hellman algorithm specified in the handshake messages.
 
    Currently, only x25519 is supported by the protocol.
+
+
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 21]
+
+Internet-Draft                     XTT                          May 2017
+
 
    For x25519, the contents are the byte string inputs and outputs of
    the corresponding functions defined in [RFC7748].  The size of the
@@ -1115,13 +1217,6 @@ Internet-Draft                     XTT                          May 2017
    receiving key/IV, and vice-versa).  The byte-length of the IVs is
    that of the nonce for the negotiated AEAD algorithm.
 
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 20]
-
-Internet-Draft                     XTT                          May 2017
-
-
    At the start of a new session (after a successful handshake), the two
    sequence numbers (client-to-server and server-to-client) are set to
    0.  The first Authenticated Session record payload the client sends
@@ -1131,6 +1226,13 @@ Internet-Draft                     XTT                          May 2017
    the server after sending its ServerAttest must have sequence number
    0, meaning that if the server sends a ServerFinished packet this
    packet will have sequence number 0.
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 22]
+
+Internet-Draft                     XTT                          May 2017
+
 
    A per-message nonce is generated before AEAD encryption by left-
    padding the sequence number (in network byte order) to the length of
@@ -1168,16 +1270,6 @@ Internet-Draft                     XTT                          May 2017
               for Security", RFC 7748, DOI 10.17487/RFC7748, January
               2016, <http://www.rfc-editor.org/info/rfc7748>.
 
-
-
-
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 21]
-
-Internet-Draft                     XTT                          May 2017
-
-
    [RFC8032]  Josefsson, S. and I. Liusvaara, "Edwards-Curve Digital
               Signature Algorithm (EdDSA)", RFC 8032,
               DOI 10.17487/RFC8032, January 2017,
@@ -1185,6 +1277,18 @@ Internet-Draft                     XTT                          May 2017
 
    [SHS]      National Institute of Standards and Technology, "Secure
               Hash Standard", NIST FIPS PUB 180-4, March 2012.
+
+
+
+
+
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 23]
+
+Internet-Draft                     XTT                          May 2017
+
 
 7.2.  Informative References
 
@@ -1226,17 +1330,21 @@ Internet-Draft                     XTT                          May 2017
               authenticated Diffie-Hellman and its use in the IKE
               protocols", Proceedings of CRYPTO 2003 , June 2003.
 
-
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 22]
-
-Internet-Draft                     XTT                          May 2017
-
-
    [SIGMASEC]
               Canetti, R. and H. Krawczyk, "Security Analysis of IKE's
               Signature-Based Key-Exchange Protocol", October 2002.
+
+
+
+
+
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 24]
+
+Internet-Draft                     XTT                          May 2017
+
 
 Appendix A.  State Machine
 
@@ -1270,7 +1378,8 @@ Appendix B.  Presentation Language
 
 B.1.  Miscellaneous
 
-   Comments begin with "/*" and end with "*/".
+   Comments begin with "/\*" and end with "\*/".  Concatenation of byte
+   strings is denoted "||"
 
    To indicate the number of bytes taken up in the byte stream by a type
    or value, the expression "sizeof(value-or-type)" is used.
@@ -1278,22 +1387,20 @@ B.1.  Miscellaneous
    Optional components are denoted by enclosing them in "[[ ]]" double
    brackets.
 
-
-
-
-
-
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 23]
-
-Internet-Draft                     XTT                          May 2017
-
-
 B.2.  Definition of Byte
 
    One byte is defined to be 8 bits.  Multiple-byte data items are
    concatenations of bytes, from left to right, from top to bottom.
+
+
+
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 25]
+
+Internet-Draft                     XTT                          May 2017
+
 
 B.3.  Byte Arrays
 
@@ -1338,19 +1445,19 @@ B.5.  Enumerateds
    To indicate a type that may take values only from a fixed set of
    possible values, a new type may be defined as of type "enum".  Each
    definition of an enumerated type is a different type.  Only
-
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 24]
-
-Internet-Draft                     XTT                          May 2017
-
-
    enumerateds of the same type may be assigned or compared.  Every
    element of an enumerated must be assigned a value.
 
    The possible values of an enumerated type are specified in this
    document using numeric values.  To indicate how to interpret a value
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 26]
+
+Internet-Draft                     XTT                          May 2017
+
+
    of an enumerated type, and to indicate how much space in the byte
    stream is occupied by an enumerated type, the definition of the
    enumerated type includes the underlying numeric type used to define
@@ -1394,18 +1501,19 @@ B.6.  Constructed Types
    A value of type "T" would occupy a total of "sizeof(T1) + sizeof(T2)"
    bytes in the byte stream.
 
-
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 25]
-
-Internet-Draft                     XTT                          May 2017
-
-
    Subfields of a constructed type are referenced in this document by
    "Type.subfield" when referring to the field in the general type
    "Type", and by "name.subfield" when referring to the field in a
    specific value named "name".  Thus, the value of the subfield "f2" in
+
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 27]
+
+Internet-Draft                     XTT                          May 2017
+
+
    a value called "foo" of type "T", from the example above, would be
    referenced as "foo.f1".
 
@@ -1447,17 +1555,6 @@ B.8.  Constants
        T2 f2;
    } T;
 
-
-
-
-
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 26]
-
-Internet-Draft                     XTT                          May 2017
-
-
 B.9.  Variants
 
    Defined structures may have variants based on some knowledge that is
@@ -1465,6 +1562,14 @@ B.9.  Variants
    type that defines the possible variants the structure defines.  There
    must be a case arm for every element of the enumeration declared in
    the select.  Case arms have limited fall-through: if two case arms
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 28]
+
+Internet-Draft                     XTT                          May 2017
+
+
    follow in immediate succession with no fields in between, then they
    both contain the same fields.
 
@@ -1500,20 +1605,6 @@ Appendix C.  Protocol Data Structures and Constant Values
 
 C.1.  Common Message Header
 
-
-
-
-
-
-
-
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 27]
-
-Internet-Draft                     XTT                          May 2017
-
-
    enum : uint8 {
        client_init(0x01),
        server_init_and_attest(0x02),
@@ -1526,6 +1617,14 @@ Internet-Draft                     XTT                          May 2017
        record_regular(0x31),
        alert(0x41)
    } MsgType;
+
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 29]
+
+Internet-Draft                     XTT                          May 2017
+
 
    enum : uint8 {
        one(1)
@@ -1562,14 +1661,6 @@ C.2.1.  Signature Types
 
    byte ServerSignature[<size of signature for this algorithm>];
 
-
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 28]
-
-Internet-Draft                     XTT                          May 2017
-
-
  byte ServerSignaturePublicKey[<size of public key for this algorithm>];
 
    byte DAAGroupKey[<size of group public key for this algorithm>];
@@ -1583,6 +1674,13 @@ C.2.2.  Server Certificates
    } ServerCertificateVersion;
 
    byte Date[8];   /* YYYYMMDD according to UTC */
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 30]
+
+Internet-Draft                     XTT                          May 2017
+
 
    struct {
        ServerCertificateVersion version;
@@ -1616,16 +1714,6 @@ C.3.  Record Layer
 
    uint16 MsgLength;
 
-
-
-
-
-
-Beckwith & Bild         Expires November 11, 2017              [Page 29]
-
-Internet-Draft                     XTT                          May 2017
-
-
    enum : uint8 {
        queue_protocol(1),
        ipv6(2)
@@ -1637,6 +1725,17 @@ Authors' Addresses
    Xaptum, Inc.
 
    Email: zane.beckwith@xaptum.com
+
+
+
+
+
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 31]
+
+Internet-Draft                     XTT                          May 2017
 
 
    David R. Bild
@@ -1677,4 +1776,17 @@ Authors' Addresses
 
 
 
-Beckwith & Bild         Expires November 11, 2017              [Page 30]
+
+
+
+
+
+
+
+
+
+
+
+
+
+Beckwith & Bild         Expires November 12, 2017              [Page 32]
