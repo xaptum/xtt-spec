@@ -693,16 +693,16 @@ aead_struct<session_keys>(
 # Cryptographic Computations
 
 ## Notation
-The cryptographic computations used in this protocol make heavy use
+The cryptographic computations used in this protocol make use
 of a pseudo-random function `prf`, defined as:
 
 ~~~
-prf<N>(key, input) =
-        Keyed pseudo-random function (set during handshake),
-        keyed by "key", with "input" as input, outputting "N" bytes
+prf<N>(Key, Input) =
+    Keyed pseudo-random function (set during handshake),
+    keyed by "Key", with "Input" as input, outputting "N" bytes
 ~~~
 
-The `prf` can be implemented by any keyed hash function.
+The `prf` is implemented by a keyed hash function.
 For the case of the SHA512-based suite_spec options,
 `prf` is HMAC, as specified in {{RFC2104}}, using SHA-512,
 defined in {{SHS}}, as the underlying hash function.
@@ -714,78 +714,119 @@ For the SHA512-based suite_spec options, this is just SHA-512.
 For the BLAKE2b-based suite_specs, this is Blake2b with
 a zero-length key.
 
+The hashes used in the cryptographic computations described below
+use a construction denoted `hash_ext`, which appends the input length
+to its input before hashing:
+
+~~~
+hash_ext(Input) =
+    hash(
+        struct {
+            uint16 length = Input.length;
+            byte input[<input.length>] = Input;
+        };
+    )
+~~~
+
+Similarly, `prf_ext` is defined as the `prf` function with
+the output length appended to its input:
+
+~~~
+prf_ext<N>(Key, Input) =
+    prf<N>(Key,
+           struct {
+               uint16 out_length = N;
+               byte input[<input.length>] = Input;
+           };
+    )
+~~~
+
 ## Transcript Hashes
 
 The computation of the shared secret materials requires
 various hashes of the handshake messages, in order to bind
 these secret materials to the specific handshake.
 The definitions of these hash values follow below.
-When included in these hashes, the messages are unencrypted.
 
-`length-of-hash-output` is the output length of `hash`
-expressed as an 8-byte numeric value.
+When included in a hash, handshake messages are unencrypted.
 
 ~~~
 ServerSigHash =
-    hash(
-        ClientInit
-        | ServerInitAndAttest-up-to-signature
+    hash_ext(
+        ClientInit ||
+        ServerInitAndAttest-up-to-signature
     )
 ~~~
 
 ~~~
 HandshakeKeyHash =
-    hash(
-        length-of-hash-output
-        | hash(
-            ClientInit
-            | ServerInitAndAttest-up-to-cookie
-        )
-        | server_cookie
+    hash_ext(
+        hash_ext(
+            ClientInit ||
+            ServerInitAndAttest-up-to-cookie
+        ) ||
+        server_cookie
     )
 ~~~
 
 ~~~
 ClientSigHash =
-    hash(
-        length-of-hash-output
-        | hash(
-            ClientInit
-            | ServerInitAndAttest-up-to-cookie
-        )
-        | server_cookie
-        | ClientAttest-up-to-signature
+    hash_ext(
+        hash_ext(
+            ClientInit ||
+            ServerInitAndAttest-up-to-cookie
+        ) ||
+        server_cookie ||
+        ClientAttest-up-to-signature
     )
 ~~~
 
 ~~~
 SessionHash =
-    hash(
-        length-of-hash-output
-        | hash(
-            ClientInit
-            | ServerInitAndAttest-up-to-cookie
-        )
-        | server_cookie
-        | ClientAttest
+    hash_ext(
+        hash_ext(
+            ClientInit ||
+            ServerInitAndAttest-up-to-cookie
+        ) ||
+        server_cookie ||
+        ClientAttest
     )
 ~~~
 
 ~~~
 ServerFinishedHash =
-    hash(
-        length-of-hash-output
-        | hash(
-            ClientInit
-            | ServerInitAndAttest-up-to-cookie
-        )
-        | server_cookie
-        | ClientAttest
-        | ServerFinished-up-to-ctx
+    hash_ext(
+        hash_ext(
+            ClientInit ||
+            ServerInitAndAttest-up-to-cookie
+        ) ||
+        server_cookie ||
+        ClientAttest-up-through-signature ||
+        ServerFinished-up-to-ctx
     )
 ~~~
 
 ## Key Calculation and Schedule
+Multiple secret materials are derived from the same input key
+by including different handshake context into the call to `prf`.
+These contexts are defined in {{xtt-context-table}} below,
+and their use is shown in {{xtt-handshake-schedule}},
+{{xtt-psk-schedule}}, and {{xtt-session-schedule}}.
+
+| Context                       | Definition                                                  |
+|:----------------------------- | -----------------------------------------------------------:|
+| ClientHandshakeKeyContext     | "XTT handshake client key" \|\| HandshakeKeyHash            |
+| ClientHandshakeIVContext      | "XTT handshake client iv" \|\| HandshakeKeyHash             |
+| ServerHandshakeKeyContext     | "XTT handshake server key" \|\| HandshakeKeyHash            |
+| ServerHandshakeIVContext      | "XTT handshake server iv" \|\| HandshakeKeyHash             |
+| LongtermSharedSecretContext   | "XTT long-term secret" \|\| SessionHash                     |
+| LongtermSecretKeyContext      | "XTT long-term secret key" \|\| SessionHash                 |
+| ClientSessionKeyContext       | "XTT session client key" \|\| SessionHash                   |
+| ClientSessionIVContext        | "XTT session client iv" \|\| SessionHash                    |
+| ServerSessionKeyContext       | "XTT session server key" \|\| SessionHash                   |
+| ServerSessionIVContext        | "XTT session server iv" \|\| SessionHash                    |
+{: #xtt-context-table title="Context Strings for Secret Material Derivation"}
+
 The prf is drawn as taking the key argument from the left
 and outputting downward.
 `DH-shared-secret` is the result of running Diffie-Hellman
@@ -799,25 +840,29 @@ and `key_size` and `iv_size` are the key- and nonce-sizes
      |      
      +--> prf<sizeof(LongtermSecret)>(DH-shared-secret)
            |
-           +--> prf<key_size>(“XTT handshake client key”
-           |                  | HandshakeKeyHash)
-           |       = client_handshake_send_key
-           |       = server_handshake_receive_key
+           +--> prf<key_size>(ClientHandshakeKeyContext)
+           |     |
+           |     +--> client_handshake_send_key
+           |     |
+           |     +--> server_handshake_receive_key
            |
-           +--> prf<iv_size>(“XTT handshake client iv”
-           |                  | HandshakeKeyHash)
-           |       = client_handshake_send_iv
-           |       = server_handshake_receive_iv
+           +--> prf<iv_size>(ClientHandshakeIVContext)
+           |     |
+           |     +--> client_handshake_send_iv
+           |     |
+           |     +--> server_handshake_receive_iv
            |
-           +--> prf<key_size>(“XTT handshake server key”
-           |                  | HandshakeKeyHash)
-           |       = client_handshake_receive_key
-           |       = server_handshake_send_key
+           +--> prf<key_size>(ServerHandshakeKeyContext)
+           |     |
+           |     +--> client_handshake_receive_key
+           |     |
+           |     +--> server_handshake_send_key
            |
-           +--> prf<iv_size>(“XTT handshake server iv”
-           |                  | HandshakeKeyHash)
-           |       = client_handshake_receive_iv
-           |       = server_handshake_send_iv
+           +--> prf<iv_size>(ServerHandshakeIVContext)
+           |     |
+           |     +--> client_handshake_receive_iv
+           |     |
+           |     +--> server_handshake_send_iv
            |
            +--> handshake_secret
 ~~~
@@ -829,12 +874,13 @@ and `key_size` and `iv_size` are the key- and nonce-sizes
      |      
      +--> prf<sizeof(LongtermSecret)>(ClientID)
            |
-           +--> prf<sizeof(LongTermSecret)>(“XTT long-term secret”
-           |                  | SessionHash)
-           |       = longterm_client_shared_secret
-           +--> prf<sizeof(LongtermSignatureKey)>(“XTT long-term signature key”
-                              | SessionHash)
-                   = longterm_client_shared_secret_key
+           +--> prf<sizeof(LongtermSecret)>(LongtermSharedSecretContext)
+           |     |
+           |     +--> longterm_client_shared_secret
+           |
+           +--> prf<sizeof(LongtermSignatureKey)>(LongtermSecretKeyContext)
+                 |
+                 +--> longterm_client_shared_secret_key
 ~~~
 {: #xtt-psk-schedule title="Derivation of Longterm-Shared-Secret"}
 
@@ -844,25 +890,29 @@ and `key_size` and `iv_size` are the key- and nonce-sizes
      |      
      +--> prf<sizeof(LongtermSecret)>(longterm_client_shared_secret)
            |
-           +--> prf<key_size>(“XTT session client key”
-           |                  | SessionHash)
-           |       = client_session_send_key
-           |       = server_session_receive_key
+           +--> prf<key_size>(ClientSessionKeyContext)
+           |     |
+           |     +--> client_session_send_key
+           |     |
+           |     +--> server_session_receive_key
            |
-           +--> prf<iv_size>(“XTT session client iv”
-           |                  | SessionHash)
-           |       = client_session_send_iv
-           |       = server_session_receive_iv
+           +--> prf<iv_size>(ClientSessionIVContext)
+           |     |
+           |     +--> client_session_send_iv
+           |     |
+           |     +--> server_session_receive_iv
            |
-           +--> prf<key_size>(“XTT session server key”
-           |                  | SessionHash)
-           |       = client_session_receive_key
-           |       = server_session_send_key
+           +--> prf<key_size>(ServerSessionKeyContext)
+           |     |
+           |     +--> client_session_receive_key
+           |     |
+           |     +--> server_session_send_key
            |
-           +--> prf<iv_size>(“XTT session server iv”
-                              | SessionHash)
-                   = client_session_receive_iv
-                   = server_session_send_iv
+           +--> prf<iv_size>(ServerSessionIVContext)
+                 |
+                 +--> client_session_receive_iv
+                 |
+                 +--> server_session_send_iv
 ~~~
 {: #xtt-session-schedule title="Key Schedule for Handshake Keys"}
 
@@ -873,7 +923,7 @@ with the server's seed first:
 
 ~~~
 SessionID =
-    session_id_seed_s | session_id_seed_c
+    session_id_seed_s || session_id_seed_c
 ~~~
 
 ## ECDHE Parameters
@@ -965,7 +1015,8 @@ comprehension. Messages which are sent only sometimes are indicated in
 # Presentation Language
 
 ## Miscellaneous
-Comments begin with "/\*" and end with "\*/".
+Comments begin with `/\*` and end with `\*/`.
+Concatenation of byte strings is denoted `||`
 
 To indicate the number of bytes taken up in the byte stream
 by a type or value, the expression `sizeof(value-or-type)` is used.
