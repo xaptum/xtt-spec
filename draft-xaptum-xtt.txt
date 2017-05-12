@@ -5,7 +5,7 @@
 Network Working Group                                        Z. Beckwith
 Internet-Draft                                                   D. Bild
 Intended status: Informational                              Xaptum, Inc.
-Expires: November 12, 2017                                  May 11, 2017
+Expires: November 13, 2017                                  May 12, 2017
 
 
          The Xaptum Trusted Transit (XTT) Protocol Version 1.0
@@ -33,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on November 12, 2017.
+   This Internet-Draft will expire on November 13, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Beckwith & Bild         Expires November 12, 2017               [Page 1]
+Beckwith & Bild         Expires November 13, 2017               [Page 1]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Beckwith & Bild         Expires November 12, 2017               [Page 2]
+Beckwith & Bild         Expires November 13, 2017               [Page 2]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -143,7 +143,7 @@ Internet-Draft                     XTT                          May 2017
    The primary goal of the XTT protocol is to provide a secure
    communication channel between an Internet of Things (IoT) device in
    the field and a backend network or server.  The nature of the IoT
-   imposes several constraints different from traditional transport
+   imposes several constraints that differ from traditional transport
    layer security:
 
    -  Identity Provisioning: IoT devices will be numerous and must be
@@ -155,9 +155,9 @@ Internet-Draft                     XTT                          May 2017
 
    -  IP Address Mobility: The last-mile Internet access can change
       frequently for IoT devices.  Needing to reestablish the secure
-      channel after every IP address change is bad for energy- and
-      bandwidth-constrained devices.  XTT decouples the secure channel
-      from the underlying TCP or UDP transport socket.
+      channel after every IP address change consumes precious energy and
+      bandwidth.  XTT decouples the secure channel from the underlying
+      TCP/IP or UDP/IP transport socket
 
    -  DoS Resistance: The secure communication channel is established
       over the public Internet, so the protocol must be designed to help
@@ -165,7 +165,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017               [Page 3]
+Beckwith & Bild         Expires November 13, 2017               [Page 3]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -189,8 +189,9 @@ Internet-Draft                     XTT                          May 2017
 
    XTT consists of three primary components:
 
-   -  An identity provisioning protocol (Section 3.2) that (TODO) (1
-      par.) describe this protocol
+   -  An identity provisioning protocol (Section 3.2) used by the device
+      to request an identity from the server and establish a long-term
+      shared secret.
 
    -  A session establishment protocol (Section 3.3) that (TODO) (1
       par.) describe this protocol
@@ -217,14 +218,15 @@ Internet-Draft                     XTT                          May 2017
 
    receiver: (TODO) (1 sent.)
 
-   sender: (TODO) (1 sent.)
 
 
 
-Beckwith & Bild         Expires November 12, 2017               [Page 4]
+Beckwith & Bild         Expires November 13, 2017               [Page 4]
 
 Internet-Draft                     XTT                          May 2017
 
+
+   sender: (TODO) (1 sent.)
 
    server: (TODO) (1 sent.)
 
@@ -271,16 +273,17 @@ Internet-Draft                     XTT                          May 2017
    -  Pushing data requires performing full Two-Round-Trip handshake
       first
 
-   -  Protects identity of server, not client, which is the opposite of
-      what's needed in IoT
 
 
 
 
-Beckwith & Bild         Expires November 12, 2017               [Page 5]
+Beckwith & Bild         Expires November 13, 2017               [Page 5]
 
 Internet-Draft                     XTT                          May 2017
 
+
+   -  Protects identity of server, not client, which is the opposite of
+      what's needed in IoT
 
    -  Very complex to configure, and easy to get wrong
 
@@ -327,17 +330,17 @@ Internet-Draft                     XTT                          May 2017
    The ClientID handshake is used to authenticate both parties as being
    members of recognized and permissioned groups.  The typical case is
    of a client proving membership in a group permissioned to access a
-   private network, and a server proving membership in the group of
-   access points for that network.  Upon successful completion of a
-   ClientID handshake, the server provisions to the client a ClientID, a
 
 
 
-Beckwith & Bild         Expires November 12, 2017               [Page 6]
+Beckwith & Bild         Expires November 13, 2017               [Page 6]
 
 Internet-Draft                     XTT                          May 2017
 
 
+   private network, and a server proving membership in the group of
+   access points for that network.  Upon successful completion of a
+   ClientID handshake, the server provisions to the client a ClientID, a
    unique identifier within the client's group.  In addition, the client
    and server have now negotiated shared secret material that can be
    used for future authentication, without requiring the public-
@@ -382,17 +385,17 @@ Internet-Draft                     XTT                          May 2017
    standard) is to protect against replay attacks.  The handshake
    protocol protects the confidentiality of the client's identity from
    both passive and active attackers, while protecting the server's
-   identity from passive attackers (this isn't an issue in IoT, as the
-   server's identity is usually known).
 
 
 
 
-
-Beckwith & Bild         Expires November 12, 2017               [Page 7]
+Beckwith & Bild         Expires November 13, 2017               [Page 7]
 
 Internet-Draft                     XTT                          May 2017
 
+
+   identity from passive attackers (this isn't an issue in IoT, as the
+   server's identity is usually known).
 
    (TODO) Specific handshake design aspects * Small, fixed-size messages
    during handshake * No arbitrary-length certificate chains
@@ -442,10 +445,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-
-
-
-Beckwith & Bild         Expires November 12, 2017               [Page 8]
+Beckwith & Bild         Expires November 13, 2017               [Page 8]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -501,7 +501,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017               [Page 9]
+Beckwith & Bild         Expires November 13, 2017               [Page 9]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -557,7 +557,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 10]
+Beckwith & Bild         Expires November 13, 2017              [Page 10]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -613,7 +613,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 11]
+Beckwith & Bild         Expires November 13, 2017              [Page 11]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -669,7 +669,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 12]
+Beckwith & Bild         Expires November 13, 2017              [Page 12]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -725,7 +725,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 13]
+Beckwith & Bild         Expires November 13, 2017              [Page 13]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -781,7 +781,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 14]
+Beckwith & Bild         Expires November 13, 2017              [Page 14]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -837,7 +837,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 15]
+Beckwith & Bild         Expires November 13, 2017              [Page 15]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -893,7 +893,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 16]
+Beckwith & Bild         Expires November 13, 2017              [Page 16]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -949,7 +949,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 17]
+Beckwith & Bild         Expires November 13, 2017              [Page 17]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1005,7 +1005,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 18]
+Beckwith & Bild         Expires November 13, 2017              [Page 18]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1061,7 +1061,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 19]
+Beckwith & Bild         Expires November 13, 2017              [Page 19]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1117,7 +1117,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 20]
+Beckwith & Bild         Expires November 13, 2017              [Page 20]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1173,7 +1173,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 21]
+Beckwith & Bild         Expires November 13, 2017              [Page 21]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1229,7 +1229,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 22]
+Beckwith & Bild         Expires November 13, 2017              [Page 22]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1285,7 +1285,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 23]
+Beckwith & Bild         Expires November 13, 2017              [Page 23]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1341,7 +1341,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 24]
+Beckwith & Bild         Expires November 13, 2017              [Page 24]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1397,7 +1397,7 @@ B.2.  Definition of Byte
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 25]
+Beckwith & Bild         Expires November 13, 2017              [Page 25]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1453,7 +1453,7 @@ B.5.  Enumerateds
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 26]
+Beckwith & Bild         Expires November 13, 2017              [Page 26]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1509,7 +1509,7 @@ B.6.  Constructed Types
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 27]
+Beckwith & Bild         Expires November 13, 2017              [Page 27]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1565,7 +1565,7 @@ B.9.  Variants
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 28]
+Beckwith & Bild         Expires November 13, 2017              [Page 28]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1621,7 +1621,7 @@ C.1.  Common Message Header
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 29]
+Beckwith & Bild         Expires November 13, 2017              [Page 29]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1677,7 +1677,7 @@ C.2.2.  Server Certificates
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 30]
+Beckwith & Bild         Expires November 13, 2017              [Page 30]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1733,7 +1733,7 @@ Authors' Addresses
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 31]
+Beckwith & Bild         Expires November 13, 2017              [Page 31]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1789,4 +1789,4 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 12, 2017              [Page 32]
+Beckwith & Bild         Expires November 13, 2017              [Page 32]
