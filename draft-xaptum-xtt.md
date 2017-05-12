@@ -126,8 +126,8 @@ security analysis.
 
 The primary goal of the XTT protocol is to provide a secure communication
 channel between an Internet of Things (IoT) device in the field and a backend
-network or server. The nature of the IoT imposes several constraints different
-from traditional transport layer security:
+network or server. The nature of the IoT imposes several constraints that
+differ from traditional transport layer security:
 
 - Identity Provisioning: IoT devices will be numerous and must be low-cost, so
   manual provisioning of preshared keys (PSKs) or client certificates will not
@@ -137,9 +137,8 @@ from traditional transport layer security:
 
 - IP Address Mobility: The last-mile Internet access can change frequently for
   IoT devices. Needing to reestablish the secure channel after every IP
-  address change is bad for energy- and bandwidth-constrained devices.  XTT
-  decouples the secure channel from the underlying TCP or UDP transport
-  socket.
+  address change consumes precious energy and bandwidth.  XTT decouples the
+  secure channel from the underlying TCP/IP or UDP/IP transport socket
 
 - DoS Resistance: The secure communication channel is established over the
   public Internet, so the protocol must be designed to help the server-side
@@ -162,16 +161,15 @@ described in {{RFC3552}}.
 
 XTT consists of three primary components:
 
-- An identity provisioning protocol
-  ({{identity-provisioning-protocol}}) that (TODO) (1 par.) describe
-  this protocol
+- An identity provisioning protocol ({{identity-provisioning-protocol}}) used
+  by the device to request an identity from the server and establish a
+  long-term shared secret. 
 
-- A session establishment protocol
-  ({{session-establishment-protocol}}) that (TODO) (1 par.) describe
-  this protocol
+- A session establishment protocol ({{session-establishment-protocol}}) that
+  (TODO) (1 par.) describe this protocol
 
-- A record protocol ({{record-protocol}}) that (TODO) (1 par.)
-  describe this protocol
+- A record protocol ({{record-protocol}}) that (TODO) (1 par.)  describe this
+  protocol
 
 ## Conventions and Terminology
 
