@@ -1320,7 +1320,7 @@ struct {
     ServerCertificateVersion version;
     Date expiry;
     ClientID id;
-    ServerSignature signature;
+    ServerSignaturePublicKey public_key;
     ServerIntermediateCertificate signers_certificate;
     ServerSignature signers_signature;
 } ServerCertificate;
