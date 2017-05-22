@@ -255,73 +255,20 @@ requirements.
 (TODO) (1 list) what MinimalLT doesn't offer that IoT requires
 
 # Protocol Overview
+The XTT protocol provisions shared, secret state between a client
+and a server that may persist past the lifetime of the underlying connection.
+This shared state is grouped into two classes:
 
-An XTT session is started using one of two related but distinct
-handshake protocols: one to create an Authenticated Session,
-and another to both create an Authenticated Session
-and provision a ClientID to the client.
-Running an Authenticated Session handshake requires
-that a ClientID handshake has successfully been
-performed at least once previously.
+* A long-term identity
+  for a client and the shared secrets used to prove that identity
+  to the server during future communication
+* A session consisting of cryptographic material to be used
+  for message authentication and confidentiality
 
-The ClientID handshake is used to authenticate both parties
-as being members of recognized and permissioned groups.
-The typical case is of a client proving membership in a group
-permissioned to access a private network, and a server
-proving membership in the group of access points for that network.
-Upon successful completion of a ClientID handshake,
-the server provisions to the client a ClientID, a unique
-identifier within the client's group.
-In addition, the client and server have now negotiated
-shared secret material that can be used for future authentication,
-without requiring the public-cryptography-based authentication
-of the ClientID handshake.
-
-Note that the lifetime of a given ClientID, i.e. the time between
-successive ClientID handshakes, is up to the discretion of the client.
-It is possible for a given physical endpoint to perform a ClientID handshake
-only once (due to, for example, hardware constraints the preclude the required signatures)
-and retain the same ClientID for its entire lifetime.
-Conversely, a client that does not wish its messages to be linkable
-by passive attackers
-may perform a ClientID handshake as often as every message;
-in fact, by using anonymized signature algorithms (e.g. Direct Anonymous Attestation),
-a client may keep active attackers and even the server from being
-able to link its messages to one another.
-
-The XTT AuthenticatedSession handshake can be performed after
-(or at the same time as) a successful ClientID handshake.
-The AuthenticatedSession handshake leverages existing
-secret material shared between the client and server
-to generate shared secret cryptographic keys,
-to be used for encrypting and authenticating subsequent messages.
-
-Both XTT handshake protocols are based on the
-SigMA family of authenticated key exchange protocols,
-which is also the basis for signature-based authentication
-in the Internet Key Exchange version 2 (IKEv2) protocol {{RFC7296}}
-used in the IPSec protocol suite.
-Specifically, the XTT protocol uses
-the SigMA-I variant described in {{SIGMA}}.
-In particular, note that the present protocol does not place
-the MAC under the signature, as is done in IKEv2
-(this is referred to as variant (ii) in {{SIGMA}}).
-A formal security analysis of the SigMA protocols can be found in {{SIGMASEC}}.
-
-The handshake protocols are authenticated Diffie-Hellman key exchanges.
-Both protocols require three messages,
-and only one full round-trip (1 RTT) before a client can begin pushing traffic.
-The client, who is always the initiator of a handshake,
-may choose to begin pushing traffic with the third message,
-before receiving the final response from the server.
-The reason for requiring 1 RTT
-(in distinction to the 0-RTT option proposed for the upcoming TLSv1.3 standard)
-is to protect against replay attacks.
-The handshake protocol protects the confidentiality of the
-client's identity from both passive and active attackers,
-while protecting the server's identity from passive attackers
-(this isn't an issue in IoT, as the server's identity is usually known).
-
+A client requests an identity from a server using the handshake shown
+in ({{xtt-provisioning}}) and described in ({{identity-provisioning-protocol}}).
+To complete the handshake, the client must prove its membership in
+a client group recognized by the server, using a Direct Anonymous Attestation (DAA) signature.
 
 ~~~
         Client                                             Server
@@ -329,49 +276,44 @@ while protecting the server's identity from passive attackers
          CLIENTINIT
          + version
          + suite_spec
-         + session_id_seed_c
          + nonce_c 
          + dh_keyshare_c         ------->
                                              SERVERINITANDATTEST ^ < Hk
                                                        version + | 
                                                     suite_spec + | 
-                                             session_id_seed_c + |
                                                  dh_keyshare_s + | 
                                                  {certificate} + | 
-                                           {session_id_seed_s} + | 
                                                  {signature_s} + |
                                  <-------      {server_cookie} + v 
-  Hk > ^ CLIENTATTEST 
+  Hk > ^ IDENTITY_CLIENTATTEST 
        | + version
        | + suite_spec
        | + server_cookie
        | + {daa_gpk}
        | + {id_c}
-       v + {daa_signature_c}
-  Sk > ^ + ([length])
-       | + ([payload_type])
-       v + ([payload])           ------->
-                                                  SERVERFINISHED ^ < Sk
+       v + {daa_signature_c}     ------->
+                                         IDENTITY_SERVERFINISHED ^ < Hk
                                                        version + |
                                                     suite_spec + |
-                                                        [id_c] + |
-                                 <-------                [ctx] + v
-  Sk > ^ RECORDREGULAR                             RECORDREGULAR ^ < Sk
-       | + version                                     version + |
-       | + session_id                               session_id + |
-       | + seq_num                                     seq_num + |
-       | + length                                       length + |
-       | + [payload_type]                       [payload_type] + |
-       v + [payload]             <------>            [payload] + v
+                                                        {id_c} + |
+                                 <-------    {awareness_proof} + v
   
               +    Indicates message subfields
               ()   Indicates optional messages/subfields
               {}   Indicates data encrypted using handshake keys
-              []   Indicates data encrypted using session keys
               Hk > Indicates data MAC'd using handshake keys
-              Sk > Indicates data MAC'd using session keys
 ~~~
 {: #xtt-provisioning title="Message flow for XTT Identity Provisioning Handshake"}
+
+Once a client possesses an identity,
+it authenticates that identity to a server and negotiates a session,
+using the handshake shown
+in ({{xtt-session}}) and described in ({{session-establishment-protocol}}).
+The cryptographic parameters and materials negotiated during the session-establishment
+handshake allow the client and server to protect (check authentication and integrity,
+and optionally encrypt) application layer traffic using a record-level protocol
+also shown in ({{xtt-session}}) and described
+in ({{record-protocol}}).
 
 ~~~
         Client                                             Server
@@ -379,31 +321,35 @@ while protecting the server's identity from passive attackers
          CLIENTINIT
          + version
          + suite_spec
-         + session_id_seed_c
          + nonce_c 
          + dh_keyshare_c         ------->
                                              SERVERINITANDATTEST ^ < Hk
                                                        version + | 
                                                     suite_spec + | 
-                                             session_id_seed_c + |
                                                  dh_keyshare_s + | 
                                                  {certificate} + | 
-                                           {session_id_seed_s} + | 
                                                  {signature_s} + |
                                  <-------      {server_cookie} + v 
-  Hk > ^ CLIENTATTEST 
+  Hk > ^ SESSION_CLIENTATTEST 
        | + version
        | + suite_spec
        | + server_cookie
+       | + {session_id}
        | + {id_c}
        v + {signature_c}
-  Sk > ^ + ([length])
+  Sk > ^ (RECORDREGULAR)
+       | + (version)
+       | + (session_id)
+       | + (seq_num)
+       | + (length)
        | + ([payload_type])
        v + ([payload])           ------->
-                                                  SERVERFINISHED ^ < Sk
+                                          SESSION_SERVERFINISHED ^ < Sk
                                                        version + |
                                                     suite_spec + |
-                                 <-------                [ctx] + v
+                                                  {session_id} + |
+                                 <-------    {awareness_proof} + v
+
   Sk > ^ RECORDREGULAR                             RECORDREGULAR ^ < Sk
        | + version                                     version + |
        | + session_id                               session_id + |
@@ -419,33 +365,31 @@ while protecting the server's identity from passive attackers
               Hk > Indicates data MAC'd using handshake keys
               Sk > Indicates data MAC'd using session keys
 ~~~
-{: #xtt-session title="Message flow for XTT Session Creation Handshake"}
-
-(TODO) record layer
+{: #xtt-session title="Message flow for XTT Session Creation Handshake and Record-Level Protocol"}
 
 # Handshake Protocols
+The XTT protocol includes two handshake protocols:
+an identity-provisioning protocol,
+and a session-establishment protocol.
 
-## Features Common to All Handshakes
-The first two messages of a handshake (ClientInit and ServerInitAndAttest)
-are the same for both handshake types (ClientID and AuthenticatedSession).
-When responding to a ClientInit with a ServerInitAndAttest,
-an implementation MAY store all necessary state in the ServerCookie
-embedded in the ServerInitAndAttest and save no state locally.
+The messages defined below are given to the underlying transport-layer
+as-is (i.e. there is no further framing).
+A handshake MUST be completed within a single
+underlying connection with the same physical endpoint.
 
-After receiving a ServerInitAndAttest,
-a client responds with a ClientAttest message.
-There are four variants of ClientAttest message,
-where two are for a ClientID handshake and two
-are for an AuthenticatedSession handshake.
-For each handshake type, the two variants indicate whether
-or not a payload is included with the message.
+## Common Messages
+Both handshake protocols begin with the same two messages:
+the ClientInit and the ServerInitAndAttest.
 
-### ClientInit Message
-All handshakes begin with the client sending a ClientInit message to the server.
-A client may resend a ClientInit if it has not received a ServerInitAndAttest
-in response within a timeout period.
-There is no requirement that ClientInit retries be identical, as long
-as a client only responds to one ServerInitAndAttest response.
+### ClientInit
+A client initiates a handshake
+with a ClientInit message.
+This message determines the parameters
+(version and cryptographic algorithms)
+of the subsequent handshake,
+provides a nonce for the server to sign
+(to prevent replay attacks of this handshake),
+and communicates the client's ephemeral Diffie-Hellman public key.
 
 Structure of this message:
 
@@ -454,18 +398,209 @@ struct {
     MsgType type = client_init;
     Version version;
     SuiteSpec suite_spec;
-    SessionIDSeed session_id_seed_c;
     SigningNonce nonce_c;
     DHKeyShare dh_keyshare_c;
 } ClientInit;
 ~~~
 
 ### ServerInitAndAttest
-Upon receiving a ClientInit, 
-and if the version and suite_spec of the ClientInit are acceptable,
-a server responds with a ServerInitAndAttest message.
-If the version and/or suite_spec of the ClientInit are unacceptable,
-the server MUST respond with the appropriate Alert message.
+Upon receiving a ClientInit message, and assuming the version
+and suite_spec are acceptable, a server responds with a
+ServerInitAndAttest message.
+This message confirms the version and suite_spec,
+communicates the server's ephemeral Diffie-Hellman public key,
+authenticates the server's identity,
+and provides the client with a ServerCookie.
+This ServerCookie is used to prevent replay attacks against
+the server, and to challenge the client's return-routability.
+
+The ServerCookie also allows a server implementation
+to refrain from storing any local state until the client
+proves return-routability; see ({{server-cookie-and-dos-attacks}}).
+
+The message is AEAD-protected (using the algorithm specified in the suite_spec)
+using the `server_handshake_send_key` and `server_handshake_send_iv`.
+The `signature_s` and `certificate` are created as described in ({{serversignature}}).
+
+Structure of this message:
+
+~~~
+aead_struct<server_handshake_send_keys>(
+    MsgType type = server_init_and_attest;
+    Version version;
+    SuiteSpec suite_spec;
+    DHKeyShare dh_keyshare_s;
+)[
+    ServerCertificate certificate;
+    ServerSignature signature_s;
+    ServerCookie server_cookie;
+] ServerInitAndAttest;
+~~~
+
+## Identity Provisioning Protocol
+This handshake provisions an identity to a client,
+along with the shared secrets necessary for the client
+to prove possesion of the identity.
+A successful identity-provisioning handshake is required
+before a client may perform a session-establishment handshake.
+
+### ClientIdentity_ClientAttest
+Once a client receives a ServerInitAndAttest message during an identity-provisioning handshake,
+and assuming the ServerInitAndAttest is correctly
+validated (MAC and signature are verified, and version and suite_spec
+correspond to those sent in the ClientInit message),
+the client responds with a ClientIdentity_ClientAttest message.
+This message echoes the ServerCookie (to prove return-reachability),
+authenticates the client's membership in an authorized group,
+and requests to be provisioned an identity.
+
+A client may indicate a specific ClientID in the `id_c` field of a ClientIdentity_ClientAttest
+message, in order to request that specific ClientID be provisioned to it.
+Otherwise, if the client wishes the server to select the ClientID for it,
+the `id_c` field MUST be set to all zeroes.
+
+The message is AEAD-protected (using the algorithm specified in the suite_spec)
+using the `client_handshake_send_key` and `client_handshake_send_iv`.
+The `daa_signature_c` is created as described in ({{daasignature}}).
+
+Structure of this message:
+
+~~~
+aead_struct<client_handshake_send_keys>(
+    MsgType type =  MsgType.id_clientattest;
+    Version version;
+    SuiteSpec suite_spec;
+    ServerCookie server_cookie;     /* echo from server */
+}[
+    DAAGroupKey daa_gpk;
+    ClientID id_c;                  /* all zeroes if not specific id */
+    DAASignature daa_signature_c;
+] ClientIdentity_ClientAttest;
+~~~
+
+### ClientIdentity_ServerFinished
+Once a server receives a ClientIdentity_ClientAttest message,
+and if that message is validated
+(message authentication code and client signature verified,
+and version and suite_spec are acceptable),
+the server responds with a ClientIdentity_ServerFinished message.
+
+The ClientIdentity_ServerFinished message informs the client of the
+ClientID that has been provisioned to it
+(either echoing the same `id_c` requested in the ClientAttest
+message or sending the newly-provisioned id if `id_c` was all zeroes).
+In addition, the ServerFinished message contains
+a hash of the successful handshake, authenticated
+using a key derived from the LongtermSecret that has been provisioned.
+This is to provide 'peer-awareness' to the client, so the client
+and server can confirm they have the same view of the provisioned
+ClientID and LongtermSecret.
+
+The message is AEAD-protected (using the algorithm specified in the suite_spec)
+using the `server_handshake_send_key` and `server_handshake_send_iv`.
+The `awareness_proof` is given by `identity_awareness_proof`,
+as described in ({{xtt-psk-schedule}}).
+
+Structure of this message:
+
+~~~
+aead_struct<server_handshake_send_keys>(
+    MsgType type = MsgType.id_serverfinished;
+    Version version;
+    SuiteSpec suite_spec;
+)[
+    ClientID id_c;     /* confirm id of client */
+    AwarenessProof awareness_proof;
+] ClientIdentity_ServerFinished;
+~~~
+
+## Session Establishment Protocol
+This handshake negotiates a session (cryptographic secrets
+used for secure communication), and
+requires that a ClientID has been provisioned for this client
+via a previous identity-provisioning handshake.
+A successful session-establishment handshake is required
+before a client may securely communicate via the record-layer protocol.
+
+### Session_ClientAttest
+Once a client receives a ServerInitAndAttest message during a session-establishment handshake,
+and assuming the ServerInitAndAttest is correctly
+validated (MAC and signature are verified, and version and suite_spec
+correspond to those sent in the ClientInit message),
+the client responds with a Session_ClientAttest message.
+This message echoes the ServerCookie (to prove return-reachability),
+proves the client's ownership of the claimed ClientID,
+and requests to be provisioned a SessionID.
+
+A client may indicate a specific SessionID in the `session_id` field of a ClientAttest
+message, in order to request that specific SessionID be provisioned to it.
+Otherwise, if the client wishes the server to select the SessionID for it,
+the `session_id` field MUST be set to all zeroes.
+
+The message is AEAD-protected (using the algorithm specified in the suite_spec)
+using the `client_handshake_send_key` and `client_handshake_send_iv`.
+The `signature_c` is created as described in ({{symmetricsignature}}).
+
+Structure of this message:
+
+~~~
+aead_struct<client_handshake_send_keys>(
+    MsgType type =  MsgType.session_clientattest;
+    Version version;
+    SuiteSpec spec;
+    ServerCookie server_cookie;     /* echo from server */
+}[
+    SessionID session_id;           /* all zeroes if not specific id */
+    ClientID id_c;                  /* from previous identity handshake */
+    SymmetricSignature signature_c;
+] Session_ClientAttest;
+~~~
+
+### Session_ServerFinished
+Once a server receives a Session_ClientAttest message,
+and if that message is validated
+(message authentication code and client signature verified,
+and version and suite_spec are acceptable),
+the server responds with a Session_ServerFinished message.
+
+The Session_ServerFinished message informs the client of the
+SessionID that has been provisioned to it
+(either echoing the same `session_id` requested in the Session_ClientAttest
+message or sending the newly-provisioned SessionID if `session_id` was all zeroes).
+In addition, the ServerFinished message contains
+a hash of the successful handshake, authenticated
+using a key derived from the cryptographic secrets that have been provisioned.
+This is to provide 'peer-awareness' to the client, so the client
+and server can confirm they have the same view of the provisioned
+secrets necessary for secure communication.
+
+The message is AEAD-protected (using the algorithm specified in the suite_spec)
+using the `server_handshake_send_key` and `server_handshake_send_iv`.
+The `awareness_proof` is given by `session_awareness_proof`,
+as described in ({{xtt-session-schedule}}).
+
+Structure of this message:
+
+~~~
+aead_struct<session_keys>(
+    MsgType type = MsgType.session_serverfinished;
+    Version version;
+    SuiteSpec spec;
+)[
+    SessionID session_id;   /* confirm session_id */
+    AwarenessProof awareness_proof;
+] Session_ServerFinished;
+~~~
+
+## Behaviors Common to Both Handshake Protocols
+A client may resend a ClientInit if it has not received a ServerInitAndAttest
+in response within a timeout period.
+There is no requirement that ClientInit retries be identical, as long
+as a client only responds to one ServerInitAndAttest response.
+
+When responding to a ClientInit message with a ServerInitAndAttest,
+a server MAY store all necessary state in the ServerCookie
+embedded in the ServerInitAndAttest and save no state locally.
 
 A server MAY respond to multiple ClientInit messages from the same client
 with not-necessarily identical
@@ -476,201 +611,25 @@ during a handshake and the server is storing state locally after responding
 the server MUST ensure that response to any one of the ClientInitAndAttest
 is valid.
 
-Structure of this message:
-
-~~~
-aead_struct<handshake_keys>(
-    MsgType type = server_init_and_attest;
-    Version version;
-    SuiteSpec suite_spec;
-    SessionIDSeed session_id_seed_c;   /* echo from client */
-    DHKeyShare dh_keyshare_s;
-)[
-    ServerCertificate certificate;
-    SessionIDSeed session_id_seed_s;
-    ServerSignature signature_s;
-    ServerCookie server_cookie;
-] ServerInitAndAttest;
-~~~
-
-## Identity Provisioning Protocol
-This handshake provisions a ClientID to a client
-and simultaneously creates an AuthenticatedSession.
-
-### ClientIdentity_ClientAttest
-Once a client receives a ServerInitAndAttest in response to
-its ClientInit, and if that ServerInitAndAttest is validated
-(message authentication code and server signature verified,
-and version and suite_spec match what was sent in the ClientInit),
-the client responds with a ClientAttest message.
-
 If a client times-out waiting for a ServerFinished
 response to its ClientAttest message,
-the client MUST send only identical ClientAttest messages during the handshake,
+the client MUST resend identical ClientAttest messages during the handshake,
 or else abort the handshake.
 If multiple non-identical ClientAttest messages are sent during the same handshake,
 the client's and the server's view of the shared secret material negotiated
 during the handshake will differ, and communication will be impossible.
 
-Two variants of the ClientIdentity_ClientAttest message exist: one that
-includes an encapsulated payload and one that does not.
-
-A client may indicate a specific ClientID in the `id_c` field of a ClientAttest
-message, in order to request that specific ClientID be provisioned to it.
-Otherwise, if the client wishes the server to select the ClientID for it,
-the `id_c` field MUST be set to all zeroes.
-
-The structure of a ClientAttest message that does not include an
-encapsulated payload is:
-
-~~~
-aead_struct<handshake_keys>(
-    MsgType type =  MsgType.id_clientattest_nopayload;
-    Version version;
-    SuiteSpec suite_spec;
-    ServerCookie server_cookie;     /* echo from server */
-}[
-    DAAGroupKey daa_gpk;
-    ClientID id_c;
-    DAASignature daa_signature_c;
-] ClientIdentity_ClientAttest_NoPayload;
-~~~
-
-The structure of a ClientAttest message that does include an
-encapsulated payload is:
-
-~~~
-struct {
-    aead_struct<handshake_keys>(
-        MsgType type = MsgType.id_clientattest_payload;
-        Version version;
-        SuiteSpec suite_spec;
-        ServerCookie server_cookie;     /* echo from server */
-    }[
-        DAAGroupKey daa_gpk;
-        ClientID id_c;
-        DAASignature daa_signature_c;
-    ];
-    aead_struct<session_keys>(
-        MsgLength length;               /* total length */
-    )[
-        EncapsulatedPayloadType payload_type;
-        byte payload[length - sizeof(rest_of_message)];
-    ];
-} ClientIdentity_ClientAttest_Payload;
-~~~
-
-Note that the `length` field in the ClientAttest_Payload message
-is the total byte-length of the entire ClientAttest_Payload message.
-
-### ClientIdentity_ServerFinished
-Once a server receives a ClientAttest,
-and if that ClientAttest is validated
-(message authentication code and client signature verified,
-and version and suite_spec are acceptable),
-the server responds with a ServerFinished message.
+A client MUST wait until successful receipt of a ServerFinished
+message before initiating a session-establishment handshake.
 
 If a server receives a ClientAttest message
 from a client from which it has already received
 a ClientAttest message during this handshake,
 the server MUST ignore the the extra messages.
 
-The ServerFinished message informs the client of the
-ClientID that has been provisioned to it
-(either echoing the same `id_c` requested in the ClientAttest
-message or sending the newly-provisioned id).
-In addition, the ServerFinished message contains
-a hash of the successful handshake, authenticated
-using a key derived from the LongtermSecret that has been provisioned.
-This is to provide 'peer-awareness' to the client, so the client
-and server can confirm they have the same view of the provisioned
-ClientID and LongtermSecret.
-
-A client MUST wait until successful receipt of a ServerFinished
-message before sending any record layer payloads.
-
-Structure of this message:
-
-~~~
-aead_struct<session_keys>(
-    MsgType type = MsgType.id_serverfinished;
-    Version version;
-    SuiteSpec suite_spec;
-)[
-    ClientID id_c;     /* confirm id of client */
-    FinishedContext ctx;
-] ClientIdentity_ServerFinished;
-~~~
-
-## Session Establishment Protocol
-This handshake creates an AuthenticatedSession, and
-requires that a successful ClientIdentity handshake
-has already been run at least once in the past for this client.
-The notes in ({{identity-provisioning-protocol}})
-about message resends apply also to this handshake.
-
-### Session_ClientAttest
-As for the ClientIdentity handshake, a client responds to
-a ServerInitAndAttest message with a ClientAttest message.
-The only difference from the ClientIdentity handshake
-is that the client uses a SymmetricSignature, rather than a DAASignature,
-to authenticate its identity.
-
-The structure of a ClientAttest message that does not include an
-encapsulated payload is:
-
-~~~
-aead_struct<handshake_keys>(
-    MsgType type =  MsgType.session_clientattest_nopayload;
-    Version version;
-    SuiteSpec spec;
-    ServerCookie server_cookie;     /* echo from server */
-}[
-    ClientID id;
-    SymmetricSignature signature_c;
-] AuthenticatedSession_ClientAttest_NoPayload;
-~~~
-
-The structure of a ClientAttest message that does include an
-encapsulated payload is:
-
-~~~
-struct {
-    aead_struct<handshake_keys>(
-        MsgType type = MsgType.session_clientattest_payload;
-        Version version;
-        SuiteSpec spec;
-        ServerCookie server_cookie;     /* echo from server */
-    }[
-        ClientID id;
-        SymmetricSignature signature_c;
-    ];
-    aead_struct<session_keys>(
-        MsgLength length;               /* total length */
-    )[
-        EncapsulatedPayloadType payload_type;
-        byte payload[length - sizeof(rest_of_message)];
-    ];
-} AuthenticatedSession_ClientAttest_Payload;
-~~~
-
-### Session_ServerFinished
-The structure and function of the Session_ServerFinished
-is nearly-identical to that of the ClientID_ServerFinished,
-with the only difference being that the ClientID of the client
-is not included in the message.
-
-~~~
-aead_struct<session_keys>(
-    MsgType type = MsgType.session_serverfinished;
-    Version version;
-    SuiteSpec spec;
-)[
-    FinishedContext ctx;
-] AuthenticatedSession_ServerFinished;
-~~~
-
 # Record Protocol
+(TODO): Describe record protocol
+
 ~~~
 aead_struct<session_keys>(
     MsgType type = MsgType.record_regular;
@@ -799,7 +758,7 @@ ServerFinishedHash =
             ServerInitAndAttest-up-to-cookie
         ) ||
         server_cookie ||
-        ClientAttest-up-through-signature ||
+        ClientAttest ||
         ServerFinished-up-to-ctx
     )
 ~~~
@@ -817,12 +776,14 @@ and their use is shown in {{xtt-handshake-schedule}},
 | ClientHandshakeIVContext      | "XTT handshake client iv" \|\| HandshakeKeyHash             |
 | ServerHandshakeKeyContext     | "XTT handshake server key" \|\| HandshakeKeyHash            |
 | ServerHandshakeIVContext      | "XTT handshake server iv" \|\| HandshakeKeyHash             |
-| LongtermSharedSecretContext   | "XTT long-term secret" \|\| SessionHash                     |
-| LongtermSecretKeyContext      | "XTT long-term secret key" \|\| SessionHash                 |
+| LongtermSharedSecretContext   | "XTT long-term secret" \|\| ServerFinishedHash              |
+| IdentityFinishedContext       | "XTT identity awareness" \|\| ServerFinishedHash            |
+| LongtermSecretKeyContext      | "XTT long-term secret key" \|\| ServerFinishedHash          |
 | ClientSessionKeyContext       | "XTT session client key" \|\| SessionHash                   |
 | ClientSessionIVContext        | "XTT session client iv" \|\| SessionHash                    |
 | ServerSessionKeyContext       | "XTT session server key" \|\| SessionHash                   |
 | ServerSessionIVContext        | "XTT session server iv" \|\| SessionHash                    |
+| SessionFinishedContext        | "XTT session awareness" \|\| SessionHash                    |
 {: #xtt-context-table title="Context Strings for Secret Material Derivation"}
 
 The prf is drawn as taking the key argument from the left
@@ -876,6 +837,10 @@ and `key_size` and `iv_size` are the key- and nonce-sizes
            |     |
            |     +--> longterm_client_shared_secret
            |
+           +--> prf<sizeof(AwarenessProof)>(IdentityFinishedContext)
+           |     |
+           |     +--> identity_awareness_proof
+           |
            +--> prf<sizeof(LongtermSignatureKey)>(LongtermSecretKeyContext)
                  |
                  +--> longterm_client_shared_secret_key
@@ -907,22 +872,15 @@ and `key_size` and `iv_size` are the key- and nonce-sizes
            |     +--> server_session_send_key
            |
            +--> prf<iv_size>(ServerSessionIVContext)
+           |     |
+           |     +--> client_session_receive_iv
+           |     |
+           |     +--> server_session_send_iv
+           +--> prf<sizeof(AwarenessProof)>(SessionFinishedContext)
                  |
-                 +--> client_session_receive_iv
-                 |
-                 +--> server_session_send_iv
+                 +--> session_awareness_proof
 ~~~
 {: #xtt-session-schedule title="Key Schedule for Handshake Keys"}
-
-## SessionID Generation
-The SessionID for an AuthenticatedSession is simply the concatenation
-of the two SessionIDSeeds exchanged by the client and server,
-with the server's seed first:
-
-~~~
-SessionID =
-    session_id_seed_s || session_id_seed_c
-~~~
 
 ## ECDHE Parameters
 The size and interpretation of a value of type DHKeyShare
@@ -935,6 +893,8 @@ outputs of the corresponding functions defined in {{RFC7748}}.
 The size of the DHKeyShare in this case is 32 bytes.
 
 ## DAA Parameters
+(TODO)
+
 EPID2, TPM2.0, and FIDO key/signature sizes.
 
 ## Signature Algorithms
@@ -954,8 +914,10 @@ Similarly, the content of ServerSignature are the byte string output
 of the signature algorithm of {{RFC8032}} in the format of {{RFC7748}}.
 
 ### SymmetricSignature
+(TODO)
 
 ### DAASignature
+(TODO)
 
 ## Per-message Nonce Calculation
 A per-session pair of key and IV are created for both sending and receiving data,
@@ -966,18 +928,50 @@ The byte-length of the IVs is that of the nonce for the negotiated AEAD algorith
 
 At the start of a new session (after a successful handshake),
 the two sequence numbers (client-to-server and server-to-client) are set to 0.
-The first Authenticated Session record payload the client sends after
-authenticating in its ClientAttest must have sequence number 0.
-Note, any AuthenticatedSessionPayload included with the ClientAttest
-will have the sequence number 0.
-Similarly, the first packet sent by the server after
-sending its ServerAttest must have sequence number 0,
-meaning that if the server sends a ServerFinished packet this packet will have sequence number 0.
+The first record-level payload the client sends after
+sending its Session_ClientAttest must have sequence number 0.
+Similarly, the first record-level payload sent by the server after
+sending its Session_ServerFinished must have sequence number 0.
 
 A per-message nonce is generated before AEAD encryption
 by left-padding the sequence number (in network byte order)
 to the length of the nonce/IV,
 then XOR’ing the appropriate IV with this padded sequence number.
+
+# Security Considerations
+Both XTT handshake protocols are based on the
+SigMA family of authenticated key exchange protocols,
+which is also the basis for signature-based authentication
+in the Internet Key Exchange version 2 (IKEv2) protocol {{RFC7296}}
+used in the IPSec protocol suite.
+Specifically, the XTT protocol uses
+the SigMA-I variant described in {{SIGMA}}.
+In particular, note that the present protocol does not place
+the MAC under the signature, as is done in IKEv2
+(this is referred to as variant (ii) in {{SIGMA}}).
+A formal security analysis of the SigMA protocols can be found in {{SIGMASEC}}.
+
+The handshake protocols are authenticated Diffie-Hellman key exchanges.
+Both protocols require four messages.
+The server, who is always the responder in a handshake,
+sends the final message to provide the client "peer awareness"
+(proving to the client that the server is alive and agrees
+on the results of the handshake).
+The client, who is always the initiator of a handshake,
+may choose to begin pushing traffic with the third message of a session-establishment handshake,
+before receiving the peer awareness response from the server.
+The reason for requiring a full roundtrip before application traffic is allowed
+(in contrast to the 0-RTT option proposed for the upcoming TLSv1.3 standard)
+is to protect against replay attacks.
+
+The handshake protocol protects the confidentiality of the
+client's identity from both passive and active attackers,
+while protecting the server's identity from passive attackers;
+in IoT, client identities are more likely to be sensitive than
+server identities.
+Assuming at least one side (client or server) produces new
+Diffie-Hellman key pairs for each handshake,
+the protocol also provides forward secrecy.
 
 --- back
 
@@ -1221,14 +1215,16 @@ This section describes protocol types and constants.
 
 ~~~
 enum : uint8 {
-    client_init(0x01),
-    server_init_and_attest(0x02),
-    id_clientattest_nopayload(0x11),
-    id_clientattest_payload(0x12),
-    id_serverfinished(0x13),
-    session_clientattest_nopayload(0x21),
-    session_clientattest_payload(0x22),
-    session_serverfinished(0x23),
+    client_identity_client_init(0x11),
+    client_identity_server_init_and_attest(0x12),
+    id_clientattest_nopayload(0x13),
+    id_clientattest_payload(0x14),
+    id_serverfinished(0x15),
+    session_client_init(0x21),
+    session_server_init_and_attest(0x22),
+    session_clientattest_nopayload(0x23),
+    session_clientattest_payload(0x24),
+    session_serverfinished(0x25),
     record_regular(0x31),
     alert(0x41)
 } MsgType;
@@ -1254,10 +1250,6 @@ enum : uint16 {
 ~~~
 
 ~~~
-byte SessionIDSeed[8];
-~~~
-
-~~~
 byte SigningNonce[32];
 ~~~
 
@@ -1271,6 +1263,10 @@ byte ClientID[16];
 
 ~~~
 byte LongtermSecret[64];
+~~~
+
+~~~
+byte AwarenessProof[16];
 ~~~
 
 ~~~
@@ -1366,3 +1362,43 @@ enum : uint8 {
 } EncapsulatedPayloadType;
 ~~~
 
+# Implementation Notes
+
+## Distributed Servers and Proxies
+Because the identity and session may be long-lived and are not tied to
+the underlying network connection,
+the protocol makes no requirement that a client only communicate
+with a single physical server endpoint during the lifetime
+of an identity or session.
+A common use case is of
+multiple server endpoints that share long-term storage,
+all aware of the state shared with a client endpoint.
+
+Similarly, the protocol makes no requirement that the physical endpoint
+that completes the identity-provisioning handshake be the same physical
+endpoint to which this identity is given.
+For example, a proxy capable of producing DAA signatures may request
+multiple distinct identities for the distinct endpoints behind it.
+
+## Server Cookie and DoS Attacks
+Server implementation MAY refrain from storing local state after
+responding to a ClientInit, and instead store state in the ServerCookie.
+Either way, the implementation MUST have a means of authenticating
+an ServerCookie echoed back to a server as being generated by that server
+and of checking that the ServerCookie has not been seen by that server before.
+One possible implementation of this is to AEAD encrypt the cookie with a key
+known only to the server and rotated frequently:
+upon receiving a cookie, the server checks that the cookie can be decrypted
+with a recent key, proving authenticity and freshness,
+and remembering that cookie has having been seen (only cookies
+generated using the recent key need be remembered), proving uniqueness.
+
+
+## Underlying Transport Protocol
+(TODO)
+Notes on fragmenting, ordering, etc.
+
+## Cryptographic Requirements
+(TODO)
+Requirements for identity-provisioning handshake, for session-establishment handshake,
+and for record-level communication.
