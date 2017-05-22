@@ -180,21 +180,22 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 
 The following terms are used:
 
-client: (TODO) (1 sent.)
+client: The initiator in a handshake.
 
-endpoint: (TODO) (1 sent.)
+connection: A transport-layer connection between client and server, over which XTT traffic is sent.
 
-handshake: (TODO) (1 sent.)
+endpoint: The physical device that is acting as either client or server during communication.
 
-identity: (TODO) (1 sent.)
+handshake: An initial negotiation between client and server for either provisioning
+authorization data to the client or establishing shared cryptographic information
+for subsequent communication.
 
-receiver: (TODO) (1 sent.)
+identity: A universally-unique tag used to identify a client to a server or to any other clients
+that may be peers.
 
-sender: (TODO) (1 sent.)
+server: The responder in a handshake.
 
-server: (TODO) (1 sent.)
-
-session: (TODO) (1 sent.)
+session: A collection of cryptographic parameters and secrets used for secure communication.
 
 ## Use Cases
 
