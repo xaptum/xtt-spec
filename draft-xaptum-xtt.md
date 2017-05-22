@@ -206,6 +206,8 @@ session: A collection of cryptographic parameters and secrets used for secure co
 
 (TODO)
 
+* Small, fixed-size messages during handshake
+    * No arbitrary-length certificate chains
 
 ## Security Requirements for the IoT
 
@@ -320,9 +322,6 @@ client's identity from both passive and active attackers,
 while protecting the server's identity from passive attackers
 (this isn't an issue in IoT, as the server's identity is usually known).
 
-(TODO) Specific handshake design aspects
-* Small, fixed-size messages during handshake
-    * No arbitrary-length certificate chains
 
 ~~~
         Client                                             Server
