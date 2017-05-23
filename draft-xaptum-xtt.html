@@ -353,7 +353,7 @@ address {
 
   <meta name="dct.creator" content="Beckwith, Z. and D. Bild" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-xaptum-xtt-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2017-5-22" />
+  <meta name="dct.issued" scheme="ISO8601" content="2017-5-23" />
   <meta name="dct.abstract" content="This document specifies version 1.0 of the Xaptum Trusted Transit (XTT) protocol for securing the Internet of Things (IoT). It provides scalable identitiy provisioning, device authentication, and data integrity and confidentiality." />
   <meta name="description" content="This document specifies version 1.0 of the Xaptum Trusted Transit (XTT) protocol for securing the Internet of Things (IoT). It provides scalable identitiy provisioning, device authentication, and data integrity and confidentiality." />
 
@@ -377,8 +377,8 @@ address {
   <td class="right">Xaptum, Inc.</td>
 </tr>
 <tr>
-  <td class="left">Expires: November 23, 2017</td>
-  <td class="right">May 22, 2017</td>
+  <td class="left">Expires: November 24, 2017</td>
+  <td class="right">May 23, 2017</td>
 </tr>
 
     	
@@ -398,7 +398,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on November 23, 2017.</p>
+<p>This Internet-Draft will expire on November 24, 2017.</p>
 <h1 id="rfc.copyrightnotice">
   <a href="#rfc.copyrightnotice">Copyright Notice</a>
 </h1>
@@ -1065,8 +1065,9 @@ ServerFinishedHash =
 <p id="rfc.section.6.6.3.p.1">(TODO)</p>
 <h2 id="rfc.section.6.7"><a href="#rfc.section.6.7">6.7.</a> <a href="#per-message-nonce-calculation" id="per-message-nonce-calculation">Per-message Nonce Calculation</a></h2>
 <p id="rfc.section.6.7.p.1">A per-session pair of key and IV are created for both sending and receiving data, upon the successful completion of a handshake.  The client and server each get a pair of sending and receiving keys/IVs (of course, the server&#8217;s sending key/IV matches the client&#8217;s receiving key/IV, and vice-versa).  The byte-length of the IVs is that of the nonce for the negotiated AEAD algorithm.</p>
-<p id="rfc.section.6.7.p.2">At the start of a new session (after a successful handshake), the two sequence numbers (client-to-server and server-to-client) are set to 0.  The first record-level payload the client sends after sending its Session_ClientAttest must have sequence number 0.  Similarly, the first record-level payload sent by the server after sending its Session_ServerFinished must have sequence number 0.</p>
-<p id="rfc.section.6.7.p.3">A per-message nonce is generated before AEAD encryption by left-padding the sequence number (in network byte order) to the length of the nonce/IV, then XOR&#8217;ing the appropriate IV with this padded sequence number.</p>
+<p id="rfc.section.6.7.p.2">A per-message nonce is generated before AEAD encryption by left-padding the sequence number (in network byte order) to the length of the nonce/IV, then XOR&#8217;ing the appropriate IV with this padded sequence number.</p>
+<p id="rfc.section.6.7.p.3">A server&#8217;s ServerInitAndAttest message has sequence number 0, and its ServerFinished message (either ClientIdentity_ServerFinished or Session_ServerFinished, depending on the type of handshake) has sequence number 1.  Similarly, a client&#8217;s ClientAttest message (either ClientIdentity_ClientAttest or Session_ClientAttest) has sequence number 0.</p>
+<p id="rfc.section.6.7.p.4">At the start of a new session (after a successful handshake), the two sequence numbers (client-to-server and server-to-client) are reset to 0.  The first record-level payload the client sends after sending its Session_ClientAttest must have sequence number 0.  Similarly, the first record-level payload sent by the server after sending its Session_ServerFinished must have sequence number 0.</p>
 <h1 id="rfc.section.7"><a href="#rfc.section.7">7.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a></h1>
 <p id="rfc.section.7.p.1">Both XTT handshake protocols are based on the SigMA family of authenticated key exchange protocols, which is also the basis for signature-based authentication in the Internet Key Exchange version 2 (IKEv2) protocol <a href="#RFC7296">[RFC7296]</a> used in the IPSec protocol suite.  Specifically, the XTT protocol uses the SigMA-I variant described in <a href="#SIGMA">[SIGMA]</a>.  In particular, note that the present protocol does not place the MAC under the signature, as is done in IKEv2 (this is referred to as variant (ii) in <a href="#SIGMA">[SIGMA]</a>).  A formal security analysis of the SigMA protocols can be found in <a href="#SIGMASEC">[SIGMASEC]</a>.</p>
 <p id="rfc.section.7.p.2">The handshake protocols are authenticated Diffie-Hellman key exchanges.  Both protocols require four messages.  The server, who is always the responder in a handshake, sends the final message to provide the client &#8220;peer awareness&#8221; (proving to the client that the server is alive and agrees on the results of the handshake).  The client, who is always the initiator of a handshake, may choose to begin pushing traffic with the third message of a session-establishment handshake, before receiving the peer awareness response from the server.  The reason for requiring a full roundtrip before application traffic is allowed (in contrast to the 0-RTT option proposed for the upcoming TLSv1.3 standard) is to protect against replay attacks.</p>

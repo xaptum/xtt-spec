@@ -5,7 +5,7 @@
 Network Working Group                                        Z. Beckwith
 Internet-Draft                                                   D. Bild
 Intended status: Informational                              Xaptum, Inc.
-Expires: November 23, 2017                                  May 22, 2017
+Expires: November 24, 2017                                  May 23, 2017
 
 
          The Xaptum Trusted Transit (XTT) Protocol Version 1.0
@@ -33,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on November 23, 2017.
+   This Internet-Draft will expire on November 24, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Beckwith & Bild         Expires November 23, 2017               [Page 1]
+Beckwith & Bild         Expires November 24, 2017               [Page 1]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -100,21 +100,21 @@ Table of Contents
        6.6.3.  DAASignature  . . . . . . . . . . . . . . . . . . . .  22
      6.7.  Per-message Nonce Calculation . . . . . . . . . . . . . .  22
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .  23
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  23
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  23
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  24
      8.2.  Informative References  . . . . . . . . . . . . . . . . .  24
    Appendix A.  State Machine  . . . . . . . . . . . . . . . . . . .  25
-     A.1.  Identity Provisioning Handshake . . . . . . . . . . . . .  25
-       A.1.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  25
+     A.1.  Identity Provisioning Handshake . . . . . . . . . . . . .  26
+       A.1.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  26
 
 
 
-Beckwith & Bild         Expires November 23, 2017               [Page 2]
+Beckwith & Bild         Expires November 24, 2017               [Page 2]
 
 Internet-Draft                     XTT                          May 2017
 
 
-       A.1.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  25
+       A.1.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  26
      A.2.  Session Establishment Handshake . . . . . . . . . . . . .  26
        A.2.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  26
        A.2.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  26
@@ -165,7 +165,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017               [Page 3]
+Beckwith & Bild         Expires November 24, 2017               [Page 3]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -221,7 +221,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017               [Page 4]
+Beckwith & Bild         Expires November 24, 2017               [Page 4]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -277,7 +277,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017               [Page 5]
+Beckwith & Bild         Expires November 24, 2017               [Page 5]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -333,7 +333,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017               [Page 6]
+Beckwith & Bild         Expires November 24, 2017               [Page 6]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -389,7 +389,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017               [Page 7]
+Beckwith & Bild         Expires November 24, 2017               [Page 7]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -445,7 +445,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017               [Page 8]
+Beckwith & Bild         Expires November 24, 2017               [Page 8]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -501,7 +501,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017               [Page 9]
+Beckwith & Bild         Expires November 24, 2017               [Page 9]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -557,7 +557,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 10]
+Beckwith & Bild         Expires November 24, 2017              [Page 10]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -613,7 +613,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 11]
+Beckwith & Bild         Expires November 24, 2017              [Page 11]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -669,7 +669,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 12]
+Beckwith & Bild         Expires November 24, 2017              [Page 12]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -725,7 +725,7 @@ aead_struct<client_handshake_send_keys>(
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 13]
+Beckwith & Bild         Expires November 24, 2017              [Page 13]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -781,7 +781,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 14]
+Beckwith & Bild         Expires November 24, 2017              [Page 14]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -837,7 +837,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 15]
+Beckwith & Bild         Expires November 24, 2017              [Page 15]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -893,7 +893,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 16]
+Beckwith & Bild         Expires November 24, 2017              [Page 16]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -949,7 +949,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 17]
+Beckwith & Bild         Expires November 24, 2017              [Page 17]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1005,7 +1005,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 18]
+Beckwith & Bild         Expires November 24, 2017              [Page 18]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1061,7 +1061,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 19]
+Beckwith & Bild         Expires November 24, 2017              [Page 19]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1117,7 +1117,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 20]
+Beckwith & Bild         Expires November 24, 2017              [Page 20]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1173,7 +1173,7 @@ Internet-Draft                     XTT                          May 2017
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 21]
+Beckwith & Bild         Expires November 24, 2017              [Page 21]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1219,25 +1219,32 @@ Internet-Draft                     XTT                          May 2017
    receiving key/IV, and vice-versa).  The byte-length of the IVs is
    that of the nonce for the negotiated AEAD algorithm.
 
-   At the start of a new session (after a successful handshake), the two
-   sequence numbers (client-to-server and server-to-client) are set to
-   0.  The first record-level payload the client sends after sending its
-   Session_ClientAttest must have sequence number 0.  Similarly, the
-   first record-level payload sent by the server after sending its
-   Session_ServerFinished must have sequence number 0.
-
-
-
-
-Beckwith & Bild         Expires November 23, 2017              [Page 22]
-
-Internet-Draft                     XTT                          May 2017
-
-
    A per-message nonce is generated before AEAD encryption by left-
    padding the sequence number (in network byte order) to the length of
    the nonce/IV, then XOR'ing the appropriate IV with this padded
    sequence number.
+
+   A server's ServerInitAndAttest message has sequence number 0, and its
+   ServerFinished message (either ClientIdentity_ServerFinished or
+
+
+
+Beckwith & Bild         Expires November 24, 2017              [Page 22]
+
+Internet-Draft                     XTT                          May 2017
+
+
+   Session_ServerFinished, depending on the type of handshake) has
+   sequence number 1.  Similarly, a client's ClientAttest message
+   (either ClientIdentity_ClientAttest or Session_ClientAttest) has
+   sequence number 0.
+
+   At the start of a new session (after a successful handshake), the two
+   sequence numbers (client-to-server and server-to-client) are reset to
+   0.  The first record-level payload the client sends after sending its
+   Session_ClientAttest must have sequence number 0.  Similarly, the
+   first record-level payload sent by the server after sending its
+   Session_ServerFinished must have sequence number 0.
 
 7.  Security Considerations
 
@@ -1271,6 +1278,18 @@ Internet-Draft                     XTT                          May 2017
    least one side (client or server) produces new Diffie-Hellman key
    pairs for each handshake, the protocol also provides forward secrecy.
 
+
+
+
+
+
+
+
+Beckwith & Bild         Expires November 24, 2017              [Page 23]
+
+Internet-Draft                     XTT                          May 2017
+
+
 8.  References
 
 8.1.  Normative References
@@ -1279,16 +1298,6 @@ Internet-Draft                     XTT                          May 2017
               Hashing for Message Authentication", RFC 2104,
               DOI 10.17487/RFC2104, February 1997,
               <http://www.rfc-editor.org/info/rfc2104>.
-
-
-
-
-
-
-Beckwith & Bild         Expires November 23, 2017              [Page 23]
-
-Internet-Draft                     XTT                          May 2017
-
 
    [RFC5116]  McGrew, D., "An Interface and Algorithms for Authenticated
               Encryption", RFC 5116, DOI 10.17487/RFC5116, January 2008,
@@ -1327,6 +1336,16 @@ Internet-Draft                     XTT                          May 2017
               conference on Computer and communications security ,
               February 2004.
 
+
+
+
+
+
+Beckwith & Bild         Expires November 24, 2017              [Page 24]
+
+Internet-Draft                     XTT                          May 2017
+
+
    [MINIMALT]
               Petullo, W., Zhang, X., Solworth, J., Bernstein, D., and
               T. Lange, "MinimalLT: Minimal-latency Networking Through
@@ -1336,15 +1355,6 @@ Internet-Draft                     XTT                          May 2017
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
-
-
-
-
-
-Beckwith & Bild         Expires November 23, 2017              [Page 24]
-
-Internet-Draft                     XTT                          May 2017
-
 
    [RFC3552]  Rescorla, E. and B. Korver, "Guidelines for Writing RFC
               Text on Security Considerations", BCP 72, RFC 3552,
@@ -1381,6 +1391,17 @@ Appendix A.  State Machine
    for ease of comprehension.  Messages which are sent only sometimes
    are indicated in "[]".  (TODO)
 
+
+
+
+
+
+
+Beckwith & Bild         Expires November 24, 2017              [Page 25]
+
+Internet-Draft                     XTT                          May 2017
+
+
 A.1.  Identity Provisioning Handshake
 
 A.1.1.  Client
@@ -1390,17 +1411,6 @@ A.1.1.  Client
 A.1.2.  Server
 
    (TODO)
-
-
-
-
-
-
-
-Beckwith & Bild         Expires November 23, 2017              [Page 25]
-
-Internet-Draft                     XTT                          May 2017
-
 
 A.2.  Session Establishment Handshake
 
@@ -1441,22 +1451,19 @@ B.3.  Byte Arrays
    Here, "Tp" occupies "n" bytes in the data stream.  The length of the
    vector is not included in the encoded stream.
 
+
+
+Beckwith & Bild         Expires November 24, 2017              [Page 26]
+
+Internet-Draft                     XTT                          May 2017
+
+
    An anonymous byte array is specified by not including a new type
    name: "byte[n]" indicates space of n bytes in the byte stream.  This
    is useful for constructed and variant types.
 
    Unless defined as a numeric data type, the bytes comprising a byte-
    array are not to be interpreted by the protocol in any way.
-
-
-
-
-
-
-Beckwith & Bild         Expires November 23, 2017              [Page 26]
-
-Internet-Draft                     XTT                          May 2017
-
 
 B.4.  Numeric Data
 
@@ -1498,21 +1505,19 @@ B.5.  Enumerateds
    containing message and handle the error as specified for that message
    type.
 
+
+
+
+
+Beckwith & Bild         Expires November 24, 2017              [Page 27]
+
+Internet-Draft                     XTT                          May 2017
+
+
    The following example defines an enumerated type called Color that
    has three possible values, which are represented in the byte stream
    as uint16 values (thus a value of type Color occupies 2 bytes in the
    byte stream)
-
-
-
-
-
-
-
-Beckwith & Bild         Expires November 23, 2017              [Page 27]
-
-Internet-Draft                     XTT                          May 2017
-
 
    enum : uint16 {
        Red(0x1234),
@@ -1560,12 +1565,7 @@ B.7.  AEAD-Encrypted Constructed Types
 
 
 
-
-
-
-
-
-Beckwith & Bild         Expires November 23, 2017              [Page 28]
+Beckwith & Bild         Expires November 24, 2017              [Page 28]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1621,7 +1621,7 @@ B.9.  Variants
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 29]
+Beckwith & Bild         Expires November 24, 2017              [Page 29]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1677,7 +1677,7 @@ C.1.  Common Message Header
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 30]
+Beckwith & Bild         Expires November 24, 2017              [Page 30]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1733,7 +1733,7 @@ C.2.2.  Server Certificates
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 31]
+Beckwith & Bild         Expires November 24, 2017              [Page 31]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1789,7 +1789,7 @@ D.1.  Distributed Servers and Proxies
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 32]
+Beckwith & Bild         Expires November 24, 2017              [Page 32]
 
 Internet-Draft                     XTT                          May 2017
 
@@ -1845,4 +1845,4 @@ Authors' Addresses
 
 
 
-Beckwith & Bild         Expires November 23, 2017              [Page 33]
+Beckwith & Bild         Expires November 24, 2017              [Page 33]
