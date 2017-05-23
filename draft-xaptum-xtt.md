@@ -926,17 +926,24 @@ The client and server each get a pair of sending and receiving keys/IVs
 (of course, the server’s sending key/IV matches the client’s receiving key/IV, and vice-versa).
 The byte-length of the IVs is that of the nonce for the negotiated AEAD algorithm.
 
-At the start of a new session (after a successful handshake),
-the two sequence numbers (client-to-server and server-to-client) are set to 0.
-The first record-level payload the client sends after
-sending its Session_ClientAttest must have sequence number 0.
-Similarly, the first record-level payload sent by the server after
-sending its Session_ServerFinished must have sequence number 0.
-
 A per-message nonce is generated before AEAD encryption
 by left-padding the sequence number (in network byte order)
 to the length of the nonce/IV,
 then XOR’ing the appropriate IV with this padded sequence number.
+
+A server's ServerInitAndAttest message has sequence number 0,
+and its ServerFinished message (either ClientIdentity_ServerFinished
+or Session_ServerFinished, depending on the type of handshake)
+has sequence number 1.
+Similarly, a client's ClientAttest message (either ClientIdentity_ClientAttest
+or Session_ClientAttest) has sequence number 0.
+
+At the start of a new session (after a successful handshake),
+the two sequence numbers (client-to-server and server-to-client) are reset to 0.
+The first record-level payload the client sends after
+sending its Session_ClientAttest must have sequence number 0.
+Similarly, the first record-level payload sent by the server after
+sending its Session_ServerFinished must have sequence number 0.
 
 # Security Considerations
 Both XTT handshake protocols are based on the
