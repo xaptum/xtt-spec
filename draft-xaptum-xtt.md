@@ -786,18 +786,18 @@ and their use is shown in {{xtt-handshake-schedule}},
 
 | Context                       | Definition                                                  |
 |:----------------------------- | -----------------------------------------------------------:|
-| ClientHandshakeKeyContext     | "XTT handshake client key" \|\| HandshakeKeyHash            |
-| ClientHandshakeIVContext      | "XTT handshake client iv" \|\| HandshakeKeyHash             |
-| ServerHandshakeKeyContext     | "XTT handshake server key" \|\| HandshakeKeyHash            |
-| ServerHandshakeIVContext      | "XTT handshake server iv" \|\| HandshakeKeyHash             |
-| LongtermSharedSecretContext   | "XTT long-term secret" \|\| ServerFinishedHash              |
-| IdentityFinishedContext       | "XTT identity awareness" \|\| ServerFinishedHash            |
-| LongtermSecretKeyContext      | "XTT long-term secret key" \|\| ServerFinishedHash          |
-| ClientSessionKeyContext       | "XTT session client key" \|\| SessionHash                   |
-| ClientSessionIVContext        | "XTT session client iv" \|\| SessionHash                    |
-| ServerSessionKeyContext       | "XTT session server key" \|\| SessionHash                   |
-| ServerSessionIVContext        | "XTT session server iv" \|\| SessionHash                    |
-| SessionFinishedContext        | "XTT session awareness" \|\| SessionHash                    |
+| ClientHandshakeKeyContext     | ( HandshakeKeyHash   \|\| "XTT handshake client key" )      |
+| ClientHandshakeIVContext      | ( HandshakeKeyHash   \|\| "XTT handshake client iv" )       |
+| ServerHandshakeKeyContext     | ( HandshakeKeyHash   \|\| "XTT handshake server key" )      |
+| ServerHandshakeIVContext      | ( HandshakeKeyHash   \|\| "XTT handshake server iv" )       |
+| LongtermSharedSecretContext   | ( ServerFinishedHash \|\| "XTT long-term secret" )          |
+| IdentityFinishedContext       | ( ServerFinishedHash \|\| "XTT identity awareness" )        |
+| LongtermSecretKeyContext      | ( ServerFinishedHash \|\| "XTT long-term secret key" )      |
+| ClientSessionKeyContext       | ( SessionHash        \|\| "XTT session client key" )        |
+| ClientSessionIVContext        | ( SessionHash        \|\| "XTT session client iv" )         |
+| ServerSessionKeyContext       | ( SessionHash        \|\| "XTT session server key" )        |
+| ServerSessionIVContext        | ( SessionHash        \|\| "XTT session server iv" )         |
+| SessionFinishedContext        | ( SessionHash        \|\| "XTT session awareness" )         |
 {: #xtt-context-table title="Context Strings for Secret Material Derivation"}
 
 The prf is drawn as taking the key argument from the left
