@@ -274,11 +274,13 @@ a client group recognized by the server, using a Direct Anonymous Attestation (D
         Client                                             Server
         -----------------------             -----------------------
          CLIENTINIT
+         + length
          + version
          + suite_spec
          + nonce_c 
          + dh_keyshare_c         ------->
                                              SERVERINITANDATTEST ^ < Hk
+                                                        length + |
                                                        version + | 
                                                     suite_spec + | 
                                                  dh_keyshare_s + | 
@@ -286,6 +288,7 @@ a client group recognized by the server, using a Direct Anonymous Attestation (D
                                                  {signature_s} + |
                                  <-------      {server_cookie} + v 
   Hk > ^ IDENTITY_CLIENTATTEST 
+       | + length
        | + version
        | + suite_spec
        | + server_cookie
@@ -293,6 +296,7 @@ a client group recognized by the server, using a Direct Anonymous Attestation (D
        | + {id_c}
        v + {daa_signature_c}     ------->
                                          IDENTITY_SERVERFINISHED ^ < Hk
+                                                        length + |
                                                        version + |
                                                     suite_spec + |
                                                         {id_c} + |
@@ -319,11 +323,13 @@ in ({{record-protocol}}).
         Client                                             Server
         -----------------------             -----------------------
          CLIENTINIT
+         + length
          + version
          + suite_spec
          + nonce_c 
          + dh_keyshare_c         ------->
                                              SERVERINITANDATTEST ^ < Hk
+                                                        length + |
                                                        version + | 
                                                     suite_spec + | 
                                                  dh_keyshare_s + | 
@@ -331,6 +337,7 @@ in ({{record-protocol}}).
                                                  {signature_s} + |
                                  <-------      {server_cookie} + v 
   Hk > ^ SESSION_CLIENTATTEST 
+       | + length
        | + version
        | + suite_spec
        | + server_cookie
@@ -338,23 +345,24 @@ in ({{record-protocol}}).
        | + {id_c}
        v + {signature_c}
   Sk > ^ (RECORDREGULAR)
+       | + (length)
        | + (version)
        | + (session_id)
        | + (seq_num)
-       | + (length)
        | + ([payload_type])
        v + ([payload])           ------->
                                           SESSION_SERVERFINISHED ^ < Sk
+                                                        length + |
                                                        version + |
                                                     suite_spec + |
                                                   {session_id} + |
                                  <-------    {awareness_proof} + v
 
   Sk > ^ RECORDREGULAR                             RECORDREGULAR ^ < Sk
+       | + length                                       length + |
        | + version                                     version + |
        | + session_id                               session_id + |
        | + seq_num                                     seq_num + |
-       | + length                                       length + |
        | + [payload_type]                       [payload_type] + |
        v + [payload]             <------>            [payload] + v
   
@@ -396,6 +404,7 @@ Structure of this message:
 ~~~
 struct {
     MsgType type = client_init;
+    MsgLength length;
     Version version;
     SuiteSpec suite_spec;
     SigningNonce nonce_c;
@@ -427,6 +436,7 @@ Structure of this message:
 ~~~
 aead_struct<server_handshake_send_keys>(
     MsgType type = server_init_and_attest;
+    MsgLength length;
     Version version;
     SuiteSpec suite_spec;
     DHKeyShare dh_keyshare_s;
@@ -468,6 +478,7 @@ Structure of this message:
 ~~~
 aead_struct<client_handshake_send_keys>(
     MsgType type =  MsgType.id_clientattest;
+    MsgLength length;
     Version version;
     SuiteSpec suite_spec;
     ServerCookie server_cookie;     /* echo from server */
@@ -506,6 +517,7 @@ Structure of this message:
 ~~~
 aead_struct<server_handshake_send_keys>(
     MsgType type = MsgType.id_serverfinished;
+    MsgLength length;
     Version version;
     SuiteSpec suite_spec;
 )[
@@ -546,6 +558,7 @@ Structure of this message:
 ~~~
 aead_struct<client_handshake_send_keys>(
     MsgType type =  MsgType.session_clientattest;
+    MsgLength length;
     Version version;
     SuiteSpec spec;
     ServerCookie server_cookie;     /* echo from server */
@@ -584,6 +597,7 @@ Structure of this message:
 ~~~
 aead_struct<session_keys>(
     MsgType type = MsgType.session_serverfinished;
+    MsgLength length;
     Version version;
     SuiteSpec spec;
 )[
@@ -633,10 +647,10 @@ the server MUST ignore the the extra messages.
 ~~~
 aead_struct<session_keys>(
     MsgType type = MsgType.record_regular;
+    MsgLength length;
     Version version;
     SessionID session_id;
     SequenceNumber seq_num;
-    MsgLength length;
 )[
     EncapsulatedPayloadType payload_type;
     byte payload[length - sizeof(rest_of_message)];
