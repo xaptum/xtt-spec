@@ -896,7 +896,7 @@ A key value of `0` indicates a zero-length key.
                  |
                  +--> session_awareness_proof
 ~~~
-{: #xtt-session-schedule title="Key Schedule for Handshake Keys"}
+{: #xtt-session-schedule title="Key Schedule for Session Keys"}
 
 ## ECDHE Parameters
 The size and interpretation of a value of type DHKeyShare
