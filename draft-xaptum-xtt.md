@@ -683,7 +683,7 @@ For the case of the BLAKE2b-based suite_spec options,
 In addition, a non-keyed hash, denoted `hash`, will be referenced here.
 For the SHA512-based suite_spec options, this is just SHA-512.
 For the BLAKE2b-based suite_specs, this is Blake2b with
-a zero-length key.
+a zero-length key and 64-byte output.
 
 The hashes used in the cryptographic computations described below
 use a construction denoted `hash_ext`, which appends the input length
