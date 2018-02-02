@@ -1323,41 +1323,25 @@ byte DAASignature[<size of signature for this algorithm>];
 
 ~~~
 enum : uint8 {
-    one(1)
-} ServerCertificateVersion;
-~~~
-
-~~~
-byte Date[8];   /* YYYYMMDD according to UTC */
+    ed25519(1)
+} ServerSignatureType;
 ~~~
 
 ~~~
 struct {
-    ServerCertificateVersion version;
-    Date expiry;
     ClientID id;
+    byte expiry[8];   /* YYYYMMDD in UTC, as ASCII-encoded numbers */
     ServerSignaturePublicKey public_key;
-    ServerIntermediateCertificate signers_certificate;
-    ServerSignature signers_signature;
+    byte root_id[16];       /* ServerRootCertificate to use */
+    ServerSignature root_signature;
 } ServerCertificate;
 ~~~
 
 ~~~
 struct {
-    ServerSignatureVersion version;
-    Date expiry;
+    ServerSignatureType type;
+    byte id[16];
     ServerSignaturePublicKey public_key;
-    byte root_id[32];       /* ServerRootCertificate to use */
-    ServerSignature root_signature;
-} ServerIntermediateCertificate;
-~~~
-
-~~~
-struct {
-    ServerSignatureVersion version;
-    Date expiry;
-    ServerSignaturePublicKey public_key;
-    byte id[32];
 } ServerRootCertificate;
 ~~~
 
