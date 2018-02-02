@@ -804,40 +804,42 @@ The prf is drawn as taking the key argument from the left
 and outputting downward.
 `DH-shared-secret` is the result of running Diffie-Hellman
 using the keys exchanged during the handshake,
-and `key_size` and `iv_size` are the key- and nonce-sizes
-(respectively) for the AEAD algorithm determined by the suite_spec.
+`key_size` and `iv_size` are the key- and nonce-sizes
+(respectively) for the AEAD algorithm determined by the suite_spec,
+and `hash_size` is the hash-out-size for the underlying hash function used.
+A key value of `0` indicates a zero-length key.
 
 ~~~
-  (nonce_c | server_cookie)
-     |      
-     |      
-     +--> prf<sizeof(LongtermSecret)>(DH-shared-secret)
-           |
-           +--> prf<key_size>(ClientHandshakeKeyContext)
-           |     |
-           |     +--> client_handshake_send_key
-           |     |
-           |     +--> server_handshake_receive_key
-           |
-           +--> prf<iv_size>(ClientHandshakeIVContext)
-           |     |
-           |     +--> client_handshake_send_iv
-           |     |
-           |     +--> server_handshake_receive_iv
-           |
-           +--> prf<key_size>(ServerHandshakeKeyContext)
-           |     |
-           |     +--> client_handshake_receive_key
-           |     |
-           |     +--> server_handshake_send_key
-           |
-           +--> prf<iv_size>(ServerHandshakeIVContext)
-           |     |
-           |     +--> client_handshake_receive_iv
-           |     |
-           |     +--> server_handshake_send_iv
-           |
-           +--> handshake_secret
+  0--> prf_ext<hash_size>(nonce_c | server_cookie)
+        |      
+        |      
+        +--> prf_ext<hash_size>(DH-shared-secret)
+              |
+              +--> prf_ext<key_size>(ClientHandshakeKeyContext)
+              |     |
+              |     +--> client_handshake_send_key
+              |     |
+              |     +--> server_handshake_receive_key
+              |
+              +--> prf_ext<iv_size>(ClientHandshakeIVContext)
+              |     |
+              |     +--> client_handshake_send_iv
+              |     |
+              |     +--> server_handshake_receive_iv
+              |
+              +--> prf_ext<key_size>(ServerHandshakeKeyContext)
+              |     |
+              |     +--> client_handshake_receive_key
+              |     |
+              |     +--> server_handshake_send_key
+              |
+              +--> prf_ext<iv_size>(ServerHandshakeIVContext)
+              |     |
+              |     +--> client_handshake_receive_iv
+              |     |
+              |     +--> server_handshake_send_iv
+              |
+              +--> handshake_secret
 ~~~
 {: #xtt-handshake-schedule title="Key Schedule for Handshake Keys"}
 
@@ -845,17 +847,17 @@ and `key_size` and `iv_size` are the key- and nonce-sizes
   handshake_secret
      |      
      |      
-     +--> prf<sizeof(LongtermSecret)>(ClientID)
+     +--> prf_ext<sizeof(LongtermSecret)>(ClientID)
            |
-           +--> prf<sizeof(LongtermSecret)>(LongtermSharedSecretContext)
+           +--> prf_ext<sizeof(LongtermSecret)>(LongtermSharedSecretContext)
            |     |
            |     +--> longterm_client_shared_secret
            |
-           +--> prf<sizeof(AwarenessProof)>(IdentityFinishedContext)
+           +--> prf_ext<sizeof(AwarenessProof)>(IdentityFinishedContext)
            |     |
            |     +--> identity_awareness_proof
            |
-           +--> prf<sizeof(LongtermSignatureKey)>(LongtermSecretKeyContext)
+           +--> prf_ext<sizeof(LongtermSignatureKey)>(LongtermSecretKeyContext)
                  |
                  +--> longterm_client_shared_secret_key
 ~~~
@@ -865,32 +867,32 @@ and `key_size` and `iv_size` are the key- and nonce-sizes
   handshake_secret
      |      
      |      
-     +--> prf<sizeof(LongtermSecret)>(longterm_client_shared_secret)
+     +--> prf_ext<sizeof(LongtermSecret)>(longterm_client_shared_secret)
            |
-           +--> prf<key_size>(ClientSessionKeyContext)
+           +--> prf_ext<key_size>(ClientSessionKeyContext)
            |     |
            |     +--> client_session_send_key
            |     |
            |     +--> server_session_receive_key
            |
-           +--> prf<iv_size>(ClientSessionIVContext)
+           +--> prf_ext<iv_size>(ClientSessionIVContext)
            |     |
            |     +--> client_session_send_iv
            |     |
            |     +--> server_session_receive_iv
            |
-           +--> prf<key_size>(ServerSessionKeyContext)
+           +--> prf_ext<key_size>(ServerSessionKeyContext)
            |     |
            |     +--> client_session_receive_key
            |     |
            |     +--> server_session_send_key
            |
-           +--> prf<iv_size>(ServerSessionIVContext)
+           +--> prf_ext<iv_size>(ServerSessionIVContext)
            |     |
            |     +--> client_session_receive_iv
            |     |
            |     +--> server_session_send_iv
-           +--> prf<sizeof(AwarenessProof)>(SessionFinishedContext)
+           +--> prf_ext<sizeof(AwarenessProof)>(SessionFinishedContext)
                  |
                  +--> session_awareness_proof
 ~~~
