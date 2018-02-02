@@ -807,39 +807,36 @@ using the keys exchanged during the handshake,
 `key_size` and `iv_size` are the key- and nonce-sizes
 (respectively) for the AEAD algorithm determined by the suite_spec,
 and `hash_size` is the hash-out-size for the underlying hash function used.
-A key value of `0` indicates a zero-length key.
+A key value of `0` indicates a `hash_size`-length key of zeroes.
 
 ~~~
-  0--> prf_ext<hash_size>(nonce_c | server_cookie)
-        |      
-        |      
-        +--> prf_ext<hash_size>(DH-shared-secret)
-              |
-              +--> prf_ext<key_size>(ClientHandshakeKeyContext)
-              |     |
-              |     +--> client_handshake_send_key
-              |     |
-              |     +--> server_handshake_receive_key
-              |
-              +--> prf_ext<iv_size>(ClientHandshakeIVContext)
-              |     |
-              |     +--> client_handshake_send_iv
-              |     |
-              |     +--> server_handshake_receive_iv
-              |
-              +--> prf_ext<key_size>(ServerHandshakeKeyContext)
-              |     |
-              |     +--> client_handshake_receive_key
-              |     |
-              |     +--> server_handshake_send_key
-              |
-              +--> prf_ext<iv_size>(ServerHandshakeIVContext)
-              |     |
-              |     +--> client_handshake_receive_iv
-              |     |
-              |     +--> server_handshake_send_iv
-              |
-              +--> handshake_secret
+  0--> prf_ext<hash_size>(DH-shared-secret)
+        |
+        +--> prf_ext<key_size>(ClientHandshakeKeyContext)
+        |     |
+        |     +--> client_handshake_send_key
+        |     |
+        |     +--> server_handshake_receive_key
+        |
+        +--> prf_ext<iv_size>(ClientHandshakeIVContext)
+        |     |
+        |     +--> client_handshake_send_iv
+        |     |
+        |     +--> server_handshake_receive_iv
+        |
+        +--> prf_ext<key_size>(ServerHandshakeKeyContext)
+        |     |
+        |     +--> client_handshake_receive_key
+        |     |
+        |     +--> server_handshake_send_key
+        |
+        +--> prf_ext<iv_size>(ServerHandshakeIVContext)
+        |     |
+        |     +--> client_handshake_receive_iv
+        |     |
+        |     +--> server_handshake_send_iv
+        |
+        +--> handshake_secret
 ~~~
 {: #xtt-handshake-schedule title="Key Schedule for Handshake Keys"}
 
