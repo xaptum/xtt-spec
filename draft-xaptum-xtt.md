@@ -284,9 +284,9 @@ a client group recognized by the server, using a Direct Anonymous Attestation (D
                                                        version + | 
                                                     suite_spec + | 
                                                  dh_keyshare_s + | 
+                                                 server_cookie + |
                                                  {certificate} + | 
-                                                 {signature_s} + |
-                                 <-------      {server_cookie} + v 
+                                 <-------        {signature_s} + v 
   Hk > ^ IDENTITY_CLIENTATTEST 
        | + length
        | + version
@@ -333,9 +333,9 @@ in ({{record-protocol}}).
                                                        version + | 
                                                     suite_spec + | 
                                                  dh_keyshare_s + | 
+                                                 server_cookie + |
                                                  {certificate} + | 
-                                                 {signature_s} + |
-                                 <-------      {server_cookie} + v 
+                                 <-------        {signature_s} + v 
   Hk > ^ SESSION_CLIENTATTEST 
        | + length
        | + version
@@ -440,10 +440,10 @@ aead_struct<server_handshake_send_keys>(
     Version version;
     SuiteSpec suite_spec;
     DHKeyShare dh_keyshare_s;
+    ServerCookie server_cookie;
 )[
     ServerCertificate certificate;
     ServerSignature signature_s;
-    ServerCookie server_cookie;
 ] ServerInitAndAttest;
 ~~~
 
