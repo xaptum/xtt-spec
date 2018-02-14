@@ -1331,8 +1331,8 @@ enum : uint8 {
 struct {
     ClientID id;
     byte expiry[8];   /* YYYYMMDD in UTC, as ASCII-encoded numbers */
-    ServerSignaturePublicKey public_key;
     byte root_id[16];       /* ServerRootCertificate to use */
+    ServerSignaturePublicKey public_key;
     ServerSignature root_signature;
 } ServerCertificate;
 ~~~
