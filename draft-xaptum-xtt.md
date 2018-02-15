@@ -293,7 +293,7 @@ a client group recognized by the server, using a Direct Anonymous Attestation (D
        | + suite_spec
        | + server_cookie
        | + {longterm_key}
-       | + {daa_gpk}
+       | + {daa_gid}
        | + {id_c}
        v + {daa_signature_c}     ------->
                                          IDENTITY_SERVERFINISHED ^ < Hk
@@ -486,7 +486,7 @@ aead_struct<client_handshake_send_keys>(
     ServerCookie server_cookie;     /* echo from server */
 }[
     LongtermKey longterm_key;
-    DAAGroupKey daa_gpk;
+    DAAGroupID daa_gid;
     ClientID id_c;                  /* all zeroes if not specific id */
     DAASignature daa_signature_c;
 ] ClientIdentity_ClientAttest;
@@ -1279,7 +1279,7 @@ byte LongtermKey[<size of public key for this algorithm>];
 ~~~
 
 ~~~
-byte DAAGroupKey[<size of group public key for this algorithm>];
+byte DAAGroupID[32];
 ~~~
 
 ~~~
