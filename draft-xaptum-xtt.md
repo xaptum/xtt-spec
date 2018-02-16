@@ -592,7 +592,7 @@ secrets necessary for secure communication.
 The message is AEAD-protected (using the algorithm specified in the suite_spec)
 using the `server_handshake_send_key` and `server_handshake_send_iv`.
 The `awareness_proof` is given by `session_awareness_proof`,
-as described in ({{xtt-key-schedule}}).
+as described in ({{xtt-session-key-schedule}}).
 
 Structure of this message:
 
@@ -790,7 +790,7 @@ ServerFinishedHash =
 Multiple secret materials are derived from the same input key
 by including different handshake context into the call to `prf`.
 These contexts are defined in {{xtt-context-table}} below,
-and their use is shown in {{xtt-key-schedule}}.
+and their use is shown in {{xtt-id-key-schedule}} and {{xtt-session-key-schedule}}.
 
 | Context                       | Definition                                                  |
 |:----------------------------- | -----------------------------------------------------------:|
@@ -837,10 +837,16 @@ A key value of `0` indicates a `hash_size`-length key of zeroes.
         |     +--> server_handshake_send_key
         |
         +--> prf_ext<iv_size>(ServerHandshakeIVContext)
-        |     |
-        |     +--> client_handshake_receive_iv
-        |     |
-        |     +--> server_handshake_send_iv
+              |
+              +--> client_handshake_receive_iv
+              |
+              +--> server_handshake_send_iv
+         
+~~~
+{: #xtt-id-key-schedule title="Identity Key Schedule"}
+
+~~~
+  0--> prf_ext<hash_size>(DH-shared-secret)
         |
         +--> prf_ext<sizeof(AwarenessProof)>(IdentityFinishedContext)
         |     |
@@ -873,7 +879,7 @@ A key value of `0` indicates a `hash_size`-length key of zeroes.
               |
               +--> session_awareness_proof
 ~~~
-{: #xtt-key-schedule title="Key Schedule"}
+{: #xtt-session-key-schedule title="Session Key Schedule"}
 
 ## ECDHE Parameters
 The size and interpretation of a value of type DHKeyShare
