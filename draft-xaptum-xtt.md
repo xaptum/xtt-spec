@@ -511,7 +511,7 @@ ClientID and LongtermKey.
 The message is AEAD-protected (using the algorithm specified in the suite_spec)
 using the `server_handshake_send_key` and `server_handshake_send_iv`.
 The `awareness_proof` is given by `identity_awareness_proof`,
-as described in ({{xtt-key-schedule}}).
+as described in ({{xtt-id-key-schedule}}).
 
 Structure of this message:
 
@@ -757,7 +757,7 @@ ClientSigHash =
             ServerInitAndAttest-up-to-cookie
         ) ||
         server_cookie ||
-        ClientAttest-up-to-signature
+        Identity_ClientAttest-up-to-signature
     )
 ~~~
 
@@ -769,7 +769,7 @@ SessionHash =
             ServerInitAndAttest-up-to-cookie
         ) ||
         server_cookie ||
-        ClientAttest
+        Session_ClientAttest
     )
 ~~~
 
@@ -781,8 +781,8 @@ ServerFinishedHash =
             ServerInitAndAttest-up-to-cookie
         ) ||
         server_cookie ||
-        ClientAttest ||
-        ServerFinished-up-to-ctx
+        Identity_ClientAttest ||
+        Identity_ServerFinished-up-to-awareness_proof
     )
 ~~~
 
