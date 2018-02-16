@@ -1216,8 +1216,7 @@ This section describes protocol types and constants.
 enum : uint8 {
     client_identity_client_init(0x11),
     client_identity_server_init_and_attest(0x12),
-    id_clientattest_nopayload(0x13),
-    id_clientattest_payload(0x14),
+    id_clientattest(0x13),
     id_serverfinished(0x15),
     session_client_init(0x21),
     session_server_init_and_attest(0x22),
