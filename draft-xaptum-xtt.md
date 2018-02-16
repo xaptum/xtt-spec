@@ -301,8 +301,7 @@ a client group recognized by the server, using a Direct Anonymous Attestation (D
                                                        version + |
                                                     suite_spec + |
                                                         {id_c} + |
-                                              {longterm_key_c} + |
-                                 <-------    {awareness_proof} + v
+                                 <-------     {longterm_key_c} + v
   
               +    Indicates message subfields
               ()   Indicates optional messages/subfields
@@ -510,8 +509,6 @@ ClientID and LongtermKey.
 
 The message is AEAD-protected (using the algorithm specified in the suite_spec)
 using the `server_handshake_send_key` and `server_handshake_send_iv`.
-The `awareness_proof` is given by `identity_awareness_proof`,
-as described in ({{xtt-id-key-schedule}}).
 
 Structure of this message:
 
@@ -524,7 +521,6 @@ aead_struct<server_handshake_send_keys>(
 )[
     ClientID id_c;     /* confirm id of client */
     LongtermKey longterm_key_c; /* confirm key of client
-    AwarenessProof awareness_proof;
 ] ClientIdentity_ServerFinished;
 ~~~
 
@@ -778,21 +774,6 @@ SessionHash =
     )
 ~~~
 
-~~~
-ServerFinishedHash =
-    hash_ext(
-        hash_ext(
-            ClientInit ||
-            ServerInitAndAttest-up-to-cookie
-        ) ||
-        server_cookie ||
-        certificate ||
-        signature_s ||
-        Identity_ClientAttest ||
-        Identity_ServerFinished-up-to-awareness_proof
-    )
-~~~
-
 ## Key Calculation and Schedule
 Multiple secret materials are derived from the same input key
 by including different handshake context into the call to `prf`.
@@ -805,7 +786,6 @@ and their use is shown in {{xtt-id-key-schedule}} and {{xtt-session-key-schedule
 | ClientHandshakeIVContext      | ( HandshakeKeyHash   \|\| "XTT handshake client iv" )       |
 | ServerHandshakeKeyContext     | ( HandshakeKeyHash   \|\| "XTT handshake server key" )      |
 | ServerHandshakeIVContext      | ( HandshakeKeyHash   \|\| "XTT handshake server iv" )       |
-| IdentityFinishedContext       | ( ServerFinishedHash \|\| "XTT identity awareness" )        |
 | ClientSessionKeyContext       | ( SessionHash        \|\| "XTT session client key" )        |
 | ClientSessionIVContext        | ( SessionHash        \|\| "XTT session client iv" )         |
 | ServerSessionKeyContext       | ( SessionHash        \|\| "XTT session server key" )        |
@@ -848,17 +828,13 @@ A key value of `0` indicates a `hash_size`-length key of zeroes.
               +--> client_handshake_receive_iv
               |
               +--> server_handshake_send_iv
-         
+               
 ~~~
 {: #xtt-id-key-schedule title="Identity Key Schedule"}
 
 ~~~
   0--> prf_ext<hash_size>(DH-shared-secret)
         |
-        +--> prf_ext<sizeof(AwarenessProof)>(IdentityFinishedContext)
-        |     |
-        |     +--> session_awareness_proof
-        |      
         +--> prf_ext<key_size>(ClientSessionKeyContext)
         |     |
         |     +--> client_session_send_key
@@ -882,6 +858,7 @@ A key value of `0` indicates a `hash_size`-length key of zeroes.
         |     +--> client_session_receive_iv
         |     |
         |     +--> server_session_send_iv
+        |
         +--> prf_ext<sizeof(AwarenessProof)>(SessionFinishedContext)
               |
               +--> session_awareness_proof
