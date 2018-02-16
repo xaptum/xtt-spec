@@ -757,6 +757,8 @@ ClientSigHash =
             ServerInitAndAttest-up-to-cookie
         ) ||
         server_cookie ||
+        certificate ||
+        signature_s ||
         Identity_ClientAttest-up-to-signature
     )
 ~~~
@@ -769,7 +771,10 @@ SessionHash =
             ServerInitAndAttest-up-to-cookie
         ) ||
         server_cookie ||
+        certificate ||
+        signature_s ||
         Session_ClientAttest
+        Session_ServerFinished-up-to-awareness_proof
     )
 ~~~
 
@@ -781,6 +786,8 @@ ServerFinishedHash =
             ServerInitAndAttest-up-to-cookie
         ) ||
         server_cookie ||
+        certificate ||
+        signature_s ||
         Identity_ClientAttest ||
         Identity_ServerFinished-up-to-awareness_proof
     )
