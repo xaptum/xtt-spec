@@ -890,7 +890,7 @@ The size of the DHKeyShare in this case is 32 bytes.
 ## DAA Parameters
 (TODO)
 
-EPID2, TPM2.0, and FIDO key/signature sizes.
+LRSWTPM and LRSW key/signature sizes.
 
 ## Signature Algorithms
 The size and interpretation of signature types (signatures and public keys)
@@ -1239,12 +1239,12 @@ enum : uint8 {
 
 ~~~
 enum : uint16 {
-    x25519_epid2_ed25519_chacha20poly1305_sha512(1),
-    x25519_epid2_ed25519_chacha20poly1305_blake2b(2),
-    x25519_epid2_ed25519_aes256gcm_sha512(3),
-    x25519_epid2_ed25519_aes256gcm_blake2b(4),
-    x25519_epid2_ed25519_null_sha512(5),
-    x25519_epid2_ed25519_null_blake2b(6)
+    x25519_lrsw_ed25519_chacha20poly1305_sha512(1),
+    x25519_lrsw_ed25519_chacha20poly1305_blake2b(2),
+    x25519_lrsw_ed25519_aes256gcm_sha512(3),
+    x25519_lrsw_ed25519_aes256gcm_blake2b(4),
+    x25519_lrsw_ed25519_null_sha512(5),
+    x25519_lrsw_ed25519_null_blake2b(6)
 } SuiteSpec;
 ~~~
 
