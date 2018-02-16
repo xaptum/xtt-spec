@@ -845,8 +845,6 @@ A key value of `0` indicates a `hash_size`-length key of zeroes.
         +--> prf_ext<sizeof(AwarenessProof)>(IdentityFinishedContext)
         |     |
         |     +--> session_awareness_proof
-        |
-        +--> handshake_secret
         |      
         +--> prf_ext<key_size>(ClientSessionKeyContext)
         |     |
