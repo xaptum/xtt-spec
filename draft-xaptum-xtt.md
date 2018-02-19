@@ -657,7 +657,22 @@ aead_struct<session_keys>(
 
 # Error Handling
 
-(TODO)
+During a handshake, if any error is encountered,
+the party recognizing the error SHOULD send an `Error` message
+and MUST terminate the connection (if using a connection-oriented transport layer)
+and MUST cease the handshake with the other party (i.e., if this is a server,
+only a `ClientInit` may be accepted from the client, and if this is a client,
+the handshake must be restarted).
+
+~~~
+struct {
+    MsgType type = error;
+    MsgLength length;
+    Version version;
+} Error;
+~~~
+
+(TODO) Session-layer error handling.
 
 # Cryptographic Computations
 
@@ -1212,7 +1227,7 @@ enum : uint8 {
     session_clientattest_payload(0x24),
     session_serverfinished(0x25),
     record_regular(0x31),
-    alert(0x41)
+    error(0x41)
 } MsgType;
 ~~~
 
