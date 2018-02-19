@@ -304,7 +304,6 @@ a client group recognized by the server, using a Direct Anonymous Attestation (D
                                  <-------     {longterm_key_c} + v
   
               +    Indicates message subfields
-              ()   Indicates optional messages/subfields
               {}   Indicates data encrypted using handshake keys
               Hk > Indicates data MAC'd using handshake keys
 ~~~
