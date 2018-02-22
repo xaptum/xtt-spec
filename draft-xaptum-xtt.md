@@ -295,6 +295,7 @@ a client group recognized by the server, using a Direct Anonymous Attestation (D
        | + {longterm_key}
        | + {daa_gid}
        | + {id_c}
+       | + {longterm_signature}
        v + {daa_signature_c}     ------->
                                          IDENTITY_SERVERFINISHED ^ < Hk
                                                         length + |
@@ -486,6 +487,7 @@ aead_struct<client_handshake_send_keys>(
     LongtermKey longterm_key;
     DAAGroupID daa_gid;
     ClientID id_c;                  /* all zeroes if not specific id */
+    LongtermSignature longterm_signature;
     DAASignature daa_signature_c;
 ] ClientIdentity_ClientAttest;
 ~~~
@@ -753,7 +755,7 @@ HandshakeKeyHash =
 ~~~
 
 ~~~
-ClientSigHash =
+ClientLongtermSigHash =
     hash_ext(
         hash_ext(
             ClientInit ||
@@ -762,7 +764,21 @@ ClientSigHash =
         server_cookie ||
         certificate ||
         signature_s ||
-        Identity_ClientAttest-up-to-signature
+        Identity_ClientAttest-up-to-longterm_signature
+    )
+~~~
+
+~~~
+ClientDAASigHash =
+    hash_ext(
+        hash_ext(
+            ClientInit ||
+            ServerInitAndAttest-up-to-cookie
+        ) ||
+        server_cookie ||
+        certificate ||
+        signature_s ||
+        Identity_ClientAttest-up-to-daa_signature
     )
 ~~~
 
