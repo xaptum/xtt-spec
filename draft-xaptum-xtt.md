@@ -734,13 +734,6 @@ The definitions of these hash values follow below.
 When included in a hash, handshake messages are unencrypted.
 
 ~~~
-RootSigHash =
-    hash_ext(
-        ServerCertificate-up-to-root_signature
-    )
-~~~
-
-~~~
 ServerSigHash =
     hash_ext(
         ClientInit ||
