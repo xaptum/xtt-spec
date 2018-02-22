@@ -147,8 +147,8 @@ differ from traditional transport layer security:
 The protocol must also provide the following traditional security properties:
 
 - Mutual Authentication: Both the client and server sides are always
-  authenticated. Server authentication happens via ECDSA and client
-  authentication happens via symmetric-key-signature or DAA.
+  authenticated. Server authentication happens via asymmetric-key-signature and client
+  authentication happens via asymmetric-key-signature or DAA.
 
 - Integrity: Data sent over the channel cannot be modified by an attacker.
 
@@ -162,8 +162,8 @@ described in {{RFC3552}}.
 XTT consists of three primary components:
 
 - An identity provisioning protocol ({{identity-provisioning-protocol}}) used
-  by the device to request an identity from the server and establish a
-  long-term shared secret. 
+  by the device to request an identity from the server and declare a
+  long-term public key to be used to authenticate. 
 
 - A session establishment protocol ({{session-establishment-protocol}}) that
   (TODO) (1 par.) describe this protocol
@@ -255,12 +255,12 @@ requirements.
 (TODO) (1 list) what MinimalLT doesn't offer that IoT requires
 
 # Protocol Overview
-The XTT protocol provisions shared, secret state between a client
+The XTT protocol provisions shared state between a client
 and a server that may persist past the lifetime of the underlying connection.
 This shared state is grouped into two classes:
 
 * A long-term identity
-  for a client and the shared secrets used to prove that identity
+  for a client and the public key used to prove that identity
   to the server during future communication
 * A session consisting of cryptographic material to be used
   for message authentication and confidentiality
@@ -274,32 +274,37 @@ a client group recognized by the server, using a Direct Anonymous Attestation (D
         Client                                             Server
         -----------------------             -----------------------
          CLIENTINIT
+         + length
          + version
          + suite_spec
          + nonce_c 
          + dh_keyshare_c         ------->
                                              SERVERINITANDATTEST ^ < Hk
+                                                        length + |
                                                        version + | 
                                                     suite_spec + | 
                                                  dh_keyshare_s + | 
+                                                 server_cookie + |
                                                  {certificate} + | 
-                                                 {signature_s} + |
-                                 <-------      {server_cookie} + v 
+                                 <-------        {signature_s} + v 
   Hk > ^ IDENTITY_CLIENTATTEST 
+       | + length
        | + version
        | + suite_spec
        | + server_cookie
-       | + {daa_gpk}
+       | + {longterm_key}
+       | + {daa_gid}
        | + {id_c}
+       | + {longterm_signature}
        v + {daa_signature_c}     ------->
                                          IDENTITY_SERVERFINISHED ^ < Hk
+                                                        length + |
                                                        version + |
                                                     suite_spec + |
                                                         {id_c} + |
-                                 <-------    {awareness_proof} + v
+                                 <-------     {longterm_key_c} + v
   
               +    Indicates message subfields
-              ()   Indicates optional messages/subfields
               {}   Indicates data encrypted using handshake keys
               Hk > Indicates data MAC'd using handshake keys
 ~~~
@@ -319,18 +324,21 @@ in ({{record-protocol}}).
         Client                                             Server
         -----------------------             -----------------------
          CLIENTINIT
+         + length
          + version
          + suite_spec
          + nonce_c 
          + dh_keyshare_c         ------->
                                              SERVERINITANDATTEST ^ < Hk
+                                                        length + |
                                                        version + | 
                                                     suite_spec + | 
                                                  dh_keyshare_s + | 
+                                                 server_cookie + |
                                                  {certificate} + | 
-                                                 {signature_s} + |
-                                 <-------      {server_cookie} + v 
+                                 <-------        {signature_s} + v 
   Hk > ^ SESSION_CLIENTATTEST 
+       | + length
        | + version
        | + suite_spec
        | + server_cookie
@@ -338,23 +346,24 @@ in ({{record-protocol}}).
        | + {id_c}
        v + {signature_c}
   Sk > ^ (RECORDREGULAR)
+       | + (length)
        | + (version)
        | + (session_id)
        | + (seq_num)
-       | + (length)
        | + ([payload_type])
        v + ([payload])           ------->
                                           SESSION_SERVERFINISHED ^ < Sk
+                                                        length + |
                                                        version + |
                                                     suite_spec + |
                                                   {session_id} + |
                                  <-------    {awareness_proof} + v
 
   Sk > ^ RECORDREGULAR                             RECORDREGULAR ^ < Sk
+       | + length                                       length + |
        | + version                                     version + |
        | + session_id                               session_id + |
        | + seq_num                                     seq_num + |
-       | + length                                       length + |
        | + [payload_type]                       [payload_type] + |
        v + [payload]             <------>            [payload] + v
   
@@ -396,6 +405,7 @@ Structure of this message:
 ~~~
 struct {
     MsgType type = client_init;
+    MsgLength length;
     Version version;
     SuiteSpec suite_spec;
     SigningNonce nonce_c;
@@ -420,20 +430,21 @@ proves return-routability; see ({{server-cookie-and-dos-attacks}}).
 
 The message is AEAD-protected (using the algorithm specified in the suite_spec)
 using the `server_handshake_send_key` and `server_handshake_send_iv`.
-The `signature_s` and `certificate` are created as described in ({{serversignature}}).
+The `signature_s` and `certificate` are created as described in ({{longtermsignature}}).
 
 Structure of this message:
 
 ~~~
 aead_struct<server_handshake_send_keys>(
     MsgType type = server_init_and_attest;
+    MsgLength length;
     Version version;
     SuiteSpec suite_spec;
     DHKeyShare dh_keyshare_s;
+    ServerCookie server_cookie;
 )[
     ServerCertificate certificate;
-    ServerSignature signature_s;
-    ServerCookie server_cookie;
+    LongtermSignature signature_s;
 ] ServerInitAndAttest;
 ~~~
 
@@ -468,12 +479,15 @@ Structure of this message:
 ~~~
 aead_struct<client_handshake_send_keys>(
     MsgType type =  MsgType.id_clientattest;
+    MsgLength length;
     Version version;
     SuiteSpec suite_spec;
     ServerCookie server_cookie;     /* echo from server */
 }[
-    DAAGroupKey daa_gpk;
+    LongtermKey longterm_key;
+    DAAGroupID daa_gid;
     ClientID id_c;                  /* all zeroes if not specific id */
+    LongtermSignature longterm_signature;
     DAASignature daa_signature_c;
 ] ClientIdentity_ClientAttest;
 ~~~
@@ -488,29 +502,26 @@ the server responds with a ClientIdentity_ServerFinished message.
 The ClientIdentity_ServerFinished message informs the client of the
 ClientID that has been provisioned to it
 (either echoing the same `id_c` requested in the ClientAttest
-message or sending the newly-provisioned id if `id_c` was all zeroes).
-In addition, the ServerFinished message contains
-a hash of the successful handshake, authenticated
-using a key derived from the LongtermSecret that has been provisioned.
+message or sending the newly-provisioned id if `id_c` was all zeroes),
+as well as confirms the LongtermKey that the client sent.
 This is to provide 'peer-awareness' to the client, so the client
 and server can confirm they have the same view of the provisioned
-ClientID and LongtermSecret.
+ClientID and LongtermKey.
 
 The message is AEAD-protected (using the algorithm specified in the suite_spec)
 using the `server_handshake_send_key` and `server_handshake_send_iv`.
-The `awareness_proof` is given by `identity_awareness_proof`,
-as described in ({{xtt-psk-schedule}}).
 
 Structure of this message:
 
 ~~~
 aead_struct<server_handshake_send_keys>(
     MsgType type = MsgType.id_serverfinished;
+    MsgLength length;
     Version version;
     SuiteSpec suite_spec;
 )[
     ClientID id_c;     /* confirm id of client */
-    AwarenessProof awareness_proof;
+    LongtermKey longterm_key_c; /* confirm key of client
 ] ClientIdentity_ServerFinished;
 ~~~
 
@@ -539,20 +550,21 @@ the `session_id` field MUST be set to all zeroes.
 
 The message is AEAD-protected (using the algorithm specified in the suite_spec)
 using the `client_handshake_send_key` and `client_handshake_send_iv`.
-The `signature_c` is created as described in ({{symmetricsignature}}).
+The `signature_c` is created as described in ({{longtermsignature}}).
 
 Structure of this message:
 
 ~~~
 aead_struct<client_handshake_send_keys>(
     MsgType type =  MsgType.session_clientattest;
+    MsgLength length;
     Version version;
     SuiteSpec spec;
     ServerCookie server_cookie;     /* echo from server */
 }[
     SessionID session_id;           /* all zeroes if not specific id */
     ClientID id_c;                  /* from previous identity handshake */
-    SymmetricSignature signature_c;
+    LongtermSignature signature_c;
 ] Session_ClientAttest;
 ~~~
 
@@ -577,13 +589,14 @@ secrets necessary for secure communication.
 The message is AEAD-protected (using the algorithm specified in the suite_spec)
 using the `server_handshake_send_key` and `server_handshake_send_iv`.
 The `awareness_proof` is given by `session_awareness_proof`,
-as described in ({{xtt-session-schedule}}).
+as described in ({{xtt-session-key-schedule}}).
 
 Structure of this message:
 
 ~~~
 aead_struct<session_keys>(
     MsgType type = MsgType.session_serverfinished;
+    MsgLength length;
     Version version;
     SuiteSpec spec;
 )[
@@ -633,10 +646,10 @@ the server MUST ignore the the extra messages.
 ~~~
 aead_struct<session_keys>(
     MsgType type = MsgType.record_regular;
+    MsgLength length;
     Version version;
     SessionID session_id;
     SequenceNumber seq_num;
-    MsgLength length;
 )[
     EncapsulatedPayloadType payload_type;
     byte payload[length - sizeof(rest_of_message)];
@@ -645,7 +658,22 @@ aead_struct<session_keys>(
 
 # Error Handling
 
-(TODO)
+During a handshake, if any error is encountered,
+the party recognizing the error SHOULD send an `Error` message
+and MUST terminate the connection (if using a connection-oriented transport layer)
+and MUST cease the handshake with the other party (i.e., if this is a server,
+only a `ClientInit` may be accepted from the client, and if this is a client,
+the handshake must be restarted).
+
+~~~
+struct {
+    MsgType type = error;
+    MsgLength length;
+    Version version;
+} Error;
+~~~
+
+(TODO) Session-layer error handling.
 
 # Cryptographic Computations
 
@@ -669,7 +697,7 @@ For the case of the BLAKE2b-based suite_spec options,
 In addition, a non-keyed hash, denoted `hash`, will be referenced here.
 For the SHA512-based suite_spec options, this is just SHA-512.
 For the BLAKE2b-based suite_specs, this is Blake2b with
-a zero-length key.
+a zero-length key and 64-byte output.
 
 The hashes used in the cryptographic computations described below
 use a construction denoted `hash_ext`, which appends the input length
@@ -727,14 +755,30 @@ HandshakeKeyHash =
 ~~~
 
 ~~~
-ClientSigHash =
+ClientLongtermSigHash =
     hash_ext(
         hash_ext(
             ClientInit ||
             ServerInitAndAttest-up-to-cookie
         ) ||
         server_cookie ||
-        ClientAttest-up-to-signature
+        certificate ||
+        signature_s ||
+        Identity_ClientAttest-up-to-longterm_signature
+    )
+~~~
+
+~~~
+ClientDAASigHash =
+    hash_ext(
+        hash_ext(
+            ClientInit ||
+            ServerInitAndAttest-up-to-cookie
+        ) ||
+        server_cookie ||
+        certificate ||
+        signature_s ||
+        Identity_ClientAttest-up-to-daa_signature
     )
 ~~~
 
@@ -746,20 +790,10 @@ SessionHash =
             ServerInitAndAttest-up-to-cookie
         ) ||
         server_cookie ||
-        ClientAttest
-    )
-~~~
-
-~~~
-ServerFinishedHash =
-    hash_ext(
-        hash_ext(
-            ClientInit ||
-            ServerInitAndAttest-up-to-cookie
-        ) ||
-        server_cookie ||
-        ClientAttest ||
-        ServerFinished-up-to-ctx
+        certificate ||
+        signature_s ||
+        Session_ClientAttest
+        Session_ServerFinished-up-to-awareness_proof
     )
 ~~~
 
@@ -767,120 +801,92 @@ ServerFinishedHash =
 Multiple secret materials are derived from the same input key
 by including different handshake context into the call to `prf`.
 These contexts are defined in {{xtt-context-table}} below,
-and their use is shown in {{xtt-handshake-schedule}},
-{{xtt-psk-schedule}}, and {{xtt-session-schedule}}.
+and their use is shown in {{xtt-id-key-schedule}} and {{xtt-session-key-schedule}}.
 
 | Context                       | Definition                                                  |
 |:----------------------------- | -----------------------------------------------------------:|
-| ClientHandshakeKeyContext     | "XTT handshake client key" \|\| HandshakeKeyHash            |
-| ClientHandshakeIVContext      | "XTT handshake client iv" \|\| HandshakeKeyHash             |
-| ServerHandshakeKeyContext     | "XTT handshake server key" \|\| HandshakeKeyHash            |
-| ServerHandshakeIVContext      | "XTT handshake server iv" \|\| HandshakeKeyHash             |
-| LongtermSharedSecretContext   | "XTT long-term secret" \|\| ServerFinishedHash              |
-| IdentityFinishedContext       | "XTT identity awareness" \|\| ServerFinishedHash            |
-| LongtermSecretKeyContext      | "XTT long-term secret key" \|\| ServerFinishedHash          |
-| ClientSessionKeyContext       | "XTT session client key" \|\| SessionHash                   |
-| ClientSessionIVContext        | "XTT session client iv" \|\| SessionHash                    |
-| ServerSessionKeyContext       | "XTT session server key" \|\| SessionHash                   |
-| ServerSessionIVContext        | "XTT session server iv" \|\| SessionHash                    |
-| SessionFinishedContext        | "XTT session awareness" \|\| SessionHash                    |
+| ClientHandshakeKeyContext     | ( HandshakeKeyHash   \|\| "XTT handshake client key" )      |
+| ClientHandshakeIVContext      | ( HandshakeKeyHash   \|\| "XTT handshake client iv" )       |
+| ServerHandshakeKeyContext     | ( HandshakeKeyHash   \|\| "XTT handshake server key" )      |
+| ServerHandshakeIVContext      | ( HandshakeKeyHash   \|\| "XTT handshake server iv" )       |
+| ClientSessionKeyContext       | ( SessionHash        \|\| "XTT session client key" )        |
+| ClientSessionIVContext        | ( SessionHash        \|\| "XTT session client iv" )         |
+| ServerSessionKeyContext       | ( SessionHash        \|\| "XTT session server key" )        |
+| ServerSessionIVContext        | ( SessionHash        \|\| "XTT session server iv" )         |
+| SessionFinishedContext        | ( SessionHash        \|\| "XTT session awareness" )         |
 {: #xtt-context-table title="Context Strings for Secret Material Derivation"}
 
 The prf is drawn as taking the key argument from the left
 and outputting downward.
 `DH-shared-secret` is the result of running Diffie-Hellman
 using the keys exchanged during the handshake,
-and `key_size` and `iv_size` are the key- and nonce-sizes
-(respectively) for the AEAD algorithm determined by the suite_spec.
+`key_size` and `iv_size` are the key- and nonce-sizes
+(respectively) for the AEAD algorithm determined by the suite_spec,
+and `hash_size` is the hash-out-size for the underlying hash function used.
+A key value of `0` indicates a `hash_size`-length key of zeroes.
 
 ~~~
-  (nonce_c | server_cookie)
-     |      
-     |      
-     +--> prf<sizeof(LongtermSecret)>(DH-shared-secret)
-           |
-           +--> prf<key_size>(ClientHandshakeKeyContext)
-           |     |
-           |     +--> client_handshake_send_key
-           |     |
-           |     +--> server_handshake_receive_key
-           |
-           +--> prf<iv_size>(ClientHandshakeIVContext)
-           |     |
-           |     +--> client_handshake_send_iv
-           |     |
-           |     +--> server_handshake_receive_iv
-           |
-           +--> prf<key_size>(ServerHandshakeKeyContext)
-           |     |
-           |     +--> client_handshake_receive_key
-           |     |
-           |     +--> server_handshake_send_key
-           |
-           +--> prf<iv_size>(ServerHandshakeIVContext)
-           |     |
-           |     +--> client_handshake_receive_iv
-           |     |
-           |     +--> server_handshake_send_iv
-           |
-           +--> handshake_secret
+  0--> prf_ext<hash_size>(DH-shared-secret)
+        |
+        +--> prf_ext<key_size>(ClientHandshakeKeyContext)
+        |     |
+        |     +--> client_handshake_send_key
+        |     |
+        |     +--> server_handshake_receive_key
+        |
+        +--> prf_ext<iv_size>(ClientHandshakeIVContext)
+        |     |
+        |     +--> client_handshake_send_iv
+        |     |
+        |     +--> server_handshake_receive_iv
+        |
+        +--> prf_ext<key_size>(ServerHandshakeKeyContext)
+        |     |
+        |     +--> client_handshake_receive_key
+        |     |
+        |     +--> server_handshake_send_key
+        |
+        +--> prf_ext<iv_size>(ServerHandshakeIVContext)
+              |
+              +--> client_handshake_receive_iv
+              |
+              +--> server_handshake_send_iv
+               
 ~~~
-{: #xtt-handshake-schedule title="Key Schedule for Handshake Keys"}
+{: #xtt-id-key-schedule title="Identity Key Schedule"}
 
 ~~~
-  handshake_secret
-     |      
-     |      
-     +--> prf<sizeof(LongtermSecret)>(ClientID)
-           |
-           +--> prf<sizeof(LongtermSecret)>(LongtermSharedSecretContext)
-           |     |
-           |     +--> longterm_client_shared_secret
-           |
-           +--> prf<sizeof(AwarenessProof)>(IdentityFinishedContext)
-           |     |
-           |     +--> identity_awareness_proof
-           |
-           +--> prf<sizeof(LongtermSignatureKey)>(LongtermSecretKeyContext)
-                 |
-                 +--> longterm_client_shared_secret_key
+  0--> prf_ext<hash_size>(DH-shared-secret)
+        |
+        +--> prf_ext<key_size>(ClientSessionKeyContext)
+        |     |
+        |     +--> client_session_send_key
+        |     |
+        |     +--> server_session_receive_key
+        |
+        +--> prf_ext<iv_size>(ClientSessionIVContext)
+        |     |
+        |     +--> client_session_send_iv
+        |     |
+        |     +--> server_session_receive_iv
+        |
+        +--> prf_ext<key_size>(ServerSessionKeyContext)
+        |     |
+        |     +--> client_session_receive_key
+        |     |
+        |     +--> server_session_send_key
+        |
+        +--> prf_ext<iv_size>(ServerSessionIVContext)
+        |     |
+        |     +--> client_session_receive_iv
+        |     |
+        |     +--> server_session_send_iv
+        |
+        +--> prf_ext<sizeof(AwarenessProof)>(SessionFinishedContext)
+              |
+              +--> session_awareness_proof
 ~~~
-{: #xtt-psk-schedule title="Derivation of Longterm-Shared-Secret"}
-
-~~~
-  handshake_secret
-     |      
-     |      
-     +--> prf<sizeof(LongtermSecret)>(longterm_client_shared_secret)
-           |
-           +--> prf<key_size>(ClientSessionKeyContext)
-           |     |
-           |     +--> client_session_send_key
-           |     |
-           |     +--> server_session_receive_key
-           |
-           +--> prf<iv_size>(ClientSessionIVContext)
-           |     |
-           |     +--> client_session_send_iv
-           |     |
-           |     +--> server_session_receive_iv
-           |
-           +--> prf<key_size>(ServerSessionKeyContext)
-           |     |
-           |     +--> client_session_receive_key
-           |     |
-           |     +--> server_session_send_key
-           |
-           +--> prf<iv_size>(ServerSessionIVContext)
-           |     |
-           |     +--> client_session_receive_iv
-           |     |
-           |     +--> server_session_send_iv
-           +--> prf<sizeof(AwarenessProof)>(SessionFinishedContext)
-                 |
-                 +--> session_awareness_proof
-~~~
-{: #xtt-session-schedule title="Key Schedule for Handshake Keys"}
+{: #xtt-session-key-schedule title="Session Key Schedule"}
 
 ## ECDHE Parameters
 The size and interpretation of a value of type DHKeyShare
@@ -895,26 +901,23 @@ The size of the DHKeyShare in this case is 32 bytes.
 ## DAA Parameters
 (TODO)
 
-EPID2, TPM2.0, and FIDO key/signature sizes.
+LRSWTPM and LRSW key/signature sizes.
 
 ## Signature Algorithms
 The size and interpretation of signature types (signatures and public keys)
 depends on the signature algorithm.
 
-### ServerSignature
+### LongtermSignature
 Currently, the only supported algorithm for the
-server's signature in a ServerInitAndAttest is
+longterm signature is
 an EdDSA signature (described in {{RFC8032}}) using the X25519 elliptic curve
 (this combination is known as Ed25519).
 
-For Ed25519, the contents of ServerSignaturePublicKey are the byte string
+For Ed25519, the contents of LongtermKey are the byte string
 output of the key generation described in {{RFC8032}}, where the byte string
 format is defined in {{RFC7748}}.
-Similarly, the content of ServerSignature are the byte string output
+Similarly, the content of LongtermSignature are the byte string output
 of the signature algorithm of {{RFC8032}} in the format of {{RFC7748}}.
-
-### SymmetricSignature
-(TODO)
 
 ### DAASignature
 (TODO)
@@ -1224,8 +1227,7 @@ This section describes protocol types and constants.
 enum : uint8 {
     client_identity_client_init(0x11),
     client_identity_server_init_and_attest(0x12),
-    id_clientattest_nopayload(0x13),
-    id_clientattest_payload(0x14),
+    id_clientattest(0x13),
     id_serverfinished(0x15),
     session_client_init(0x21),
     session_server_init_and_attest(0x22),
@@ -1233,7 +1235,7 @@ enum : uint8 {
     session_clientattest_payload(0x24),
     session_serverfinished(0x25),
     record_regular(0x31),
-    alert(0x41)
+    error(0x41)
 } MsgType;
 ~~~
 
@@ -1247,12 +1249,12 @@ enum : uint8 {
 
 ~~~
 enum : uint16 {
-    x25519_epid2_ed25519_chacha20poly1305_sha512(1),
-    x25519_epid2_ed25519_chacha20poly1305_blake2b(2),
-    x25519_epid2_ed25519_aes256gcm_sha512(3),
-    x25519_epid2_ed25519_aes256gcm_blake2b(4),
-    x25519_epid2_ed25519_null_sha512(5),
-    x25519_epid2_ed25519_null_blake2b(6)
+    x25519_lrsw_ed25519_chacha20poly1305_sha512(1),
+    x25519_lrsw_ed25519_chacha20poly1305_blake2b(2),
+    x25519_lrsw_ed25519_aes256gcm_sha512(3),
+    x25519_lrsw_ed25519_aes256gcm_blake2b(4),
+    x25519_lrsw_ed25519_null_sha512(5),
+    x25519_lrsw_ed25519_null_blake2b(6)
 } SuiteSpec;
 ~~~
 
@@ -1269,10 +1271,6 @@ byte ClientID[16];
 ~~~
 
 ~~~
-byte LongtermSecret[64];
-~~~
-
-~~~
 byte AwarenessProof[16];
 ~~~
 
@@ -1283,23 +1281,15 @@ byte DHKeyShare[<size of public key for this algorithm>];
 ### Signature Types
 
 ~~~
-byte SymmetricSignature[<size of prf output>];
+byte LongtermSignature[<size of signature for this algorithm>];
 ~~~
 
 ~~~
-byte SymmetricSignatureKey[64];
+byte LongtermKey[<size of public key for this algorithm>];
 ~~~
 
 ~~~
-byte ServerSignature[<size of signature for this algorithm>];
-~~~
-
-~~~
-byte ServerSignaturePublicKey[<size of public key for this algorithm>];
-~~~
-
-~~~
-byte DAAGroupKey[<size of group public key for this algorithm>];
+byte DAAGroupID[32];
 ~~~
 
 ~~~
@@ -1310,41 +1300,25 @@ byte DAASignature[<size of signature for this algorithm>];
 
 ~~~
 enum : uint8 {
-    one(1)
-} ServerCertificateVersion;
-~~~
-
-~~~
-byte Date[8];   /* YYYYMMDD according to UTC */
+    ed25519(1)
+} RootAlgType;
 ~~~
 
 ~~~
 struct {
-    ServerCertificateVersion version;
-    Date expiry;
     ClientID id;
-    ServerSignaturePublicKey public_key;
-    ServerIntermediateCertificate signers_certificate;
-    ServerSignature signers_signature;
+    byte expiry[8];   /* YYYYMMDD in UTC, as ASCII-encoded numbers */
+    byte root_id[16];       /* ServerRootCertificate to use */
+    LongtermKey public_key;
+    LongtermSignature root_signature;
 } ServerCertificate;
 ~~~
 
 ~~~
 struct {
-    ServerSignatureVersion version;
-    Date expiry;
-    ServerSignaturePublicKey public_key;
-    byte root_id[32];       /* ServerRootCertificate to use */
-    ServerSignature root_signature;
-} ServerIntermediateCertificate;
-~~~
-
-~~~
-struct {
-    ServerSignatureVersion version;
-    Date expiry;
-    ServerSignaturePublicKey public_key;
-    byte id[32];
+    RootAlgType type;
+    byte id[16];
+    LongtermKey public_key;
 } ServerRootCertificate;
 ~~~
 
