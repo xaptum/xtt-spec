@@ -1299,12 +1299,6 @@ byte DAASignature[<size of signature for this algorithm>];
 ### Server Certificates
 
 ~~~
-enum : uint8 {
-    ed25519(1)
-} RootAlgType;
-~~~
-
-~~~
 struct {
     ClientID id;
     byte expiry[8];   /* YYYYMMDD in UTC, as ASCII-encoded numbers */
@@ -1312,14 +1306,6 @@ struct {
     LongtermKey public_key;
     LongtermSignature root_signature;
 } ServerCertificate;
-~~~
-
-~~~
-struct {
-    RootAlgType type;
-    byte id[16];
-    LongtermKey public_key;
-} ServerRootCertificate;
 ~~~
 
 ## Record Layer
