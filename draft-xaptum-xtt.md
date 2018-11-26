@@ -42,7 +42,6 @@ normative:
   RFC7539:
   RFC7693:
   RFC7748:
-  RFC8032:
   
   SHS:
        title: Secure Hash Standard
@@ -51,6 +50,21 @@ normative:
          org: National Institute of Standards and Technology
        seriesinfo:
          NIST: FIPS PUB 180-4
+
+  X962:
+       title: "Public Key Cryptography For The Financial Services Industry: The Elliptic Curve Digital Signature Algorithm (ECDSA)"
+       date: 1998
+       author:
+         org: American National Standards Institute
+       seriesinfo:
+         ANSI: X9.62
+
+  SECG-SEC2:
+       title: "SEC 2: Recommended Elliptic Curve Domain Parameters"
+       date: 2010-01
+       author:
+         org: Certicom Research
+       seriesinfo: Standards for Efficient Cryptography 2 (SEC 2)
 
 informative:
   RFC2119:
@@ -910,14 +924,13 @@ depends on the signature algorithm.
 ### LongtermSignature
 Currently, the only supported algorithm for the
 longterm signature is
-an EdDSA signature (described in {{RFC8032}}) using the X25519 elliptic curve
-(this combination is known as Ed25519).
-
-For Ed25519, the contents of LongtermKey are the byte string
-output of the key generation described in {{RFC8032}}, where the byte string
-format is defined in {{RFC7748}}.
-Similarly, the content of LongtermSignature are the byte string output
-of the signature algorithm of {{RFC8032}} in the format of {{RFC7748}}.
+an ECDSA signature (described in {{X962}}) using the secp256r1 elliptic curve
+defined in {{SECG-SEC2}} (this curve is also frequently referred to as "p-256").
+The content of LongtermKey are the octet string of the public key
+point as defined in {{X962}}; implementations MUST support uncompressed format curve points, and MAY
+support compressed format.
+The content of LongtermSignature is the concatenation of the octet string
+representations of the `r` and `s` values of the signature as defined in {{X962}}.
 
 ### DAASignature
 (TODO)
