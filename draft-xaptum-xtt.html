@@ -1171,8 +1171,7 @@ SessionHash =
 <h3 id="rfc.section.6.6.1">
 <a href="#rfc.section.6.6.1">6.6.1.</a> <a href="#longtermsignature" id="longtermsignature">LongtermSignature</a>
 </h3>
-<p id="rfc.section.6.6.1.p.1">Currently, the only supported algorithm for the longterm signature is an EdDSA signature (described in <a href="#RFC8032" class="xref">[RFC8032]</a>) using the X25519 elliptic curve (this combination is known as Ed25519).</p>
-<p id="rfc.section.6.6.1.p.2">For Ed25519, the contents of LongtermKey are the byte string output of the key generation described in <a href="#RFC8032" class="xref">[RFC8032]</a>, where the byte string format is defined in <a href="#RFC7748" class="xref">[RFC7748]</a>.  Similarly, the content of LongtermSignature are the byte string output of the signature algorithm of <a href="#RFC8032" class="xref">[RFC8032]</a> in the format of <a href="#RFC7748" class="xref">[RFC7748]</a>.</p>
+<p id="rfc.section.6.6.1.p.1">Currently, the only supported algorithm for the longterm signature is an ECDSA signature (described in <a href="#X962" class="xref">[X962]</a>) using the secp256r1 elliptic curve defined in <a href="#SECG-SEC2" class="xref">[SECG-SEC2]</a> (this curve is also frequently referred to as &#8220;p-256&#8221;).  The content of LongtermKey are the octet string of the public key point as defined in <a href="#X962" class="xref">[X962]</a>; implementations MUST support uncompressed format curve points, and MAY support compressed format.  The content of LongtermSignature is the concatenation of the octet string representations of the <samp>r</samp> and <samp>s</samp> values of the signature as defined in <a href="#X962" class="xref">[X962]</a>.</p>
 <h3 id="rfc.section.6.6.2">
 <a href="#rfc.section.6.6.2">6.6.2.</a> <a href="#daasignature" id="daasignature">DAASignature</a>
 </h3>
@@ -1226,14 +1225,19 @@ SessionHash =
 <a>Langley, A.</a>, <a>Hamburg, M.</a> and <a>S. Turner</a>, "<a href="https://tools.ietf.org/html/rfc7748">Elliptic Curves for Security</a>", RFC 7748, DOI 10.17487/RFC7748, January 2016.</td>
 </tr>
 <tr>
-<td class="reference"><b id="RFC8032">[RFC8032]</b></td>
+<td class="reference"><b id="SECG-SEC2">[SECG-SEC2]</b></td>
 <td class="top">
-<a>Josefsson, S.</a> and <a>I. Liusvaara</a>, "<a href="https://tools.ietf.org/html/rfc8032">Edwards-Curve Digital Signature Algorithm (EdDSA)</a>", RFC 8032, DOI 10.17487/RFC8032, January 2017.</td>
+<a>Certicom Research</a>, "<a>SEC 2: Recommended Elliptic Curve Domain Parameters</a>", Standards for Efficient Cryptography 2 (SEC 2) , January 2010.</td>
 </tr>
 <tr>
 <td class="reference"><b id="SHS">[SHS]</b></td>
 <td class="top">
 <a>National Institute of Standards and Technology</a>, "<a>Secure Hash Standard</a>", NIST FIPS PUB 180-4, March 2012.</td>
+</tr>
+<tr>
+<td class="reference"><b id="X962">[X962]</b></td>
+<td class="top">
+<a>American National Standards Institute</a>, "<a>Public Key Cryptography For The Financial Services Industry: The Elliptic Curve Digital Signature Algorithm (ECDSA)</a>", ANSI X9.62, 1998.</td>
 </tr>
 </tbody></table>
 <h2 id="rfc.references.2">

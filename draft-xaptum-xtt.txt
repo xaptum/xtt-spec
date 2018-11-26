@@ -114,14 +114,14 @@ Beckwith & Bild           Expires May 30, 2019                  [Page 2]
 Internet-Draft                     XTT                     November 2018
 
 
-     A.2.  Session Establishment Handshake . . . . . . . . . . . . .  25
-       A.2.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  25
+     A.2.  Session Establishment Handshake . . . . . . . . . . . . .  26
+       A.2.1.  Client  . . . . . . . . . . . . . . . . . . . . . . .  26
        A.2.2.  Server  . . . . . . . . . . . . . . . . . . . . . . .  26
    Appendix B.  Presentation Language  . . . . . . . . . . . . . . .  26
      B.1.  Miscellaneous . . . . . . . . . . . . . . . . . . . . . .  26
      B.2.  Definition of Byte  . . . . . . . . . . . . . . . . . . .  26
      B.3.  Byte Arrays . . . . . . . . . . . . . . . . . . . . . . .  26
-     B.4.  Numeric Data  . . . . . . . . . . . . . . . . . . . . . .  26
+     B.4.  Numeric Data  . . . . . . . . . . . . . . . . . . . . . .  27
      B.5.  Enumerateds . . . . . . . . . . . . . . . . . . . . . . .  27
      B.6.  Constructed Types . . . . . . . . . . . . . . . . . . . .  28
      B.7.  AEAD-Encrypted Constructed Types  . . . . . . . . . . . .  28
@@ -129,16 +129,16 @@ Internet-Draft                     XTT                     November 2018
      B.9.  Variants  . . . . . . . . . . . . . . . . . . . . . . . .  29
    Appendix C.  Protocol Data Structures and Constant Values . . . .  30
      C.1.  Common Message Header . . . . . . . . . . . . . . . . . .  30
-     C.2.  Handshakes  . . . . . . . . . . . . . . . . . . . . . . .  30
+     C.2.  Handshakes  . . . . . . . . . . . . . . . . . . . . . . .  31
        C.2.1.  Signature Types . . . . . . . . . . . . . . . . . . .  31
        C.2.2.  Server Certificates . . . . . . . . . . . . . . . . .  31
      C.3.  Record Layer  . . . . . . . . . . . . . . . . . . . . . .  31
-   Appendix D.  Implementation Notes . . . . . . . . . . . . . . . .  31
-     D.1.  Distributed Servers and Proxies . . . . . . . . . . . . .  31
+   Appendix D.  Implementation Notes . . . . . . . . . . . . . . . .  32
+     D.1.  Distributed Servers and Proxies . . . . . . . . . . . . .  32
      D.2.  Server Cookie and DoS Attacks . . . . . . . . . . . . . .  32
      D.3.  Underlying Transport Protocol . . . . . . . . . . . . . .  32
      D.4.  Cryptographic Requirements  . . . . . . . . . . . . . . .  32
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  32
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  33
 
 1.  Introduction
 
@@ -1186,14 +1186,14 @@ Internet-Draft                     XTT                     November 2018
 6.6.1.  LongtermSignature
 
    Currently, the only supported algorithm for the longterm signature is
-   an EdDSA signature (described in [RFC8032]) using the X25519 elliptic
-   curve (this combination is known as Ed25519).
-
-   For Ed25519, the contents of LongtermKey are the byte string output
-   of the key generation described in [RFC8032], where the byte string
-   format is defined in [RFC7748].  Similarly, the content of
-   LongtermSignature are the byte string output of the signature
-   algorithm of [RFC8032] in the format of [RFC7748].
+   an ECDSA signature (described in [X962]) using the secp256r1 elliptic
+   curve defined in [SECG-SEC2] (this curve is also frequently referred
+   to as "p-256").  The content of LongtermKey are the octet string of
+   the public key point as defined in [X962]; implementations MUST
+   support uncompressed format curve points, and MAY support compressed
+   format.  The content of LongtermSignature is the concatenation of the
+   octet string representations of the "r" and "s" values of the
+   signature as defined in [X962].
 
 6.6.2.  DAASignature
 
@@ -1308,13 +1308,18 @@ Internet-Draft                     XTT                     November 2018
               for Security", RFC 7748, DOI 10.17487/RFC7748, January
               2016, <https://www.rfc-editor.org/info/rfc7748>.
 
-   [RFC8032]  Josefsson, S. and I. Liusvaara, "Edwards-Curve Digital
-              Signature Algorithm (EdDSA)", RFC 8032,
-              DOI 10.17487/RFC8032, January 2017,
-              <https://www.rfc-editor.org/info/rfc8032>.
+   [SECG-SEC2]
+              Certicom Research, "SEC 2: Recommended Elliptic Curve
+              Domain Parameters", Standards for Efficient Cryptography 2
+              (SEC 2) , January 2010.
 
    [SHS]      National Institute of Standards and Technology, "Secure
               Hash Standard", NIST FIPS PUB 180-4, March 2012.
+
+   [X962]     American National Standards Institute, "Public Key
+              Cryptography For The Financial Services Industry: The
+              Elliptic Curve Digital Signature Algorithm (ECDSA)",
+              ANSI X9.62, 1998.
 
 8.2.  Informative References
 
@@ -1333,11 +1338,6 @@ Internet-Draft                     XTT                     November 2018
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/info/rfc2119>.
 
-   [RFC3552]  Rescorla, E. and B. Korver, "Guidelines for Writing RFC
-              Text on Security Considerations", BCP 72, RFC 3552,
-              DOI 10.17487/RFC3552, July 2003,
-              <https://www.rfc-editor.org/info/rfc3552>.
-
 
 
 
@@ -1345,6 +1345,11 @@ Beckwith & Bild           Expires May 30, 2019                 [Page 24]
 
 Internet-Draft                     XTT                     November 2018
 
+
+   [RFC3552]  Rescorla, E. and B. Korver, "Guidelines for Writing RFC
+              Text on Security Considerations", BCP 72, RFC 3552,
+              DOI 10.17487/RFC3552, July 2003,
+              <https://www.rfc-editor.org/info/rfc3552>.
 
    [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
               (TLS) Protocol Version 1.2", RFC 5246,
@@ -1386,11 +1391,6 @@ A.1.2.  Server
 
    (TODO)
 
-A.2.  Session Establishment Handshake
-
-A.2.1.  Client
-
-   (TODO)
 
 
 
@@ -1401,6 +1401,12 @@ Beckwith & Bild           Expires May 30, 2019                 [Page 25]
 
 Internet-Draft                     XTT                     November 2018
 
+
+A.2.  Session Establishment Handshake
+
+A.2.1.  Client
+
+   (TODO)
 
 A.2.2.  Server
 
@@ -1442,13 +1448,7 @@ B.3.  Byte Arrays
    Unless defined as a numeric data type, the bytes comprising a byte-
    array are not to be interpreted by the protocol in any way.
 
-B.4.  Numeric Data
 
-   A type defined as an n-byte numeric value indicates that the byte
-   stream is interpreted (using C notation) as:
-
-   numeric_value = (byte[0] << 8*(n-1)) | (byte[1] << 8*(n-2)) |
-           ... | byte[n-1];
 
 
 
@@ -1457,6 +1457,14 @@ Beckwith & Bild           Expires May 30, 2019                 [Page 26]
 
 Internet-Draft                     XTT                     November 2018
 
+
+B.4.  Numeric Data
+
+   A type defined as an n-byte numeric value indicates that the byte
+   stream is interpreted (using C notation) as:
+
+   numeric_value = (byte[0] << 8*(n-1)) | (byte[1] << 8*(n-2)) |
+           ... | byte[n-1];
 
    This byte ordering for multi-byte values is the commonplace network
    byte order or big-endian format.  The pre-defined numeric types
@@ -1495,6 +1503,17 @@ B.5.  Enumerateds
    as uint16 values (thus a value of type Color occupies 2 bytes in the
    byte stream)
 
+
+
+
+
+
+
+Beckwith & Bild           Expires May 30, 2019                 [Page 27]
+
+Internet-Draft                     XTT                     November 2018
+
+
    enum : uint16 {
        Red(0x1234),
        Green(9),
@@ -1506,13 +1525,6 @@ B.5.  Enumerateds
    is always given by the fully-qualified form "Type.Name".  Thus a
    reference to the "Color" value "Blue" from above is given by
    "Color.Blue".
-
-
-
-Beckwith & Bild           Expires May 30, 2019                 [Page 27]
-
-Internet-Draft                     XTT                     November 2018
-
 
 B.6.  Constructed Types
 
@@ -1544,6 +1556,20 @@ B.7.  AEAD-Encrypted Constructed Types
    [RFC5116].  To indicate that a constructed type is processed using an
    AEAD algorithm, the following notation is used:
 
+
+
+
+
+
+
+
+
+
+Beckwith & Bild           Expires May 30, 2019                 [Page 28]
+
+Internet-Draft                     XTT                     November 2018
+
+
    aead_struct<key_set>(
        addl1;
        addl2;
@@ -1561,15 +1587,6 @@ B.7.  AEAD-Encrypted Constructed Types
    "encN".  The keys (encryption key, authentication key, and nonce)
    used is given by "key_set".  The entire struct is authenticated.
    Note that the total length in the byte stream of a value of type "T"
-
-
-
-
-Beckwith & Bild           Expires May 30, 2019                 [Page 28]
-
-Internet-Draft                     XTT                     November 2018
-
-
    is the size of an authentication tag (determined by the chosen AEAD
    algorithm) in addition to the sum of the sizes of its subfields.
 
@@ -1599,6 +1616,16 @@ B.9.  Variants
 
    For example:
 
+
+
+
+
+
+Beckwith & Bild           Expires May 30, 2019                 [Page 29]
+
+Internet-Draft                     XTT                     November 2018
+
+
    uint8 SubT1;
    uint16 SubT2;
    struct {
@@ -1617,15 +1644,6 @@ B.9.  Variants
    name S, if "color_in" is "Red" then the subfield "S.variant_field" is
    of type "SubT1".  Alternatively, if "color_in" is either "Green" or
    "Blue", "S.variant_field" is of type "SubT2".  Note that the size of
-
-
-
-
-Beckwith & Bild           Expires May 30, 2019                 [Page 29]
-
-Internet-Draft                     XTT                     November 2018
-
-
    the type "VariantStruct" depends on the value of "color_in" at the
    time of construction.
 
@@ -1653,6 +1671,17 @@ C.1.  Common Message Header
        one(1)
    } Version;
 
+
+
+
+
+
+
+Beckwith & Bild           Expires May 30, 2019                 [Page 30]
+
+Internet-Draft                     XTT                     November 2018
+
+
 C.2.  Handshakes
 
    enum : uint16 {
@@ -1673,14 +1702,6 @@ C.2.  Handshakes
    byte AwarenessProof[16];
 
    byte DHKeyShare[<size of public key for this algorithm>];
-
-
-
-
-Beckwith & Bild           Expires May 30, 2019                 [Page 30]
-
-Internet-Draft                     XTT                     November 2018
-
 
 C.2.1.  Signature Types
 
@@ -1710,6 +1731,13 @@ C.3.  Record Layer
 
    uint16 MsgLength;
 
+
+
+Beckwith & Bild           Expires May 30, 2019                 [Page 31]
+
+Internet-Draft                     XTT                     November 2018
+
+
    enum : uint8 {
        queue_protocol(1),
        ipv6(2)
@@ -1729,15 +1757,6 @@ D.1.  Distributed Servers and Proxies
    Similarly, the protocol makes no requirement that the physical
    endpoint that completes the identity-provisioning handshake be the
    same physical endpoint to which this identity is given.  For example,
-
-
-
-
-Beckwith & Bild           Expires May 30, 2019                 [Page 31]
-
-Internet-Draft                     XTT                     November 2018
-
-
    a proxy capable of producing DAA signatures may request multiple
    distinct identities for the distinct endpoints behind it.
 
@@ -1765,6 +1784,16 @@ D.4.  Cryptographic Requirements
    (TODO) Requirements for identity-provisioning handshake, for session-
    establishment handshake, and for record-level communication.
 
+
+
+
+
+
+Beckwith & Bild           Expires May 30, 2019                 [Page 32]
+
+Internet-Draft                     XTT                     November 2018
+
+
 Authors' Addresses
 
    Zane Beckwith
@@ -1789,4 +1818,31 @@ Authors' Addresses
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 32]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Beckwith & Bild           Expires May 30, 2019                 [Page 33]
