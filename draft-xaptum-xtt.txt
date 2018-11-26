@@ -5,7 +5,7 @@
 Network Working Group                                        Z. Beckwith
 Internet-Draft                                                   D. Bild
 Intended status: Informational                              Xaptum, Inc.
-Expires: August 26, 2018                               February 22, 2018
+Expires: May 30, 2019                                  November 26, 2018
 
 
          The Xaptum Trusted Transit (XTT) Protocol Version 1.0
@@ -33,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 26, 2018.
+   This Internet-Draft will expire on May 30, 2019.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Beckwith & Bild          Expires August 26, 2018                [Page 1]
+Beckwith & Bild           Expires May 30, 2019                  [Page 1]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    This document may not be modified, and derivative works of it may not
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Beckwith & Bild          Expires August 26, 2018                [Page 2]
+Beckwith & Bild           Expires May 30, 2019                  [Page 2]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
      A.2.  Session Establishment Handshake . . . . . . . . . . . . .  25
@@ -134,7 +134,7 @@ Internet-Draft                     XTT                     February 2018
        C.2.2.  Server Certificates . . . . . . . . . . . . . . . . .  31
      C.3.  Record Layer  . . . . . . . . . . . . . . . . . . . . . .  31
    Appendix D.  Implementation Notes . . . . . . . . . . . . . . . .  31
-     D.1.  Distributed Servers and Proxies . . . . . . . . . . . . .  32
+     D.1.  Distributed Servers and Proxies . . . . . . . . . . . . .  31
      D.2.  Server Cookie and DoS Attacks . . . . . . . . . . . . . .  32
      D.3.  Underlying Transport Protocol . . . . . . . . . . . . . .  32
      D.4.  Cryptographic Requirements  . . . . . . . . . . . . . . .  32
@@ -165,9 +165,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018                [Page 3]
+Beckwith & Bild           Expires May 30, 2019                  [Page 3]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
       bandwidth.  XTT decouples the secure channel from the underlying
@@ -221,9 +221,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018                [Page 4]
+Beckwith & Bild           Expires May 30, 2019                  [Page 4]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    connection: A transport-layer connection between client and server,
@@ -277,9 +277,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018                [Page 5]
+Beckwith & Bild           Expires May 30, 2019                  [Page 5]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    (TODO) (1 list) what (D)TLS doesn't offer that IoT requires
@@ -333,9 +333,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018                [Page 6]
+Beckwith & Bild           Expires May 30, 2019                  [Page 6]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    (TODO) (1 list) what MinimalLT doesn't offer that IoT requires
@@ -389,9 +389,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018                [Page 7]
+Beckwith & Bild           Expires May 30, 2019                  [Page 7]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
          Client                                             Server
@@ -445,9 +445,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018                [Page 8]
+Beckwith & Bild           Expires May 30, 2019                  [Page 8]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
          Client                                             Server
@@ -501,9 +501,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018                [Page 9]
+Beckwith & Bild           Expires May 30, 2019                  [Page 9]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
                {}   Indicates data encrypted using handshake keys
@@ -557,9 +557,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 10]
+Beckwith & Bild           Expires May 30, 2019                 [Page 10]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    key, authenticates the server's identity, and provides the client
@@ -613,9 +613,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 11]
+Beckwith & Bild           Expires May 30, 2019                 [Page 11]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    specific ClientID be provisioned to it.  Otherwise, if the client
@@ -669,9 +669,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 12]
+Beckwith & Bild           Expires May 30, 2019                 [Page 12]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    aead_struct<server_handshake_send_keys>(
@@ -725,9 +725,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 13]
+Beckwith & Bild           Expires May 30, 2019                 [Page 13]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
 aead_struct<client_handshake_send_keys>(
@@ -781,9 +781,9 @@ aead_struct<client_handshake_send_keys>(
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 14]
+Beckwith & Bild           Expires May 30, 2019                 [Page 14]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
 3.4.  Behaviors Common to Both Handshake Protocols
@@ -837,9 +837,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 15]
+Beckwith & Bild           Expires May 30, 2019                 [Page 15]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    aead_struct<session_keys>(
@@ -893,9 +893,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 16]
+Beckwith & Bild           Expires May 30, 2019                 [Page 16]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    For the BLAKE2b-based suite_specs, this is Blake2b with a zero-length
@@ -949,9 +949,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 17]
+Beckwith & Bild           Expires May 30, 2019                 [Page 17]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    HandshakeKeyHash =
@@ -1005,9 +1005,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 18]
+Beckwith & Bild           Expires May 30, 2019                 [Page 18]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
 6.3.  Key Calculation and Schedule
@@ -1061,9 +1061,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 19]
+Beckwith & Bild           Expires May 30, 2019                 [Page 19]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
      0--> prf_ext<hash_size>(DH-shared-secret)
@@ -1117,9 +1117,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 20]
+Beckwith & Bild           Expires May 30, 2019                 [Page 20]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
      0--> prf_ext<hash_size>(DH-shared-secret)
@@ -1173,9 +1173,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 21]
+Beckwith & Bild           Expires May 30, 2019                 [Page 21]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
 6.6.  Signature Algorithms
@@ -1229,9 +1229,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 22]
+Beckwith & Bild           Expires May 30, 2019                 [Page 22]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
 7.  Security Considerations
@@ -1285,9 +1285,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 23]
+Beckwith & Bild           Expires May 30, 2019                 [Page 23]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    [RFC5869]  Krawczyk, H. and P. Eronen, "HMAC-based Extract-and-Expand
@@ -1341,9 +1341,9 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 24]
+Beckwith & Bild           Expires May 30, 2019                 [Page 24]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
@@ -1397,9 +1397,9 @@ A.2.1.  Client
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 25]
+Beckwith & Bild           Expires May 30, 2019                 [Page 25]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
 A.2.2.  Server
@@ -1453,9 +1453,9 @@ B.4.  Numeric Data
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 26]
+Beckwith & Bild           Expires May 30, 2019                 [Page 26]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    This byte ordering for multi-byte values is the commonplace network
@@ -1509,9 +1509,9 @@ B.5.  Enumerateds
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 27]
+Beckwith & Bild           Expires May 30, 2019                 [Page 27]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
 B.6.  Constructed Types
@@ -1565,9 +1565,9 @@ B.7.  AEAD-Encrypted Constructed Types
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 28]
+Beckwith & Bild           Expires May 30, 2019                 [Page 28]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    is the size of an authentication tag (determined by the chosen AEAD
@@ -1621,9 +1621,9 @@ B.9.  Variants
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 29]
+Beckwith & Bild           Expires May 30, 2019                 [Page 29]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
    the type "VariantStruct" depends on the value of "color_in" at the
@@ -1677,9 +1677,9 @@ C.2.  Handshakes
 
 
 
-Beckwith & Bild          Expires August 26, 2018               [Page 30]
+Beckwith & Bild           Expires May 30, 2019                 [Page 30]
 
-Internet-Draft                     XTT                     February 2018
+Internet-Draft                     XTT                     November 2018
 
 
 C.2.1.  Signature Types
@@ -1694,10 +1694,6 @@ C.2.1.  Signature Types
 
 C.2.2.  Server Certificates
 
-   enum : uint8 {
-       ed25519(1)
-   } RootAlgType;
-
    struct {
        ClientID id;
        byte expiry[8];   /* YYYYMMDD in UTC, as ASCII-encoded numbers */
@@ -1705,12 +1701,6 @@ C.2.2.  Server Certificates
        LongtermKey public_key;
        LongtermSignature root_signature;
    } ServerCertificate;
-
-   struct {
-       RootAlgType type;
-       byte id[16];
-       LongtermKey public_key;
-   } ServerRootCertificate;
 
 C.3.  Record Layer
 
@@ -1727,17 +1717,6 @@ C.3.  Record Layer
 
 Appendix D.  Implementation Notes
 
-
-
-
-
-
-
-Beckwith & Bild          Expires August 26, 2018               [Page 31]
-
-Internet-Draft                     XTT                     February 2018
-
-
 D.1.  Distributed Servers and Proxies
 
    Because the identity and session may be long-lived and are not tied
@@ -1750,6 +1729,15 @@ D.1.  Distributed Servers and Proxies
    Similarly, the protocol makes no requirement that the physical
    endpoint that completes the identity-provisioning handshake be the
    same physical endpoint to which this identity is given.  For example,
+
+
+
+
+Beckwith & Bild           Expires May 30, 2019                 [Page 31]
+
+Internet-Draft                     XTT                     November 2018
+
+
    a proxy capable of producing DAA signatures may request multiple
    distinct identities for the distinct endpoints behind it.
 
@@ -1785,15 +1773,6 @@ Authors' Addresses
    Email: zane.beckwith@xaptum.com
 
 
-
-
-
-
-Beckwith & Bild          Expires August 26, 2018               [Page 32]
-
-Internet-Draft                     XTT                     February 2018
-
-
    David R. Bild
    Xaptum, Inc.
 
@@ -1810,39 +1789,4 @@ Internet-Draft                     XTT                     February 2018
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Beckwith & Bild          Expires August 26, 2018               [Page 33]
+Beckwith & Bild           Expires May 30, 2019                 [Page 32]
