@@ -5,7 +5,7 @@
 Network Working Group                                        Z. Beckwith
 Internet-Draft                                                   D. Bild
 Intended status: Informational                              Xaptum, Inc.
-Expires: May 30, 2019                                  November 26, 2018
+Expires: June 1, 2019                                  November 28, 2018
 
 
          The Xaptum Trusted Transit (XTT) Protocol Version 1.0
@@ -33,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 30, 2019.
+   This Internet-Draft will expire on June 1, 2019.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Beckwith & Bild           Expires May 30, 2019                  [Page 1]
+Beckwith & Bild           Expires June 1, 2019                  [Page 1]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Beckwith & Bild           Expires May 30, 2019                  [Page 2]
+Beckwith & Bild           Expires June 1, 2019                  [Page 2]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -165,7 +165,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                  [Page 3]
+Beckwith & Bild           Expires June 1, 2019                  [Page 3]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -221,7 +221,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                  [Page 4]
+Beckwith & Bild           Expires June 1, 2019                  [Page 4]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -277,7 +277,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                  [Page 5]
+Beckwith & Bild           Expires June 1, 2019                  [Page 5]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -333,7 +333,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                  [Page 6]
+Beckwith & Bild           Expires June 1, 2019                  [Page 6]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -389,7 +389,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                  [Page 7]
+Beckwith & Bild           Expires June 1, 2019                  [Page 7]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -445,7 +445,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                  [Page 8]
+Beckwith & Bild           Expires June 1, 2019                  [Page 8]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -501,7 +501,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                  [Page 9]
+Beckwith & Bild           Expires June 1, 2019                  [Page 9]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -557,7 +557,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 10]
+Beckwith & Bild           Expires June 1, 2019                 [Page 10]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -613,7 +613,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 11]
+Beckwith & Bild           Expires June 1, 2019                 [Page 11]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -669,7 +669,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 12]
+Beckwith & Bild           Expires June 1, 2019                 [Page 12]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -725,7 +725,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 13]
+Beckwith & Bild           Expires June 1, 2019                 [Page 13]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -781,7 +781,7 @@ aead_struct<client_handshake_send_keys>(
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 14]
+Beckwith & Bild           Expires June 1, 2019                 [Page 14]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -837,7 +837,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 15]
+Beckwith & Bild           Expires June 1, 2019                 [Page 15]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -893,7 +893,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 16]
+Beckwith & Bild           Expires June 1, 2019                 [Page 16]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -949,7 +949,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 17]
+Beckwith & Bild           Expires June 1, 2019                 [Page 17]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1005,7 +1005,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 18]
+Beckwith & Bild           Expires June 1, 2019                 [Page 18]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1061,7 +1061,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 19]
+Beckwith & Bild           Expires June 1, 2019                 [Page 19]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1117,7 +1117,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 20]
+Beckwith & Bild           Expires June 1, 2019                 [Page 20]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1173,7 +1173,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 21]
+Beckwith & Bild           Expires June 1, 2019                 [Page 21]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1229,7 +1229,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 22]
+Beckwith & Bild           Expires June 1, 2019                 [Page 22]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1285,7 +1285,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 23]
+Beckwith & Bild           Expires June 1, 2019                 [Page 23]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1341,7 +1341,7 @@ Internet-Draft                     XTT                     November 2018
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 24]
+Beckwith & Bild           Expires June 1, 2019                 [Page 24]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1397,7 +1397,7 @@ A.1.2.  Server
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 25]
+Beckwith & Bild           Expires June 1, 2019                 [Page 25]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1453,7 +1453,7 @@ B.3.  Byte Arrays
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 26]
+Beckwith & Bild           Expires June 1, 2019                 [Page 26]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1509,7 +1509,7 @@ B.5.  Enumerateds
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 27]
+Beckwith & Bild           Expires June 1, 2019                 [Page 27]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1565,7 +1565,7 @@ B.7.  AEAD-Encrypted Constructed Types
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 28]
+Beckwith & Bild           Expires June 1, 2019                 [Page 28]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1621,7 +1621,7 @@ B.9.  Variants
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 29]
+Beckwith & Bild           Expires June 1, 2019                 [Page 29]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1677,7 +1677,7 @@ C.1.  Common Message Header
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 30]
+Beckwith & Bild           Expires June 1, 2019                 [Page 30]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1716,12 +1716,14 @@ C.2.1.  Signature Types
 C.2.2.  Server Certificates
 
    struct {
-       ClientID id;
-       byte expiry[8];   /* YYYYMMDD in UTC, as ASCII-encoded numbers */
+       byte reserved[24];
        byte root_id[16];       /* ServerRootCertificate to use */
        LongtermKey public_key;
        LongtermSignature root_signature;
    } ServerCertificate;
+
+   The client MUST NOT interpret the bytes in the "reserved" field of
+   the server certificate; it is for the server's use only.
 
 C.3.  Record Layer
 
@@ -1729,14 +1731,14 @@ C.3.  Record Layer
 
    uint32 SequenceNumber;
 
-   uint16 MsgLength;
 
 
-
-Beckwith & Bild           Expires May 30, 2019                 [Page 31]
+Beckwith & Bild           Expires June 1, 2019                 [Page 31]
 
 Internet-Draft                     XTT                     November 2018
 
+
+   uint16 MsgLength;
 
    enum : uint8 {
        queue_protocol(1),
@@ -1787,9 +1789,7 @@ D.4.  Cryptographic Requirements
 
 
 
-
-
-Beckwith & Bild           Expires May 30, 2019                 [Page 32]
+Beckwith & Bild           Expires June 1, 2019                 [Page 32]
 
 Internet-Draft                     XTT                     November 2018
 
@@ -1845,4 +1845,4 @@ Authors' Addresses
 
 
 
-Beckwith & Bild           Expires May 30, 2019                 [Page 33]
+Beckwith & Bild           Expires June 1, 2019                 [Page 33]
