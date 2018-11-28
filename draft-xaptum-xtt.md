@@ -1313,13 +1313,15 @@ byte DAASignature[<size of signature for this algorithm>];
 
 ~~~
 struct {
-    ClientID id;
-    byte expiry[8];   /* YYYYMMDD in UTC, as ASCII-encoded numbers */
+    byte reserved[24];
     byte root_id[16];       /* ServerRootCertificate to use */
     LongtermKey public_key;
     LongtermSignature root_signature;
 } ServerCertificate;
 ~~~
+
+The client MUST NOT interpret the bytes in the `reserved` field of the server certificate;
+it is for the server's use only.
 
 ## Record Layer
 
